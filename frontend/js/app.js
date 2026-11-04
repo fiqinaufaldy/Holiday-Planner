@@ -125,31 +125,54 @@ function auth(){
 }
 async function hydrateTripsFromCloud(){
  if(!window.HolidayPlannerCloud?.listTrips) throw new Error("Supabase Trips API belum tersedia.");
+ // Keep an immutable snapshot until cloud sync has definitely succeeded.
+ const localSnapshot=Array.isArray(db.trips)?db.trips.map(t=>({...t})):[];
+ const map={...(db.cloudTripMap||{})};
  const remote=await window.HolidayPlannerCloud.listTrips();
- const map=db.cloudTripMap||(db.cloudTripMap={});
- // First connection: offer a safe metadata-only migration of existing local trips.
- if(remote.length===0 && db.trips.length>0){
-  const localTrips=db.trips.slice();
-  const migrate=confirm("Database Supabase masih kosong. Impor " + localTrips.length + " trip lokal ke Supabase? Data detail trip tetap disimpan lokal untuk sementara.");
+ let cloudRows=remote.slice();
+ const remoteNames=new Set(cloudRows.map(t=>(t.name||"").trim().toLowerCase()));
+ const unmappedLocal=localSnapshot.filter(t=>!map[t.id]&&!cloudRows.some(r=>r.id===t.id));
+ const candidates=unmappedLocal.filter(t=>!remoteNames.has((t.name||"").trim().toLowerCase()));
+
+ // Offer migration only when there are local trips not already represented in Supabase.
+ if(candidates.length){
+  const migrate=confirm("Ditemukan " + candidates.length + " trip lokal yang belum ada di Supabase. Impor data dasar trip sekarang? Data detail tetap dipertahankan di browser untuk sementara.");
   if(migrate){
-   for(const t of localTrips){
-    const created=await window.HolidayPlannerCloud.createTrip({name:t.name,destination:t.destination,start:t.start,end:t.end,cover:t.cover,description:"Migrated from Holiday Planner local data"});
-    map[t.id]=created.id;
+   const createdMap={};
+   try{
+    for(const t of candidates){
+     const created=await window.HolidayPlannerCloud.createTrip({name:t.name,destination:t.destination,start:t.start,end:t.end,cover:t.cover,description:"Migrated from Holiday Planner local data"});
+     if(!created?.id) throw new Error("Supabase tidak mengembalikan ID untuk trip: "+t.name);
+     createdMap[t.id]=created.id;
+    }
+    Object.assign(map,createdMap);
+    cloudRows=await window.HolidayPlannerCloud.listTrips();
+   }catch(error){
+    // Do not replace or clear local data on any partial/failed import.
+    db.trips=localSnapshot; db.cloudTripMap=map; save();
+    throw new Error("Impor trip belum selesai. Data lokal tetap dipertahankan. Detail: "+(error?.message||error));
    }
-   save();
+  }else{
+   // Cancel means stay in local mode for these trips; never replace them with an empty cloud list.
+   db.trips=localSnapshot; db.cloudTripMap=map; save();
+   return;
   }
  }
- const latest=await window.HolidayPlannerCloud.listTrips();
- const old=db.trips.slice();
- const byCloudId=new Map(old.map(t=>[t.id,t]));
- const byName=new Map(old.map(t=>[(t.name||"").trim().toLowerCase(),t]));
- const next=latest.map(r=>{
+
+ // Merge cloud rows with local details; never discard local-only records.
+ const localById=new Map(localSnapshot.map(t=>[t.id,t]));
+ const localByCloudId=new Map(Object.entries(map).map(([localId,cloudId])=>[cloudId,localById.get(localId)]).filter(([,v])=>!!v));
+ const localByName=new Map(localSnapshot.map(t=>[(t.name||"").trim().toLowerCase(),t]));
+ const merged=cloudRows.map(r=>{
   const localId=Object.keys(map).find(k=>map[k]===r.id);
-  const existing=byCloudId.get(r.id)|| (localId?byCloudId.get(localId):null) || byName.get((r.name||"").trim().toLowerCase()) || {};
-  if(existing.id && existing.id!==r.id) map[existing.id]=r.id;
-  return {...existing,id:r.id,name:r.name,destination:r.destination||"",start:r.start_date||"",end:r.end_date||"",cover:r.cover_image_url||existing.cover||"",description:r.description||"",status:r.status||"planning",participants:existing.participants||[],budget:existing.budget||[],cashflow:existing.cashflow||[],stays:existing.stays||[],destinations:existing.destinations||[],itinerary:existing.itinerary||[]};
+  const existing=localById.get(r.id)||localByCloudId.get(r.id)||(localId?localById.get(localId):null)||localByName.get((r.name||"").trim().toLowerCase())||{};
+  if(existing.id&&existing.id!==r.id)map[existing.id]=r.id;
+  return {...existing,id:r.id,name:r.name,destination:r.destination||existing.destination||"",start:r.start_date||existing.start||"",end:r.end_date||existing.end||"",cover:r.cover_image_url||existing.cover||"",description:r.description||existing.description||"",status:r.status||existing.status||"planning",participants:existing.participants||[],budget:existing.budget||[],income:existing.income||[],cashflow:existing.cashflow||[],stays:existing.stays||[],destinations:existing.destinations||[],itinerary:existing.itinerary||[]};
  });
- db.trips=next;
+ const represented=new Set(merged.map(t=>t.id));
+ const cloudMappedLocalIds=new Set(Object.keys(map));
+ const localOnly=localSnapshot.filter(t=>!cloudMappedLocalIds.has(t.id)&&!represented.has(t.id)&&!cloudRows.some(r=>(r.name||"").trim().toLowerCase()===(t.name||"").trim().toLowerCase()));
+ db.trips=[...merged,...localOnly];
  db.cloudTripMap=map;
  save();
 }
