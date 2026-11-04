@@ -81,6 +81,10 @@ function queueCloudWorkspaceSave(t){
  const timer=cloudSaveTimers.get(t.id);if(timer)clearTimeout(timer);
  cloudSaveTimers.set(t.id,setTimeout(async()=>{
   try{const snapshot=JSON.parse(JSON.stringify(t));delete snapshot.pin;
+   // Keep public.trips card metadata in sync with edits saved in the workspace.
+   if(window.HolidayPlannerCloud.updateTrip){
+    await window.HolidayPlannerCloud.updateTrip(t.id,{name:t.name,destination:t.destination,start:t.start,end:t.end,cover:t.cover,description:t.description,status:t.status});
+   }
    await window.HolidayPlannerCloud.saveTripWorkspace(t.id,snapshot);
    window.dispatchEvent(new CustomEvent("holidayplanner:cloud-saved",{detail:{tripId:t.id}}));
   }catch(error){console.error("Holiday Planner cloud save failed:",error);toast("Gagal menyimpan ke cloud: "+(error.message||"periksa koneksi"));}
