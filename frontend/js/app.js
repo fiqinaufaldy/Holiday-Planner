@@ -123,6 +123,36 @@ function auth(){
  const identity=$("#memberIdentity");if(identity)identity.remove();
  $("#pin").focus();
 }
+async function hydrateTripsFromCloud(){
+ if(!window.HolidayPlannerCloud?.listTrips) throw new Error("Supabase Trips API belum tersedia.");
+ const remote=await window.HolidayPlannerCloud.listTrips();
+ const map=db.cloudTripMap||(db.cloudTripMap={});
+ // First connection: offer a safe metadata-only migration of existing local trips.
+ if(remote.length===0 && db.trips.length>0){
+  const localTrips=db.trips.slice();
+  const migrate=confirm("Database Supabase masih kosong. Impor " + localTrips.length + " trip lokal ke Supabase? Data detail trip tetap disimpan lokal untuk sementara.");
+  if(migrate){
+   for(const t of localTrips){
+    const created=await window.HolidayPlannerCloud.createTrip({name:t.name,destination:t.destination,start:t.start,end:t.end,cover:t.cover,description:"Migrated from Holiday Planner local data"});
+    map[t.id]=created.id;
+   }
+   save();
+  }
+ }
+ const latest=await window.HolidayPlannerCloud.listTrips();
+ const old=db.trips.slice();
+ const byCloudId=new Map(old.map(t=>[t.id,t]));
+ const byName=new Map(old.map(t=>[(t.name||"").trim().toLowerCase(),t]));
+ const next=latest.map(r=>{
+  const localId=Object.keys(map).find(k=>map[k]===r.id);
+  const existing=byCloudId.get(r.id)|| (localId?byCloudId.get(localId):null) || byName.get((r.name||"").trim().toLowerCase()) || {};
+  if(existing.id && existing.id!==r.id) map[existing.id]=r.id;
+  return {...existing,id:r.id,name:r.name,destination:r.destination||"",start:r.start_date||"",end:r.end_date||"",cover:r.cover_image_url||existing.cover||"",description:r.description||"",status:r.status||"planning",participants:existing.participants||[],budget:existing.budget||[],cashflow:existing.cashflow||[],stays:existing.stays||[],destinations:existing.destinations||[],itinerary:existing.itinerary||[]};
+ });
+ db.trips=next;
+ db.cloudTripMap=map;
+ save();
+}
 async function enter(pin){
  activeAdmin=null;memberName="";
  if(/^\d{6}$/.test(pin) && window.HolidayPlannerCloud?.loginWithPin){
@@ -131,7 +161,7 @@ async function enter(pin){
   try{
    const result=await window.HolidayPlannerCloud.loginWithPin(pin);
    if(result?.profile?.role!=="master")throw new Error("Akun ini belum memiliki akses Master.");
-   mode="master";tripId=null;page="All Trips";showApp();return;
+   mode="master";tripId=null;page="All Trips";await hydrateTripsFromCloud();showApp();return;
   }catch(error){err(error.message||"PIN tidak sesuai. Coba lagi.");return;}
   finally{if(loginBtn){loginBtn.disabled=false;loginBtn.textContent="Continue →";}}
  }
@@ -580,9 +610,31 @@ function general(t){
  <section class="section plan-settings"><h2>Plan Settings</h2><p>Atur Plan A dan Plan B untuk membandingkan pemasukan dan pengeluaran. Minimal satu plan harus aktif.</p><div class="plan-settings-grid">${t.plans.map(p=>`<article class="plan-setting-card"><label class="plan-enable"><input type="checkbox" data-plan-enabled="${p.id}" ${p.enabled?"checked":""} ${ro}><span>Enable ${esc(p.name)}</span></label><label>Plan name<input data-plan-name="${p.id}" value="${esc(p.name)}" ${ro}></label><small>${p.enabled?"Available":"Disabled"}</small></article>`).join("")}</div><div class="plan-default-row"><label>Default plan<select id="defaultPlan" ${ro}>${t.plans.filter(p=>p.enabled).map(p=>`<option value="${p.id}" ${p.id===t.activePlanId?"selected":""}>${esc(p.name)}</option>`).join("")}</select></label>${mode==="member"?"":'<button class="primary" id="savePlans">Save plan settings</button>'}</div></section>`;
 }
 function openTrip(){if(mode!=="master")return;editingTripId=null;$("#tripForm").reset();$("#tripModal").showModal()}
-$("#tripForm").onsubmit=e=>{e.preventDefault();if(mode!=="master")return toast("Master Access required.");let f=Object.fromEntries(new FormData(e.target));if(!/^\\d{6}$/.test(f.pin))return toast("Trip PIN harus 6 digit.");if(db.trips.some(t=>t.pin===f.pin&&t.id!==editingTripId))return toast("PIN sudah digunakan trip lain.");if(editingTripId){let t=db.trips.find(x=>x.id===editingTripId);Object.assign(t,{name:f.name,destination:f.destination,start:f.start,end:f.end,pin:f.pin,cover:f.cover||t.cover||""});}else{let id="trip_"+Date.now();const fresh={...f,id,participants:[],budget:[],cashflow:[],stays:[],destinations:[],itinerary:[]};ensurePlans(fresh);db.trips.push(fresh);}save();$("#tripModal").close();e.target.reset();editingTripId=null;page="All Trips";showApp();toast("Trip saved")};
+$("#tripForm").onsubmit=async e=>{
+ e.preventDefault();
+ if(mode!=="master")return toast("Master Access required.");
+ const form=e.target, f=Object.fromEntries(new FormData(form));
+ if(!/^\d{6}$/.test(f.pin))return toast("Trip PIN harus 6 digit.");
+ if(db.trips.some(t=>t.pin===f.pin&&t.id!==editingTripId))return toast("PIN sudah digunakan trip lain.");
+ const submit=form.querySelector('button[type="submit"]')||form.querySelector('button.primary');
+ if(submit){submit.disabled=true;submit.textContent="Saving…";}
+ try{
+  if(editingTripId){
+   const t=db.trips.find(x=>x.id===editingTripId);
+   if(!t)throw new Error("Trip tidak ditemukan.");
+   const updated=await window.HolidayPlannerCloud.updateTrip(t.id,{name:f.name,destination:f.destination,start:f.start,end:f.end,cover:f.cover||t.cover||""});
+   Object.assign(t,{name:updated.name,destination:updated.destination||"",start:updated.start_date||"",end:updated.end_date||"",cover:updated.cover_image_url||"",pin:f.pin});
+  }else{
+   const created=await window.HolidayPlannerCloud.createTrip({name:f.name,destination:f.destination,start:f.start,end:f.end,cover:f.cover||""});
+   const fresh={...f,id:created.id,name:created.name,destination:created.destination||"",start:created.start_date||"",end:created.end_date||"",cover:created.cover_image_url||"",participants:[],budget:[],cashflow:[],stays:[],destinations:[],itinerary:[]};
+   ensurePlans(fresh);db.trips.push(fresh);
+  }
+  save();$("#tripModal").close();form.reset();editingTripId=null;page="All Trips";showApp();toast("Trip saved to Supabase");
+ }catch(error){toast(error.message||"Gagal menyimpan trip ke Supabase.");}
+ finally{if(submit){submit.disabled=false;submit.textContent="Create Trip";}}
+};
 $("#cancelTrip").onclick=()=>$("#tripModal").close();
-document.addEventListener("click",e=>{let b=e.target.closest("button");if(!b)return;
+document.addEventListener("click",async e=>{let b=e.target.closest("button");if(!b)return;
 if(b.hasAttribute("data-villa-prev")){setVillaGallery(villaGalleryIndex-1);return;}
 if(b.hasAttribute("data-villa-next")){setVillaGallery(villaGalleryIndex+1);return;}
 if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
@@ -598,7 +650,7 @@ if(b.dataset.removeadmin){if(mode!=="master")return;db.admins=db.admins.filter(a
 
 
 if(isMemberViewOnly() && (b.id==="newTrip" || b.id==="addParticipant" || b.id==="addBudget" || b.id==="addCashflow" || b.id==="addVilla" || b.id==="addDestination" || b.id==="addItinerary"))return toast("Member Access hanya untuk melihat data.");
-if(b.id==="newTrip")openTrip();if(b.dataset.open){tripId=b.dataset.open;if(mode==="master"||assignedTrips().some(t=>t.id===tripId)){page="Dashboard";pendingTripWelcome=true;showApp()}else toast("Trip access denied.")}if(b.dataset.edittrip){let t=db.trips.find(x=>x.id===b.dataset.edittrip);if(t){editingTripId=t.id;let f=$("#tripForm");f.elements.name.value=t.name;f.elements.destination.value=t.destination;f.elements.start.value=t.start;f.elements.end.value=t.end;f.elements.pin.value=t.pin||"";f.elements.cover.value=t.cover||"";$("#tripModal").showModal();}}if(b.dataset.deltrip){if(confirm("Delete this trip and all its data?")){db.trips=db.trips.filter(t=>t.id!==b.dataset.deltrip);save();render()}}if(b.id==="saveAdmin"){let p=$("#adminPin").value;if(p&&!/^\d{6}$/.test(p))return toast("Master PIN harus 6 digit.");db.admin.name=$("#adminName").value||"Fiqi Naufaldy";if(p)db.admin.pin=p;save();updateSidebarProfile();settings();toast("Settings saved")}if(b.id==="export"){let payload,filename;if(mode==="admin"){const a=db.admins.find(x=>x.id===activeAdmin);if(!a)return toast("Admin account not found.");payload={app:"Holiday Planner",format:"holiday-planner-backup",version:2,scope:"admin-assigned",adminId:activeAdmin,createdAt:new Date().toISOString(),trips:assignedTrips()};filename="holiday-planner-admin-backup.json";}else{payload={app:"Holiday Planner",format:"holiday-planner-backup",version:2,scope:"master-full",createdAt:new Date().toISOString(),...db};filename="holiday-planner-master-backup.json";}const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}if(b.id==="import")$("#backupFile").click();if(b.id==="saveGeneral"){
+if(b.id==="newTrip")openTrip();if(b.dataset.open){tripId=b.dataset.open;if(mode==="master"||assignedTrips().some(t=>t.id===tripId)){page="Dashboard";pendingTripWelcome=true;showApp()}else toast("Trip access denied.")}if(b.dataset.edittrip){let t=db.trips.find(x=>x.id===b.dataset.edittrip);if(t){editingTripId=t.id;let f=$("#tripForm");f.elements.name.value=t.name;f.elements.destination.value=t.destination;f.elements.start.value=t.start;f.elements.end.value=t.end;f.elements.pin.value=t.pin||"";f.elements.cover.value=t.cover||"";$("#tripModal").showModal();}}if(b.dataset.deltrip){if(confirm("Delete this trip and all its data?")){const id=b.dataset.deltrip;try{await window.HolidayPlannerCloud.deleteTrip(id);db.trips=db.trips.filter(t=>t.id!==id);if(db.cloudTripMap)for(const k of Object.keys(db.cloudTripMap))if(db.cloudTripMap[k]===id)delete db.cloudTripMap[k];save();render();toast("Trip deleted from Supabase")}catch(error){toast(error.message||"Gagal menghapus trip.")}}}if(b.id==="saveAdmin"){let p=$("#adminPin").value;if(p&&!/^\d{6}$/.test(p))return toast("Master PIN harus 6 digit.");db.admin.name=$("#adminName").value||"Fiqi Naufaldy";if(p)db.admin.pin=p;save();updateSidebarProfile();settings();toast("Settings saved")}if(b.id==="export"){let payload,filename;if(mode==="admin"){const a=db.admins.find(x=>x.id===activeAdmin);if(!a)return toast("Admin account not found.");payload={app:"Holiday Planner",format:"holiday-planner-backup",version:2,scope:"admin-assigned",adminId:activeAdmin,createdAt:new Date().toISOString(),trips:assignedTrips()};filename="holiday-planner-admin-backup.json";}else{payload={app:"Holiday Planner",format:"holiday-planner-backup",version:2,scope:"master-full",createdAt:new Date().toISOString(),...db};filename="holiday-planner-master-backup.json";}const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}if(b.id==="import")$("#backupFile").click();if(b.id==="saveGeneral"){
  const t=trip();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");
  t.name=$("#gName").value.trim()||t.name;
  t.destination=$("#gDestination").value.trim();t.start=$("#gStart").value;t.end=$("#gEnd").value;
