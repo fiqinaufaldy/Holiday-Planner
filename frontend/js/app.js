@@ -73,7 +73,20 @@ save();
 if(!Array.isArray(db.trips)) db.trips=seed.trips;
 
 function load(){try{return JSON.parse(localStorage.getItem(store))||seed}catch{return seed}}
-function save(){localStorage.setItem(store,JSON.stringify(db))}
+let cloudSyncReady=false;
+const cloudSaveTimers=new Map();
+function queueCloudWorkspaceSave(t){
+ if(!cloudSyncReady||!t?.id||!window.HolidayPlannerCloud?.saveTripWorkspace)return;
+ const timer=cloudSaveTimers.get(t.id);if(timer)clearTimeout(timer);
+ cloudSaveTimers.set(t.id,setTimeout(async()=>{
+  try{const snapshot=JSON.parse(JSON.stringify(t));delete snapshot.pin;
+   await window.HolidayPlannerCloud.saveTripWorkspace(t.id,snapshot);
+   window.dispatchEvent(new CustomEvent("holidayplanner:cloud-saved",{detail:{tripId:t.id}}));
+  }catch(error){console.error("Holiday Planner cloud save failed:",error);toast("Gagal menyimpan ke cloud: "+(error.message||"periksa koneksi"));}
+  finally{cloudSaveTimers.delete(t.id);}
+ },450));
+}
+function save(){localStorage.setItem(store,JSON.stringify(db));if(cloudSyncReady&&Array.isArray(db.trips))db.trips.forEach(queueCloudWorkspaceSave)}
 function money(n){return "Rp "+Number(n||0).toLocaleString("id-ID")}
 function date(s){return s?new Date(s+"T00:00:00").toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"}):"—"}
 function esc(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -174,6 +187,13 @@ async function hydrateTripsFromCloud(){
  const localOnly=localSnapshot.filter(t=>!cloudMappedLocalIds.has(t.id)&&!represented.has(t.id)&&!cloudRows.some(r=>(r.name||"").trim().toLowerCase()===(t.name||"").trim().toLowerCase()));
  db.trips=[...merged,...localOnly];
  db.cloudTripMap=map;
+ // Restore complete per-trip workspace snapshots from Supabase before enabling cloud writes.
+ for(const item of db.trips){
+  if(!cloudRows.some(r=>r.id===item.id))continue;
+  try{const payload=await window.HolidayPlannerCloud.loadTripWorkspace(item.id);if(payload&&typeof payload==="object")Object.assign(item,payload,{id:item.id,name:item.name,destination:item.destination,start:item.start,end:item.end,cover:item.cover});}
+  catch(error){console.warn("Workspace load skipped for",item.name,error);}
+ }
+ cloudSyncReady=true;
  save();
 }
 async function enter(pin){
