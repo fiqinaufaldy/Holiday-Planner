@@ -6,6 +6,9 @@ const seed={admin:{name:"Fiqi Naufaldy",pin:"240225"},trips:[
 ]};
 let db=load(),mode="",tripId=null,page="All Trips",editingTripId=null,activeAdmin=null,memberName="",pendingTripWelcome=false;
 let activePlanId="plan_a";
+// Initialize cloud sync state before the first save() call.
+let cloudSyncReady=false;
+const cloudSaveTimers=new Map();
 function ensurePlans(t){
  if(!t.plans){
   t.plans=[
@@ -73,8 +76,6 @@ save();
 if(!Array.isArray(db.trips)) db.trips=seed.trips;
 
 function load(){try{return JSON.parse(localStorage.getItem(store))||seed}catch{return seed}}
-let cloudSyncReady=false;
-const cloudSaveTimers=new Map();
 function queueCloudWorkspaceSave(t){
  if(!cloudSyncReady||!t?.id||!window.HolidayPlannerCloud?.saveTripWorkspace)return;
  const timer=cloudSaveTimers.get(t.id);if(timer)clearTimeout(timer);
