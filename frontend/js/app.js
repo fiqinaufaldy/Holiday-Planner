@@ -123,14 +123,19 @@ function auth(){
  const identity=$("#memberIdentity");if(identity)identity.remove();
  $("#pin").focus();
 }
-function enter(pin){
+async function enter(pin){
  activeAdmin=null;memberName="";
- if(pin===db.admin.pin){mode="master";tripId=null;page="All Trips";showApp();return}
- const admin=db.admins.find(a=>a.pin===pin);
- if(admin){mode="admin";activeAdmin=admin.id;tripId=null;page="Assigned Trips";showApp();return}
- const t=db.trips.find(x=>x.pin&&x.pin===pin);
- if(t){mode="member";tripId=t.id;memberName="Member";page="Dashboard";pendingTripWelcome=true;showApp();return}
- err("PIN tidak sesuai. Coba lagi.");
+ if(/^\d{6}$/.test(pin) && window.HolidayPlannerCloud?.loginWithPin){
+  const loginBtn=document.querySelector("#loginBtn");
+  if(loginBtn){loginBtn.disabled=true;loginBtn.textContent="Connecting…";}
+  try{
+   const result=await window.HolidayPlannerCloud.loginWithPin(pin);
+   if(result?.profile?.role!=="master")throw new Error("Akun ini belum memiliki akses Master.");
+   mode="master";tripId=null;page="All Trips";showApp();return;
+  }catch(error){err(error.message||"PIN tidak sesuai. Coba lagi.");return;}
+  finally{if(loginBtn){loginBtn.disabled=false;loginBtn.textContent="Continue →";}}
+ }
+ err("Layanan login Supabase belum siap. Muat ulang halaman dan coba lagi.");
 }
 function err(s){$("#loginError").textContent=s}
 window.holidayPlannerLogin=()=>enter(document.querySelector("#pin").value.trim());
