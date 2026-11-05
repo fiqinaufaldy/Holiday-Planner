@@ -118,7 +118,7 @@ const plannerOriginalTextNodes = new WeakMap();
 const plannerOriginalAttributes = new WeakMap();
 function applyPlannerLanguage(){
  const pairs=[...languagePairs].sort((a,b)=>Math.max(b[0].length,b[1].length)-Math.max(a[0].length,a[1].length));
- const replaceText=s=>{let out=s;for(const [en,id] of pairs){const from=plannerLanguage==="id"?en:id,to=plannerLanguage==="id"?id:en;if(from&&out.includes(from))out=out.split(from).join(to);}return out;};
+ const replaceText=s=>{let out=s;for(const [en,id] of pairs){const from=plannerLanguage==="id"?en:id,to=plannerLanguage==="id"?id:en;if(!from)continue;const escaped=from.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");out=out.replace(new RegExp(`(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`,"gu"),`$1${to}`);}return out;};
  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;
  while(node=walker.nextNode()){
   const el=node.parentElement;if(!el||el.closest("input,textarea,script,style,code,[contenteditable='true']"))continue;
@@ -721,8 +721,6 @@ $("#backupFile").onchange=async e=>{try{const file=e.target.files&&e.target.file
 if($("#lock"))$("#lock").onclick=auth;$("#brandHome").onclick=e=>{e.preventDefault();if(mode==="master"){page="All Trips";render()}};
 auth();
 // Translate newly rendered UI after user interactions without observing DOM mutations.
-document.addEventListener("click",()=>queueMicrotask(()=>applyPlannerLanguage()));
-document.addEventListener("change",()=>queueMicrotask(()=>applyPlannerLanguage()));
 })();
 let villaTouchStartX=0;
 document.addEventListener("touchstart",e=>{if(e.target.closest(".villa-gallery"))villaTouchStartX=e.changedTouches[0].clientX;},{passive:true});
