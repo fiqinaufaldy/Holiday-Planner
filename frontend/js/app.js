@@ -288,6 +288,19 @@ function showApp(){
    }
    mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n}</span></button>`).join("");
    mobileNav.classList.toggle("is-visible",items.length>0&&!pendingTripWelcome);
+   if(window.innerWidth<=820 && items.length){
+     mobileNav.style.display="grid";
+     mobileNav.style.gridTemplateColumns=`repeat(${items.length},minmax(0,1fr))`;
+     mobileNav.style.gridTemplateRows="1fr";
+     mobileNav.style.gridAutoFlow="column";
+     mobileNav.style.flexDirection="initial";
+     mobileNav.querySelectorAll("button").forEach(btn=>{
+       btn.style.display="flex";
+       btn.style.flexDirection="column";
+       btn.style.alignItems="center";
+       btn.style.justifyContent="center";
+     });
+   }
  }
  if(pendingTripWelcome&&tripId){document.body.classList.add("trip-welcome-mode");renderTripWelcome();return;}
  document.body.classList.remove("trip-welcome-mode");

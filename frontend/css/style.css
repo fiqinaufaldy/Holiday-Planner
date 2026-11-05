@@ -1035,3 +1035,51 @@ body[data-theme="dark"] .backup-actions button:not(.primary){background:#1b2a40;
     grid-template-columns:repeat(4,minmax(0,1fr))!important;
   }
 }
+
+
+/* FINAL MOBILE BOTTOM NAV: four items in one row; icon above label. */
+@media (max-width:820px){
+  #mobileNav.is-visible{
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    grid-template-rows:1fr !important;
+    grid-auto-flow:column !important;
+    flex-direction:initial !important;
+    align-items:stretch !important;
+    justify-items:stretch !important;
+    width:auto !important;
+    height:64px !important;
+    min-height:64px !important;
+    max-height:64px !important;
+    overflow:hidden !important;
+  }
+  #mobileNav.is-visible > button{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:auto !important;
+    min-width:0 !important;
+    height:54px !important;
+    min-height:54px !important;
+    margin:0 !important;
+    padding:4px 2px !important;
+    gap:3px !important;
+  }
+  #mobileNav.is-visible > button .hp-icon{
+    display:block !important;
+    flex:0 0 18px !important;
+    width:18px !important;
+    height:18px !important;
+  }
+  #mobileNav.is-visible > button > span{
+    display:block !important;
+    width:100% !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+    word-break:normal !important;
+    overflow-wrap:normal !important;
+    font-size:8px !important;
+    line-height:1 !important;
+  }
+}
