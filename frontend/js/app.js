@@ -707,13 +707,16 @@ function hpIcon(name){
  };
  return `<svg class="hp-icon" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.more}</svg>`;
 }
+function mobileDashboardMenu(){
+ const items=[['General','settings'],['Participants','users'],['Income Planning','income'],['Expense Planning','wallet'],['Cash Flow','chart'],['Villas & Stay','bed'],['Destinations','pin'],['Itinerary','calendar']];
+ return `<section class="mobile-dashboard-menu"><div class="mobile-dashboard-menu-grid">${items.map(([n,ic])=>`<button type="button" data-page="${n}"><span class="menu-icon ${ic}">${hpIcon(ic)}</span><span>${n}</span></button>`).join("")}</div></section>`;
+}
 function dashboard(t){
  const budget=(t.budget||[]).reduce((a,x)=>a+Number(x.amount||0),0);
  const spent=(t.cashflow||[]).filter(x=>x.type==="Expense").reduce((a,x)=>a+Number(x.amount||0),0);
  const pct=budget?Math.min(100,spent/budget*100):0;
  const people=t.participants||[], confirmed=people.filter(x=>x.status==="Confirmed").length, pending=people.filter(x=>x.status==="Pending").length, notJoining=people.filter(x=>x.status==="Not Joining").length;
  const next=(t.itinerary||[]).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];
- const menu=[["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]];
  const cover=t.cover||"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1400&q=85";
  const tripDate=`${date(t.start)} – ${date(t.end)}`;
  $("#content").innerHTML=`
@@ -723,7 +726,7 @@ function dashboard(t){
    <div class="mobile-trip-stats"><div><span>${hpIcon("users")}</span><small>Total<br>Participants</small><b>${people.length} People</b></div><div><span>${hpIcon("users")}</span><small>Confirmed</small><b>${confirmed} People</b></div><div><span>${hpIcon("users")}</span><small>Pending</small><b>${pending} People</b></div><div><span>${hpIcon("users")}</span><small>Not Joining</small><b>${notJoining} People</b></div></div>
    <div class="mobile-trip-actions"><button type="button" data-page="Participants">${hpIcon("users")} ${people.length} Participants <b>›</b></button><button type="button" class="photo-action">◉ Ganti Foto</button></div>
  </section>
- <section class="mobile-dashboard-menu"><div class="mobile-dashboard-menu-grid">${menu.map(([n,ic])=>`<button type="button" data-page="${n}"><span class="menu-icon ${ic}">${hpIcon(ic)}</span><span>${n}</span></button>`).join("")}</div></section>
+ ${mobileDashboardMenu()}
  <section class="mobile-dashboard-cards">
    <article class="mobile-dashboard-card"><div class="card-head"><h3>${hpIcon("chart")} Budget Overview</h3><b>›</b></div><small>Plan A</small><p><strong>${money(spent)}</strong> / ${money(budget)}</p><div class="mini-progress"><i style="width:${pct}%"></i></div><span>${pct.toFixed(0)}%</span></article>
    <article class="mobile-dashboard-card"><div class="card-head"><h3>${hpIcon("calendar")} Upcoming Itinerary</h3><b>›</b></div>${next?`<div class="upcoming-row"><div class="upcoming-thumb" style="background-image:url('${esc(cover)}')"></div><div><strong>${esc(next.title||next.activity||"Upcoming trip")}</strong><small>${esc(next.place||next.location||"")}</small></div><em>${next.date?date(next.date):"—"}</em></div>`:`<p class="muted">No itinerary added yet.</p>`}</article>
