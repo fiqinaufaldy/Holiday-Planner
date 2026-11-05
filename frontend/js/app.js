@@ -268,8 +268,15 @@ function showApp(){
  $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("back")}<span>Log out</span></button>`;
  const mobileNav=$("#mobileNav");
  if(mobileNav){
-   const items=mode==="master"?[]:[["Dashboard","home"],["Expense Planning","wallet"],["Participants","users"],["Villas & Stay","bed"],["More","more"]];
-   mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n==="More"?(plannerLanguage==="id"?"Lainnya":"More"):n}</span></button>`).join("");
+   let items=[];
+   if(tripId){
+     items=[["Dashboard","home"],["Expense Planning","wallet"],["Participants","users"],["Villas & Stay","bed"],["More","more"]];
+   }else if(mode==="admin"){
+     items=[["Assigned Trips","grid"],["Settings","settings"]];
+   }else if(mode==="master"){
+     items=[["All Trips","grid"],["Create Trip","plus"],["Access Management","users"],["Settings","settings"]];
+   }
+   mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n}</span></button>`).join("");
    mobileNav.classList.toggle("is-visible",items.length>0&&!pendingTripWelcome);
  }
  if(pendingTripWelcome&&tripId){document.body.classList.add("trip-welcome-mode");renderTripWelcome();return;}
@@ -348,8 +355,8 @@ function render(){
 
 function assignedTripsPage(){
  page="Assigned Trips";pageHead("Assigned Trips","Trips assigned to your Admin account.");
- const cards=assignedTrips().map(t=>`<article class="trip"><div class="cover" style="background-image:url('${esc(t.cover||"")}')"></div><div class="tripbody"><h3>${esc(t.name)}</h3><p>◎ ${esc(t.destination)}</p><p>${date(t.start)} – ${date(t.end)}</p><div class="actions"><button class="primary" data-open="${t.id}">Manage trip</button></div></div></article>`).join("");
- $("#content").innerHTML=`<div class="toolbar"><div><h2>My Assigned Trips</h2><p>Only trips assigned by Master are available here.</p></div></div><div class="grid">${cards||'<div class="empty">Belum ada trip yang ditugaskan.</div>'}</div>`;
+ const cards=assignedTrips().map(t=>`<article class="trip assigned-trip-card"><div class="cover" style="background-image:url('${esc(t.cover||"")}')"></div><div class="tripbody"><h3>${esc(t.name)}</h3><p>⌖ ${esc(t.destination||"—")}</p><p>${date(t.start)} – ${date(t.end)}</p><div class="actions"><button class="primary" data-open="${t.id}">Manage trip</button></div></div></article>`).join("");
+ $("#content").innerHTML=`<div class="assigned-trips-page"><div class="assigned-trips-heading"><h2>My Assigned Trips</h2><p>Only trips assigned by Master are available here.</p></div><div class="grid">${cards||'<div class="empty">Belum ada trip yang ditugaskan.</div>'}</div></div>`;
 }
 function accessManagement(){
  page="Access Management";pageHead("Access Management","Create Admin accounts and control which trips they can manage.");

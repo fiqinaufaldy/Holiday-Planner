@@ -867,3 +867,56 @@ body[data-theme="dark"] .backup-actions button:not(.primary){background:#1b2a40;
 @media(max-width:390px){
  .mobile-trip-hero{min-height:194px}.mobile-trip-hero-top h2{font-size:18px}.mobile-trip-stats small{font-size:6.5px}.mobile-trip-stats b{font-size:8px}.mobile-dashboard-menu-grid{gap:10px 4px}.mobile-dashboard-menu-grid .menu-icon{width:34px;height:34px}.mobile-dashboard-menu-grid button{font-size:8px}.mobile-more-grid button{font-size:9px}
 }
+
+/* MOBILE ROLE-AWARE NAVIGATION + ASSIGNED TRIPS */
+@media(max-width:700px){
+  /* Navigation is contextual: trip modules only appear when a trip is open. */
+  #mobileNav.is-visible{grid-template-columns:repeat(5,minmax(0,1fr));}
+  #mobileNav.is-visible:has(button:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,120px));justify-content:center;gap:10px}
+  #mobileNav.is-visible:has(button:nth-child(4):last-child){grid-template-columns:repeat(4,minmax(0,1fr));}
+  #mobileNav button span{white-space:normal!important;text-align:center!important;max-width:82px!important;overflow-wrap:normal!important;word-break:normal!important}
+
+  .assigned-trips-page{padding-top:0}
+  .assigned-trips-heading{margin:0 0 20px}
+  .assigned-trips-heading h2{margin:0 0 7px;font:600 25px/1.1 'Playfair Display',serif}
+  .assigned-trips-heading p{margin:0;font-size:9px;line-height:1.45;color:#7d857f}
+  .assigned-trips-page .grid{display:grid;grid-template-columns:1fr;gap:13px;margin:0}
+  .assigned-trips-page .assigned-trip-card{border-radius:12px;overflow:hidden;box-shadow:none;background:#fffdfa;border:1px solid #dfe5dd}
+  .assigned-trips-page .assigned-trip-card .cover{height:104px;background-position:center}
+  .assigned-trips-page .assigned-trip-card .tripbody{padding:11px 12px 12px}
+  .assigned-trips-page .assigned-trip-card h3{font:600 15px/1.15 'Playfair Display',serif;margin:0 0 6px}
+  .assigned-trips-page .assigned-trip-card p{font-size:8px;margin:4px 0;color:#7b827c}
+  .assigned-trips-page .assigned-trip-card .actions{margin-top:9px}
+  .assigned-trips-page .assigned-trip-card .actions .primary{padding:7px 10px;border-radius:6px;font-size:8px}
+  html[data-theme="dark"] .assigned-trips-page .assigned-trip-card,
+  body[data-theme="dark"] .assigned-trips-page .assigned-trip-card{background:#142238;border-color:#30445e;color:#eee8df}
+  html[data-theme="dark"] .assigned-trips-heading h2,
+  body[data-theme="dark"] .assigned-trips-heading h2{color:#eee8df}
+  html[data-theme="dark"] .assigned-trips-heading p,
+  body[data-theme="dark"] .assigned-trips-heading p{color:#9eacbb}
+  html[data-theme="dark"] .assigned-trips-page .assigned-trip-card p,
+  body[data-theme="dark"] .assigned-trips-page .assigned-trip-card p{color:#aab5c3}
+}
+
+/* MOBILE CONTEXTUAL NAV + ASSIGNED TRIPS */
+@media(max-width:700px){
+  #mobileNav.is-visible:has(button:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,120px));justify-content:center;gap:10px}
+  #mobileNav.is-visible:has(button:nth-child(4):last-child){grid-template-columns:repeat(4,minmax(0,1fr));}
+  #mobileNav button span{white-space:normal!important;text-align:center!important;max-width:82px!important;overflow-wrap:normal!important;word-break:normal!important}
+  .assigned-trips-page{padding-top:0}
+  .assigned-trips-heading{margin:0 0 20px}
+  .assigned-trips-heading h2{margin:0 0 7px;font:600 25px/1.1 'Playfair Display',serif}
+  .assigned-trips-heading p{margin:0;font-size:9px;line-height:1.45;color:#7d857f}
+  .assigned-trips-page .grid{display:grid;grid-template-columns:1fr;gap:13px;margin:0}
+  .assigned-trips-page .assigned-trip-card{border-radius:12px;overflow:hidden;box-shadow:none;background:#fffdfa;border:1px solid #dfe5dd}
+  .assigned-trips-page .assigned-trip-card .cover{height:104px;background-position:center}
+  .assigned-trips-page .assigned-trip-card .tripbody{padding:11px 12px 12px}
+  .assigned-trips-page .assigned-trip-card h3{font:600 15px/1.15 'Playfair Display',serif;margin:0 0 6px}
+  .assigned-trips-page .assigned-trip-card p{font-size:8px;margin:4px 0;color:#7b827c}
+  .assigned-trips-page .assigned-trip-card .actions{margin-top:9px}
+  .assigned-trips-page .assigned-trip-card .actions .primary{padding:7px 10px;border-radius:6px;font-size:8px}
+  html[data-theme="dark"] .assigned-trips-page .assigned-trip-card,body[data-theme="dark"] .assigned-trips-page .assigned-trip-card{background:#142238;border-color:#30445e;color:#eee8df}
+  html[data-theme="dark"] .assigned-trips-heading h2,body[data-theme="dark"] .assigned-trips-heading h2{color:#eee8df}
+  html[data-theme="dark"] .assigned-trips-heading p,body[data-theme="dark"] .assigned-trips-heading p{color:#9eacbb}
+  html[data-theme="dark"] .assigned-trips-page .assigned-trip-card p,body[data-theme="dark"] .assigned-trips-page .assigned-trip-card p{color:#aab5c3}
+}
