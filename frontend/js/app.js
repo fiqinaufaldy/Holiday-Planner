@@ -221,19 +221,12 @@ async function enter(pin){
    const result=await window.HolidayPlannerCloud.loginWithPin(pin);
    const role=result?.profile?.role;
    if(role==="master"){
-    mode="master";tripId=null;page="All Trips";
-    await hydrateTripsFromCloud();showApp();return;
+    mode="master";tripId=null;page="All Trips";await hydrateTripsFromCloud();showApp();return;
    }
    if(role==="admin"){
-    const access=await window.HolidayPlannerCloud.listMyTripAccess();
-    activeAdmin=result.user.id;
-    db.admins=db.admins.filter(a=>a.id!==activeAdmin);
-    db.admins.push({id:activeAdmin,name:result.profile.display_name||"Admin",pin,trips:access.map(x=>x.trip_id)});
-    memberName=result.profile.display_name||"Admin";
-    mode="admin";tripId=null;page="Assigned Trips";
-    await hydrateTripsFromCloud();showApp();return;
+    mode="admin";activeAdmin=result.user.id;tripId=null;page="Assigned Trips";await hydrateTripsFromCloud();showApp();return;
    }
-   throw new Error("Akun ini belum memiliki akses Admin atau Master.");
+   throw new Error("Akun tidak memiliki akses.");
   }catch(error){err(error.message||"PIN tidak sesuai. Coba lagi.");return;}
   finally{if(loginBtn){loginBtn.disabled=false;loginBtn.textContent="Continue →";}}
  }
@@ -245,7 +238,11 @@ const loginBtn=document.querySelector("#loginBtn");loginBtn.type="button";
 loginBtn.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();window.holidayPlannerLogin();},true);
 $("#pin").addEventListener("keydown",e=>{if(e.key==="Enter")enter(e.target.value.trim())});
 if($("#lock"))$("#lock").onclick=auth;
-function assignedTrips(){const a=db.admins.find(x=>x.id===activeAdmin);return db.trips.filter(t=>mode==="master"||(mode==="admin"&&(a?.trips||[]).includes(t.id)));}
+function assignedTrips(){
+ if(mode==="master")return db.trips;
+ if(mode==="admin")return db.trips;
+ return[];
+}
 function navItems(){
  if(mode==="master")return tripId?[["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"],["All Trips","back"]]:[["All Trips","grid"],["Create Trip","plus"],["Access Management","users"],["Settings","settings"]];
  if(mode==="admin")return tripId?[["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"],["Settings","settings"],["Assigned Trips","back"]]:[["Assigned Trips","grid"],["Settings","settings"]];
@@ -716,13 +713,14 @@ if(b.id==="createAdmin"){
  if(!name||!/^[0-9]{6}$/.test(pin))return toast("Isi nama dan PIN 6 digit.");
  if(pin===db.admin.pin||db.admins.some(a=>a.pin===pin)||db.trips.some(t=>t.pin===pin))return toast("PIN sudah digunakan.");
  if(!trips.length)return toast("Pilih minimal satu trip untuk Admin ini.");
- const btn=$("#createAdmin");if(btn)btn.disabled=true;
  try{
-  const result=await window.HolidayPlannerCloud.createAdminAccount(name,pin,trips);
-  if(!result?.user_id)throw new Error("Supabase tidak mengembalikan user ID Admin.");
-  db.admins.push({id:result.user_id,name,pin,trips});save();accessManagement();toast("Admin account created.");
- }catch(error){toast(error.message||"Gagal membuat Admin account.");}
- finally{if(btn)btn.disabled=false;}
+  const result=await window.HolidayPlannerCloud.createAdmin(name,pin,trips);
+  db.admins=db.admins.filter(a=>a.id!==result.user_id);
+  db.admins.push({id:result.user_id,name,trips});
+  save();accessManagement();toast("Admin account created.");
+ }catch(error){
+  toast(error?.message||"Gagal membuat Admin.");
+ }
 }
 if(b.dataset.removeadmin){if(mode!=="master")return;db.admins=db.admins.filter(a=>a.id!==b.dataset.removeadmin);save();accessManagement();toast("Admin removed.");}
 

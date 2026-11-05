@@ -1,76 +1,77 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import bcrypt from "npm:bcryptjs@2.4.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
-  status, headers: { ...corsHeaders, "Content-Type": "application/json" },
-});
+
+const json = (data, status = 200) =>
+  new Response(JSON.stringify(data), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+
   try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) return json({ success:false, error:"Unauthorized." },401);
+
     const url = Deno.env.get("SUPABASE_URL");
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    if (!url || !serviceKey) return json({ error: "Supabase service configuration is missing." }, 500);
-    const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "").trim();
-    if (!token) return json({ error: "Missing authorization token." }, 401);
+    if (!url || !serviceKey) return json({ success:false, error:"Supabase server configuration tidak lengkap." },500);
 
-    const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
-    const { data: caller, error: callerError } = await admin.auth.getUser(token);
-    if (callerError || !caller.user) return json({ error: "Unauthorized." }, 401);
+    const admin = createClient(url, serviceKey, { auth:{ persistSession:false } });
+    const token = authHeader.replace("Bearer ","").trim();
+    const { data: callerData, error: callerError } = await admin.auth.getUser(token);
+    if (callerError || !callerData?.user) return json({ success:false, error:"Session tidak valid." },401);
 
-    const { data: callerProfile, error: profileError } = await admin.from("profiles")
-      .select("id,role,is_active").eq("id", caller.user.id).single();
-    if (profileError || !callerProfile || callerProfile.role !== "master" || !callerProfile.is_active)
-      return json({ error: "Master Access required." }, 403);
-
-    const body = await req.json();
-    const name = String(body?.name || "").trim();
-    const pin = String(body?.pin || "").trim();
-    const tripIds = Array.isArray(body?.tripIds) ? [...new Set(body.tripIds.map(String))] : [];
-    if (!name || !/^\d{6}$/.test(pin)) return json({ error: "Nama dan PIN 6 digit wajib diisi." }, 400);
-    if (!tripIds.length) return json({ error: "Pilih minimal satu trip." }, 400);
-
-    const { data: pinExists, error: pinCheckError } = await admin.rpc("verify_pin", { p_pin: pin });
-    if (pinCheckError) return json({ error: "PIN check failed: " + pinCheckError.message }, 500);
-    if (pinExists?.length) return json({ error: "PIN sudah digunakan." }, 409);
-
-    const email = `admin-${crypto.randomUUID()}@holidayplanner.app`;
-    const { data: created, error: createUserError } = await admin.auth.admin.createUser({
-      email, email_confirm: true, user_metadata: { display_name: name, app_role: "admin" },
-    });
-    if (createUserError || !created.user) return json({ error: createUserError?.message || "Gagal membuat Auth user." }, 500);
-
-    const userId = created.user.id;
-    const { error: profileInsertError } = await admin.rpc("create_admin_profile", {
-      p_user_id: userId, p_display_name: name, p_pin: pin,
-    });
-    if (profileInsertError) {
-      await admin.auth.admin.deleteUser(userId);
-      return json({ error: "Gagal membuat profile Admin: " + profileInsertError.message }, 500);
+    const { data: callerProfile, error: profileError } = await admin
+      .from("profiles").select("role,is_active").eq("id",callerData.user.id).single();
+    if (profileError || callerProfile?.role !== "master" || !callerProfile?.is_active) {
+      return json({ success:false, error:"Hanya Master yang dapat membuat Admin." },403);
     }
 
-    const { data: validTrips, error: tripError } = await admin.from("trips").select("id").in("id", tripIds);
-    if (tripError || !(validTrips || []).length) {
-      await admin.from("profiles").delete().eq("id", userId);
-      await admin.auth.admin.deleteUser(userId);
-      return json({ error: tripError?.message || "Trip yang dipilih tidak ditemukan di Supabase." }, 400);
+    const { display_name, pin, trip_ids=[] } = await req.json();
+    if (!display_name || !/^[0-9]{6}$/.test(String(pin))) {
+      return json({ success:false, error:"Nama dan PIN 6 digit wajib diisi." },400);
+    }
+    if (!Array.isArray(trip_ids) || !trip_ids.length) {
+      return json({ success:false, error:"Pilih minimal satu trip." },400);
     }
 
-    const { error: accessError } = await admin.from("trip_access").insert(
-      validTrips.map(t => ({ trip_id: t.id, user_id: userId, access_role: "admin" }))
-    );
+    const internalEmail = `admin-${crypto.randomUUID()}@holidayplanner.local`;
+    const { data:userData, error:userError } = await admin.auth.admin.createUser({
+      email: internalEmail,
+      email_confirm: true,
+      user_metadata: { display_name, app_role:"admin" },
+    });
+    if (userError || !userData?.user) return json({ success:false, error:userError?.message||"Gagal membuat user." },400);
+
+    const userId=userData.user.id;
+    const pinHash=await bcrypt.hash(String(pin),10);
+
+    const { error:profileCreateError } = await admin.rpc("create_admin_profile", {
+      p_user_id:userId, p_display_name:String(display_name).trim(), p_pin_hash:pinHash
+    });
+    if (profileCreateError) {
+      await admin.auth.admin.deleteUser(userId);
+      return json({ success:false, error:profileCreateError.message },400);
+    }
+
+    const accessRows=trip_ids.map(trip_id=>({ user_id:userId, trip_id, access_role:"admin" }));
+    const { error:accessError } = await admin.from("trip_access").insert(accessRows);
     if (accessError) {
-      await admin.from("profiles").delete().eq("id", userId);
       await admin.auth.admin.deleteUser(userId);
-      return json({ error: "Gagal memberi trip access: " + accessError.message }, 500);
+      return json({ success:false, error:accessError.message },400);
     }
-    return json({ success: true, user_id: userId, name, email, trip_ids: validTrips.map(t => t.id) });
+
+    return json({ success:true, user_id:userId, display_name:String(display_name).trim(), role:"admin", trip_count:trip_ids.length });
   } catch (error) {
-    return json({ error: error?.message || String(error) }, 500);
+    console.error("create-admin error:",error);
+    return json({ success:false, error:error?.message||"Terjadi kesalahan." },500);
   }
 });

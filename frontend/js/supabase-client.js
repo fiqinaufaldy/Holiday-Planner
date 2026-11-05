@@ -23,24 +23,25 @@
    if(!profile?.is_active)throw new Error("Akun tidak aktif.");
    return {session:sessionData.session,user:data.user,profile};
   },
-  async createAdminAccount(name,pin,tripIds){
-   await requireSession();
-   const {data:{session},error:sessionError}=await client.auth.getSession();fail(sessionError);
-   const {data,error}=await client.functions.invoke("create-admin",{body:{name,pin,tripIds},headers:{Authorization:`Bearer ${session.access_token}`}});
-   fail(error);
-   if(!data?.success)throw new Error(data?.error||"Gagal membuat Admin.");
-   return data;
-  },
-  async listMyTripAccess(){
-   await requireSession();
-   const {data:{user},error:userError}=await client.auth.getUser();fail(userError);
-   const {data,error}=await client.from("trip_access").select("id,trip_id,user_id,access_role,created_at").eq("user_id",user.id).eq("access_role","admin").order("created_at");
-   fail(error);return data||[];
-  },
   async signOut(){const {error}=await client.auth.signOut();fail(error);return{ok:true};},
   async getSession(){const {data,error}=await client.auth.getSession();fail(error);return data.session;},
   async getMyProfile(){await requireSession();const {data,error}=await client.from("profiles").select("id,display_name,role,is_active").single();fail(error);return data;},
-  async listTrips(){await requireSession();const {data,error}=await client.from("trips").select("id,name,destination,start_date,end_date,description,cover_image_url,status,created_by,created_at,updated_at").order("created_at",{ascending:false});fail(error);return data||[];},
+  async listTrips(){
+   const session=await requireSession();
+   const {data:profile,error:profileError}=await client.from("profiles").select("role").eq("id",session.user.id).single();
+   fail(profileError);
+   let query=client.from("trips").select("id,name,destination,start_date,end_date,description,cover_image_url,status,created_by,created_at,updated_at").order("created_at",{ascending:false});
+   if(profile?.role==="admin"){
+    const {data:access,error:accessError}=await client.from("trip_access").select("trip_id").eq("user_id",session.user.id).eq("access_role","admin");
+    fail(accessError);
+    const ids=(access||[]).map(x=>x.trip_id);
+    if(!ids.length)return[];
+    query=query.in("id",ids);
+   }
+   const {data,error}=await query;
+   fail(error);
+   return data||[];
+  },
   async loadTripWorkspace(tripId){await requireSession();const {data,error}=await client.from("trip_workspaces").select("payload,updated_at").eq("trip_id",tripId).maybeSingle();fail(error);return data?.payload||null;},
   async saveTripWorkspace(tripId,payload){await requireSession();const {data,error}=await client.from("trip_workspaces").upsert({trip_id:tripId,payload,updated_at:new Date().toISOString()},{onConflict:"trip_id"}).select("trip_id,updated_at").single();fail(error);return data;},
   async createTrip(t){await requireSession();const payload={name:String(t.name||"").trim(),destination:t.destination||null,start_date:t.start||t.start_date||null,end_date:t.end||t.end_date||null,description:t.description||null,cover_image_url:t.cover||t.cover_image_url||null,status:t.status||"planning"};if(!payload.name)throw new Error("Nama trip wajib diisi.");const {data,error}=await client.from("trips").insert(payload).select().single();fail(error);return data;},
@@ -48,6 +49,13 @@
   async deleteTrip(id){await requireSession();const {error}=await client.from("trips").delete().eq("id",id);fail(error);return{ok:true};},
   async listTripAccess(id){await requireSession();const {data,error}=await client.from("trip_access").select("id,trip_id,user_id,access_role,created_at,profiles(display_name,role,is_active)").eq("trip_id",id).order("created_at");fail(error);return data||[];},
   async listProfiles(){await requireSession();const {data,error}=await client.from("profiles").select("id,display_name,role,is_active,created_at").order("display_name");fail(error);return data||[];},
+  async createAdmin(displayName,pin,tripIds){
+   await requireSession();
+   const {data,error}=await client.functions.invoke("create-admin",{body:{display_name:displayName,pin:String(pin),trip_ids:Array.isArray(tripIds)?tripIds:[]}});
+   fail(error);
+   if(!data?.success)throw new Error(data?.error||"Gagal membuat Admin.");
+   return data;
+  },
   async grantTripAccess(tripId,userId,role){await requireSession();if(!["admin","member"].includes(role))throw new Error("Role akses harus admin atau member.");const {data,error}=await client.from("trip_access").upsert({trip_id:tripId,user_id:userId,access_role:role},{onConflict:"trip_id,user_id"}).select().single();fail(error);return data;},
   async revokeTripAccess(id){await requireSession();const {error}=await client.from("trip_access").delete().eq("id",id);fail(error);return{ok:true};}
  };
