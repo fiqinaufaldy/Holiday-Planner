@@ -163,21 +163,34 @@ async function hydrateTripsFromCloud(){
  const unmappedLocal=localSnapshot.filter(t=>!map[t.id]&&!cloudRows.some(r=>r.id===t.id));
  const candidates=unmappedLocal.filter(t=>!remoteNames.has((t.name||"").trim().toLowerCase()));
 
- // Supabase is now the primary source of truth.
- // Local-only trips are kept only as a browser fallback/backup and are NOT
- // offered for automatic import during normal login. This prevents the
- // migration popup from appearing on every device/browser that still has
- // an old localStorage snapshot.
- //
- // If a local trip has the same name as a Supabase trip, its local detail
- // snapshot may still be merged below until the cloud workspace is loaded.
- // Trips that exist only in localStorage are intentionally excluded from
- // the active cloud dataset.
+ // Offer migration only when there are local trips not already represented in Supabase.
  if(candidates.length){
-  console.info("Ignoring local-only trips during cloud login:", candidates.map(t=>t.name));
+  const migrate=confirm("Ditemukan " + candidates.length + " trip lokal yang belum ada di Supabase. Impor data dasar trip sekarang? Data detail tetap dipertahankan di browser untuk sementara.");
+  if(migrate){
+   const createdMap={};
+   try{
+    for(const t of candidates){
+     const created=await window.HolidayPlannerCloud.createTrip({name:t.name,destination:t.destination,start:t.start,end:t.end,cover:t.cover,description:"Migrated from Holiday Planner local data"});
+     if(!created?.id) throw new Error("Supabase tidak mengembalikan ID untuk trip: "+t.name);
+     createdMap[t.id]=created.id;
+    }
+    Object.assign(map,createdMap);
+    cloudRows=await window.HolidayPlannerCloud.listTrips();
+   }catch(error){
+    // Do not replace or clear local data on any partial/failed import.
+    db.trips=localSnapshot; db.cloudTripMap=map; save();
+    throw new Error("Impor trip belum selesai. Data lokal tetap dipertahankan. Detail: "+(error?.message||error));
+   }
+  }else{
+   // Cancel means stay in local mode for these trips; never replace them with an empty cloud list.
+   db.trips=localSnapshot; db.cloudTripMap=map; save();
+   return;
+  }
  }
 
  // Merge cloud rows with local details; never discard local-only records.
+ if(mode==="admin")db.cloudAssignedTripIds=cloudRows.map(r=>r.id);
+ if(mode==="admin")db.cloudAssignedTripIds=cloudRows.map(r=>r.id);
  const localById=new Map(localSnapshot.map(t=>[t.id,t]));
  const localByCloudId=new Map(Object.entries(map).map(([localId,cloudId])=>[cloudId,localById.get(localId)]).filter(([,v])=>!!v));
  const localByName=new Map(localSnapshot.map(t=>[(t.name||"").trim().toLowerCase(),t]));
@@ -189,9 +202,7 @@ async function hydrateTripsFromCloud(){
  });
  const represented=new Set(merged.map(t=>t.id));
  const cloudMappedLocalIds=new Set(Object.keys(map));
- // Do not surface local-only trips in the active app when Supabase is available.
- // They remain in localStorage only as a fallback/backup.
- const localOnly=[];
+ const localOnly=mode==="admin"?[]:localSnapshot.filter(t=>!cloudMappedLocalIds.has(t.id)&&!represented.has(t.id)&&!cloudRows.some(r=>(r.name||"").trim().toLowerCase()===(t.name||"").trim().toLowerCase()));
  db.trips=[...merged,...localOnly];
  db.cloudTripMap=map;
  // Restore complete per-trip workspace snapshots from Supabase before enabling cloud writes.
@@ -231,12 +242,15 @@ $("#pin").addEventListener("keydown",e=>{if(e.key==="Enter")enter(e.target.value
 if($("#lock"))$("#lock").onclick=auth;
 function assignedTrips(){
  if(mode==="master")return db.trips;
- if(mode==="admin")return db.trips;
+ if(mode==="admin")return db.trips.filter(t=>{
+  const assigned=db.cloudAssignedTripIds||[];
+  return assigned.includes(t.id);
+ });
  return[];
 }
 function navItems(){
  if(mode==="master")return tripId?[["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"],["All Trips","back"]]:[["All Trips","grid"],["Create Trip","plus"],["Access Management","users"],["Settings","settings"]];
- if(mode==="admin")return tripId?[["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"],["Settings","settings"],["Assigned Trips","back"]]:[["Assigned Trips","grid"],["Settings","settings"]];
+ if(mode==="admin")return tripId?[["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"],["Assigned Trips","back"]]:[["Assigned Trips","grid"],["Settings","settings"]];
  if(mode==="member")return [["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]];
  return [];
 }
@@ -259,8 +273,13 @@ function showApp(){
  $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("back")}<span>Log out</span></button>`;
  const mobileNav=$("#mobileNav");
  if(mobileNav){
-   const items=mode==="master"?[]:[["Dashboard","home"],["Expense Planning","wallet"],["Itinerary","calendar"],["Participants","users"],["More","more"]];
-   mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n==="More"?"General":n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n==="More"?(plannerLanguage==="id"?"Lainnya":"More"):n}</span></button>`).join("");
+   let items=[];
+   if(tripId){
+     items=[["Dashboard","home"],["General","settings"],["Expense Planning","wallet"],["Itinerary","calendar"],["More","more"]];
+   }else if(mode==="admin"){
+     items=[["Assigned Trips","grid"],["Settings","settings"]];
+   }
+   mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n==="More"?(plannerLanguage==="id"?"Lainnya":"More"):n}</span></button>`).join("");
    mobileNav.classList.toggle("is-visible",items.length>0&&!pendingTripWelcome);
  }
  if(pendingTripWelcome&&tripId){document.body.classList.add("trip-welcome-mode");renderTripWelcome();return;}
