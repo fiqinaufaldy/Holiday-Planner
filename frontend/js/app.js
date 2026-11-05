@@ -143,10 +143,27 @@ function applyPlannerLanguage(){
 }
 function togglePlannerLanguage(){plannerLanguage=plannerLanguage==="en"?"id":"en";localStorage.setItem("holidayPlannerLanguage",plannerLanguage);location.reload();}
 
+function updateLoginCopy(){
+ const id=plannerLanguage==="id";
+ const eyebrow=$("#loginEyebrow"),title=$("#loginTitle"),desc=$("#loginDesc"),pin=$("#pin"),btn=$("#loginBtn");
+ if(eyebrow)eyebrow.textContent=id?"RUANG PERJALANAN PRIBADI ANDA":"YOUR PERSONAL TRAVEL SPACE";
+ if(title)title.innerHTML=id?`<span>Selamat datang di</span><strong>Holiday Planner</strong>`:`<span>Welcome to your</span><strong>Holiday Planner</strong>`;
+ if(desc)desc.textContent=id?"Masukkan PIN Akses untuk melanjutkan.":"Enter your Access PIN to continue.";
+ if(pin)pin.placeholder=id?"Masukkan PIN Akses":"Enter Access PIN";
+ if(btn)btn.childNodes[0].nodeValue=id?"Lanjutkan ":"Continue ";
+ const lang=$("#loginLanguageToggle");if(lang){lang.textContent=id?"EN":"ID";lang.title=id?"Switch to English":"Ganti ke Bahasa Indonesia";}
+}
+function applyLoginTheme(){
+ document.documentElement.dataset.theme=plannerTheme;document.body.dataset.theme=plannerTheme;
+ const btn=$("#loginThemeToggle");
+ if(btn){btn.innerHTML=plannerTheme==="dark"?"☼ <span>Light</span>":"☾ <span>Dark</span>";btn.setAttribute("aria-label",plannerTheme==="dark"?"Switch to light mode":"Switch to dark mode");}
+}
+function toggleLoginTheme(){plannerTheme=plannerTheme==="dark"?"light":"dark";localStorage.setItem("holidayPlannerTheme",plannerTheme);applyLoginTheme();}
+function toggleLoginLanguage(){plannerLanguage=plannerLanguage==="en"?"id":"en";localStorage.setItem("holidayPlannerLanguage",plannerLanguage);updateLoginCopy();}
+
 function auth(){
  $("#login").classList.remove("hidden");$("#app").classList.add("hidden");
- $("#loginTitle").textContent="Welcome to Holiday Planner";
- $("#loginDesc").textContent="Masukkan PIN untuk melanjutkan.";
+ updateLoginCopy();applyLoginTheme();
  $("#loginHint").textContent="";$("#loginHint").hidden=true;
  $("#pin").value="";$("#pin").setAttribute("autocomplete","new-password");$("#loginError").textContent="";
  const identity=$("#memberIdentity");if(identity)identity.remove();
@@ -238,6 +255,9 @@ const loginBtn=document.querySelector("#loginBtn");loginBtn.type="button";
 loginBtn.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();window.holidayPlannerLogin();},true);
 $("#pin").addEventListener("keydown",e=>{if(e.key==="Enter")enter(e.target.value.trim())});
 if($("#lock"))$("#lock").onclick=auth;
+if($("#loginThemeToggle"))$("#loginThemeToggle").onclick=toggleLoginTheme;
+if($("#loginLanguageToggle"))$("#loginLanguageToggle").onclick=toggleLoginLanguage;
+updateLoginCopy();applyLoginTheme();
 function assignedTrips(){
  if(mode==="master")return db.trips;
  if(mode==="admin")return db.trips;
@@ -760,7 +780,10 @@ if(b.id==="newTrip")openTrip();if(b.dataset.open){tripId=b.dataset.open;if(mode=
 }if(b.id==="savePlans"){const t=trip();ensurePlans(t);const checks=[...document.querySelectorAll("[data-plan-enabled]")];if(!checks.some(x=>x.checked))return toast("Minimal satu plan harus aktif.");t.plans.forEach(p=>{p.enabled=!!document.querySelector(`[data-plan-enabled="${p.id}"]`)?.checked;const n=document.querySelector(`[data-plan-name="${p.id}"]`);if(n&&n.value.trim())p.name=n.value.trim()});const def=$("#defaultPlan").value;if(t.plans.some(p=>p.id===def&&p.enabled))t.activePlanId=def;activatePlan(t,t.activePlanId);save();general(t);toast("Plan settings saved")}if(b.id==="editTripSettings")toast("Trip settings editor is next development step");if(b.id==="planningAdd")openPlanningForm(b.dataset.kind);if(b.dataset.planEdit){const [k,i]=b.dataset.planEdit.split(":");openPlanningForm(k,Number(i));}if(b.dataset.planDelete){const [k,i]=b.dataset.planDelete.split(":");if(confirm("Delete this item?")){const t=trip();if(!Array.isArray(t[k]))t[k]=[];t[k].splice(Number(i),1);save();planningCollectionPage(t,k);}}if(b.id==="cashflowAdd")openCashFlowForm();if(b.dataset.cfEdit!==undefined){const [pid,ix]=b.dataset.cfEdit.split(":");if(pid!=="legacy"){const t=trip();t.activePlanId=pid;openCashFlowForm(Number(ix));}}if(b.dataset.cfDelete!==undefined){const [pid,ix]=b.dataset.cfDelete.split(":");const t=trip();if(confirm("Hapus transaksi ini?")){if(pid==="legacy")t.cashflow.splice(Number(ix),1);else{const p=t.plans.find(p=>p.id===pid);p?.cashflow?.splice(Number(ix),1);}save();cashFlowPage(t);}}if(b.id==="addItem")toast("Form input module is next development step");if(b.id==="addParticipant")openParticipant();if(b.id==="addBudget")openBudget();if(b.id==="addIncome")openIncome();if(b.dataset.editincome!==undefined)openIncome(Number(b.dataset.editincome));if(b.dataset.delincome!==undefined){const i=Number(b.dataset.delincome);if(confirm("Delete this income item?")){const t=trip();const item=t.income[i];if(item?.cashflowId)t.cashflow=(t.cashflow||[]).filter(x=>x.incomeId!==item.cashflowId&&x.id!==item.cashflowId);t.income.splice(i,1);const p=t.plans?.find(x=>x.id===t.activePlanId);if(p){p.income=t.income;p.cashflow=t.cashflow;}save();incomePage(t);}}if(b.dataset.switchPlan){const t=trip();const target=b.dataset.switchPlan;const dest=page;if(activatePlan(t,target)){page=dest;render()}}if(b.id==="addVilla"||b.id==="addVillaEmpty")openVilla();if(b.dataset.editvilla!==undefined)openVilla(Number(b.dataset.editvilla));if(b.dataset.villadetail!==undefined)villaDetail(Number(b.dataset.villadetail));if(b.dataset.delvilla!==undefined){const i=Number(b.dataset.delvilla);if(confirm("Delete this villa?")){trip().stays.splice(i,1);save();villasPage(trip());toast("Villa deleted")}}if(b.dataset.editbudget!==undefined)openBudget(Number(b.dataset.editbudget));if(b.dataset.delbudget!==undefined){const i=Number(b.dataset.delbudget);if(confirm("Delete this budget item?")){trip().budget.splice(i,1);save();budgetPage(trip());toast("Budget item deleted")}}if(b.dataset.editperson!==undefined)openParticipant(Number(b.dataset.editperson));if(b.dataset.delperson!==undefined){const i=Number(b.dataset.delperson);if(confirm("Remove this participant from the trip?")){trip().participants.splice(i,1);save();participantsPage(trip());toast("Participant removed")}}if(b.dataset.delitem){let [key,i]=b.dataset.delitem.split(":");if(confirm("Delete this item?")){trip()[key].splice(+i,1);save();render()}}});
 document.addEventListener("change",e=>{if(e.target.id==="dashboardPlan"){const t=trip();if(activatePlan(t,e.target.value)){page="Dashboard";render()}return}if(e.target.id==="profilePhoto"&&e.target.files&&e.target.files[0]){if(mode!=="master")return toast("Master Access required.");const file=e.target.files[0];if(!["image/jpeg","image/png","image/webp"].includes(file.type))return toast("Use JPG, PNG, or WEBP.");if(file.size>2*1024*1024)return toast("Maximum photo size is 2 MB.");const reader=new FileReader();reader.onload=()=>{db.admin.photo=reader.result;save();updateSidebarProfile();settings();toast("Profile photo updated")};reader.readAsDataURL(file);}});
 $("#backupFile").onchange=async e=>{try{const file=e.target.files&&e.target.files[0];if(!file)return;const x=JSON.parse(await file.text());if(x.app!=="Holiday Planner"||!Array.isArray(x.trips))throw new Error("Invalid backup file");if(mode==="admin"){if(x.scope!=="admin-assigned"||x.adminId!==activeAdmin)throw new Error("Backup ini bukan milik akun Admin yang sedang digunakan.");const allowed=new Set(assignedTrips().map(t=>t.id));if(!x.trips.every(t=>t&&typeof t.id==="string"&&allowed.has(t.id)))throw new Error("Backup berisi trip yang tidak ditugaskan ke akun ini.");if(!confirm("Restore backup untuk trip yang ditugaskan ke akun Admin ini? Data trip tersebut akan diganti."))return;const incoming=new Map(x.trips.map(t=>[t.id,t]));db.trips=db.trips.map(t=>incoming.has(t.id)?incoming.get(t.id):t);save();showApp();toast("Admin trip backup restored")}else if(mode==="master"){if(x.scope!=="master-full"||!x.admin||!Array.isArray(x.admins))throw new Error("Gunakan backup Master lengkap untuk restore di Master Access.");if(!confirm("Restore full backup? Seluruh data lokal saat ini akan diganti."))return;const restored={...x};delete restored.app;delete restored.format;delete restored.version;delete restored.scope;delete restored.createdAt;db=restored;save();mode="master";tripId=null;activeAdmin=null;page="All Trips";showApp();toast("Full backup restored")}else throw new Error("Access denied.")}catch(err){toast(err.message||"Invalid backup file")}e.target.value=""};
-if($("#lock"))$("#lock").onclick=auth;$("#brandHome").onclick=e=>{e.preventDefault();if(mode==="master"){page="All Trips";render()}};
+if($("#lock"))$("#lock").onclick=auth;
+if($("#loginThemeToggle"))$("#loginThemeToggle").onclick=toggleLoginTheme;
+if($("#loginLanguageToggle"))$("#loginLanguageToggle").onclick=toggleLoginLanguage;
+updateLoginCopy();applyLoginTheme();$("#brandHome").onclick=e=>{e.preventDefault();if(mode==="master"){page="All Trips";render()}};
 auth();
 // Translate newly rendered UI after user interactions without observing DOM mutations.
 })();
