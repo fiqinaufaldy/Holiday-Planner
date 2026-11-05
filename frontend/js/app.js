@@ -268,7 +268,7 @@ function showApp(){
  $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("back")}<span>Log out</span></button>`;
  const mobileNav=$("#mobileNav");
  if(mobileNav){
-   const items=mode==="master"?[]:[["Dashboard","home"],["Expense Planning","wallet"],["Itinerary","calendar"],["Participants","users"],["More","more"]];
+   const items=mode==="master"?[]:[["Dashboard","home"],["Expense Planning","wallet"],["Participants","users"],["Villas & Stay","bed"],["More","more"]];
    mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n==="More"?"General":n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n==="More"?(plannerLanguage==="id"?"Lainnya":"More"):n}</span></button>`).join("");
    mobileNav.classList.toggle("is-visible",items.length>0&&!pendingTripWelcome);
  }
@@ -329,26 +329,10 @@ function openCashFlowForm(index=null){
  const d=document.createElement("dialog");d.className="planner-dialog";d.innerHTML=`<form id="cashFlowForm"><h2>${index===null?"Add":"Edit"} transaction</h2><label>Date<input type="date" name="date" value="${esc(old.date||"")}"></label><label>Type<select name="type"><option ${old.type==="Income"?"selected":""}>Income</option><option ${old.type==="Expense"?"selected":""}>Expense</option></select></label><label>Description<input name="description" required value="${esc(old.description||"")}"></label><label>Amount (Rp)<input type="number" min="0" name="amount" required value="${Number(old.amount||0)}"></label><label>Notes<textarea name="notes">${esc(old.notes||"")}</textarea></label><div class="dialog-actions"><button type="button" class="secondary" id="cfCancel">Cancel</button><button class="primary">Save transaction</button></div></form></dialog>`;
  document.body.appendChild(d);d.showModal();d.querySelector("#cfCancel").onclick=()=>d.remove();d.querySelector("form").onsubmit=e=>{e.preventDefault();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");const x=Object.fromEntries(new FormData(e.target));x.amount=Number(x.amount);x.source="Manual";if(index===null)p.cashflow.push(x);else p.cashflow[index]=x;t.cashflow=p.cashflow;save();d.close();d.remove();cashFlowPage(t);};
 }
-function mobileTripMenu(){
- if(!tripId || page==="Dashboard")return;
- const content=$("#content");
- if(!content || content.querySelector(".mobile-trip-menu"))return;
- const items=[["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]];
- const el=document.createElement("section");
- el.className="mobile-trip-menu";
- const t=trip();
- el.innerHTML=`<div class="mobile-page-header">
-   <div class="mobile-page-brand"><span class="mobile-brand-mark">✈</span><div><strong>Holiday<br>Planner</strong><small>${esc(t.name||"Your Trip")}</small></div></div>
-   <div class="mobile-page-actions"><button type="button" aria-label="Refresh">↻</button><button type="button" aria-label="Search">⌕</button><button type="button" aria-label="Notifications">♧</button></div>
- </div>
- <div class="mobile-trip-context"><div><span class="mobile-trip-kicker">YOUR TRAVEL SPACE</span><h1>${esc(t.name||"Your Trip")}</h1><p>${esc(t.destination||"—")} · ${date(t.start)} – ${date(t.end)}</p></div><div class="mobile-role-pill">${mode.toUpperCase()}</div></div>
- <div class="mobile-trip-menu-head"><div><span class="eyebrow">TRIP MENU</span><h2>Plan your trip</h2></div></div><div class="mobile-trip-menu-grid">${items.map(([n,ic])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div>`;
- content.prepend(el);
-}
 function render(){
- if(mode==="master"){if(page==="All Trips"||!tripId){if(page==="Settings")return settings();if(page==="Access Management")return accessManagement();if(page==="Create Trip"){openTrip();page="All Trips";return;}return allTrips();}tripPage();mobileTripMenu();return;}
- if(mode==="admin"){if(page==="Settings")return settings();if(page==="Assigned Trips"||!tripId)return assignedTripsPage();tripPage();mobileTripMenu();return;}
- if(mode==="member"){tripPage();mobileTripMenu();return;}
+ if(mode==="master"){if(page==="All Trips"||!tripId){if(page==="Settings")return settings();if(page==="Access Management")return accessManagement();if(page==="Create Trip"){openTrip();page="All Trips";return;}return allTrips();}return tripPage();}
+ if(mode==="admin"){if(page==="Settings")return settings();if(page==="Assigned Trips"||!tripId)return assignedTripsPage();return tripPage();}
+ if(mode==="member")return tripPage();
 }
 
 function assignedTripsPage(){
@@ -421,7 +405,25 @@ function applyApprovedChange(r){
 function allTrips(){page="All Trips";pageHead("All Trips","Plan, organize, and keep track of all your journeys.");$("#nav").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.page==="All Trips"));let cards=db.trips.map(t=>{let budget=t.budget.reduce((a,x)=>a+ +x.amount,0),spent=t.cashflow.filter(x=>x.type==="Expense").reduce((a,x)=>a+ +x.amount,0),pct=budget?Math.min(100,spent/budget*100):0;return `<article class="trip"><div class="cover" style="background-image:url('${esc(t.cover||"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1000&q=80")}')"></div><div class="tripbody"><h3>${esc(t.name)}</h3><p>▦ ${date(t.start)} – ${date(t.end)}</p><p>◎ ${esc(t.destination)}</p><div class="tripfoot"><span>${money(spent)} spent</span><b>${pct.toFixed(0)}%</b></div><div class="bar"><i style="width:${pct}%"></i></div><div class="actions"><button class="primary" data-open="${t.id}">Open trip</button><button data-edittrip="${t.id}">Trip Settings / PIN</button><button data-deltrip="${t.id}">Delete</button></div></div></article>`}).join("");$("#content").innerHTML=`<section class="hero" style="background-image:url('https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1600&q=85')"><span class="pill">MASTER ACCESS</span><h2>Every trip, one place.</h2><p>Keep your journeys organized and ready for the next adventure.</p></section><div class="toolbar"><div><h2 style="font:600 23px 'Playfair Display'">My Trips (${db.trips.length})</h2><p>Choose a trip to open its private workspace.</p></div><button class="primary" id="newTrip">＋ Create New Trip</button></div><div class="grid">${cards||'<div class="empty">Belum ada perjalanan. Buat trip pertamamu.</div>'}</div>`}
 function settings(){page="Settings";pageHead("Settings","Manage your profile and backup data.");const isAdmin=mode==="admin",scopeTrips=isAdmin?assignedTrips():db.trips;const profile=isAdmin?"":`<section class="section"><h2>Profile Settings</h2><div class="profile-setting">${db.admin.photo?`<img id="profilePreview" src="${db.admin.photo}" alt="Profile photo">`:`<div class="profile-placeholder" id="profilePreview">${esc((db.admin.name||"AD").split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase())}</div>`}<div><strong>${esc(db.admin.name||"Fiqi Naufaldy")}</strong><p style="font-size:11px;color:#788177;margin:5px 0 9px">Account profile</p><label class="profile-upload" for="profilePhoto">↑ Upload profile photo</label><input id="profilePhoto" type="file" accept="image/png,image/jpeg,image/webp" hidden></div></div><div class="formgrid"><label>Display name<input id="adminName" value="${esc(db.admin.name)}"></label><label>New Master PIN (optional)<input id="adminPin" inputmode="numeric" maxlength="6" placeholder="Leave blank to keep current"></label></div><p><button class="primary" id="saveAdmin">Save Settings</button></p><p style="font-size:11px;color:#788177">Foto dan nama ini ditampilkan di footer sidebar sebagai identitas pemilik akun.</p></section>`;const scopeText=isAdmin?`Backup hanya mencakup ${scopeTrips.length} trip yang ditugaskan ke akun Admin ini. Data trip lain dan pengaturan akses Master tidak akan berubah saat restore.`:"Backup mencakup seluruh trip, akun Admin, dan profil Master.";$("#content").innerHTML=`${profile}<section class="section"><h2>Backup & Restore</h2><p>${scopeText}</p><div class="actions backup-actions"><button class="primary" id="export">${hpIcon("download")}<span>${isAdmin?"Export Assigned Trips":"Export All Data"}</span></button><button id="import">${hpIcon("upload")}<span>Import Backup</span></button></div><p style="font-size:11px;color:#788177">Simpan file backup di tempat aman. Saat import, data pada cakupan backup akan menggantikan data yang sekarang.</p></section>`}
 const labels={General:"Trip information",Participants:"People joining this trip",Budgeting:"Plan trip expenses", "Cash Flow":"Track income and expenses","Villas & Stay":"Accommodation options",Destinations:"Places to explore",Itinerary:"Schedule your trip"};
-function tripPage(){let t=trip();pageHead(page==="Dashboard"?t.name:page,labels[page]||"Your trip workspace");$("#nav").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));if(page==="Destinations")return planningCollectionPage(t,"destinations");if(page==="Itinerary")return planningCollectionPage(t,"itinerary");if(page==="Cash Flow")return cashFlowPage(t);if(page==="Dashboard")return dashboard(t);if(page==="General")return general(t);if(page==="Participants")return participantsPage(t);if(page==="Expense Planning")return budgetPage(t);if(page==="Income Planning")return incomePage(t);if(page==="Villas & Stay")return villasPage(t);let key={"Participants":"participants","Expense Planning":"budget","Income Planning":"income","Cash Flow":"cashflow","Villas & Stay":"stays","Destinations":"destinations","Itinerary":"itinerary"}[page];let arr=t[key]||[];let fields={participants:["Name","Contact","Role","Status"],budget:["Category","Description","Amount"],cashflow:["Date","Type","Description","Amount"],stays:["Name","Area","Check-in","Check-out","Price"],destinations:["Name","Area","Est. ticket"],itinerary:["Date","Time","Activity","Location","Notes"]}[key];let rows=arr.map((x,i)=>`<tr>${Object.values(x).map(v=>`<td>${esc(typeof v==="number"&&["amount","price","cost"].includes("")?money(v):v)}</td>`).join("")}<td><button data-delitem="${key}:${i}">Delete</button></td></tr>`).join("");$("#content").innerHTML=`<section class="section"><div class="toolbar"><div><h2>${page}</h2><p>${arr.length} item(s) recorded.</p></div><button class="primary" id="addItem" data-key="${key}">＋ Add ${page}</button></div><div style="overflow:auto"><table><thead><tr>${fields.map(x=>`<th>${x}</th>`).join("")}<th>Action</th></tr></thead><tbody>${rows||`<tr><td colspan="${fields.length+1}" class="empty">No data yet.</td></tr>`}</tbody></table></div></section>`}
+function mobileTripMenu(){
+ const items=[["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]];
+ return `<section class="mobile-trip-menu"><div class="mobile-trip-menu-head"><span>TRIP MENU</span><h3>Plan your trip</h3></div><div class="mobile-trip-menu-grid">${items.map(([n,ic])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
+}
+function tripPage(){
+ let t=trip();
+ pageHead(page==="Dashboard"?t.name:page,labels[page]||"Your trip workspace");
+ $("#nav").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+ const inject=()=>{if(window.innerWidth<=820 && page!=="Dashboard") $("#content").insertAdjacentHTML("afterbegin",mobileTripMenu());};
+ if(page==="Destinations"){planningCollectionPage(t,"destinations");inject();return;}
+ if(page==="Itinerary"){planningCollectionPage(t,"itinerary");inject();return;}
+ if(page==="Cash Flow"){cashFlowPage(t);inject();return;}
+ if(page==="Dashboard")return dashboard(t);
+ if(page==="General"){general(t);inject();return;}
+ if(page==="Participants"){participantsPage(t);inject();return;}
+ if(page==="Expense Planning"){budgetPage(t);inject();return;}
+ if(page==="Income Planning"){incomePage(t);inject();return;}
+ if(page==="Villas & Stay"){villasPage(t);inject();return;}
+}
 
 function budgetPage(t){
  if(!Array.isArray(t.budget))t.budget=[];
@@ -679,44 +681,14 @@ function dashboard(t){
  const spent=(t.cashflow||[]).filter(x=>x.type==="Expense").reduce((a,x)=>a+Number(x.amount||0),0);
  const pct=budget?Math.min(100,spent/budget*100):0;
  const next=(t.itinerary||[]).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];
- const participants=Array.isArray(t.participants)?t.participants:[];
- const confirmed=participants.filter(x=>String(x.status||"").toLowerCase()==="confirmed").length;
- const pending=participants.filter(x=>String(x.status||"").toLowerCase()==="pending").length;
- const notJoining=participants.filter(x=>String(x.status||"").toLowerCase().replace(/\s+/g,"")==="notjoining").length;
- const total=participants.length;
- const cover=esc(t.cover||"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1600&q=85");
- const mobileMenu=[
-  ["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],
-  ["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]
- ];
- const menuHtml=mobileMenu.map(([n,ic])=>`<button type="button" class="mobile-dashboard-menu-item" data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("");
- const mobileStats=`<div class="mobile-trip-stats">
-  <article><span>${hpIcon("users")}</span><small>Total Participants</small><b>${total} People</b></article>
-  <article><span>${hpIcon("check")}</span><small>Confirmed</small><b>${confirmed} People</b></article>
-  <article><span>${hpIcon("clock")}</span><small>Pending</small><b>${pending} People</b></article>
-  <article><span>${hpIcon("close")}</span><small>Not Joining</small><b>${notJoining} People</b></article>
- </div>`;
- const mobileDashboard=`<div class="mobile-dashboard">
-   <div class="mobile-dashboard-top"><div class="mobile-brand"><span class="mobile-brand-mark">✈</span><div><strong>Holiday<br>Planner</strong></div></div><div class="mobile-top-actions"><button type="button" aria-label="Refresh">↻</button><button type="button" aria-label="Search">⌕</button><button type="button" aria-label="Notifications">♧</button></div></div>
-   <section class="mobile-trip-hero" style="--mobile-trip-cover:url('${cover}')">
-     <div class="mobile-trip-overlay"></div>
-     <div class="mobile-trip-hero-top"><div><span class="mobile-trip-name">${esc(t.name)}</span><span class="mobile-trip-meta">⌖ ${esc(t.destination||"—")}</span><span class="mobile-trip-meta">▣ ${date(t.start)} – ${date(t.end)}</span></div><div class="mobile-trip-clock"><strong>${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</strong><small>${new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</small></div></div>
-     ${mobileStats}
-     <div class="mobile-trip-photo-bottom"><button type="button" class="mobile-participant-badge" data-page="Participants">${hpIcon("users")} <b>${total} Participants</b><span>›</span></button><button type="button" class="mobile-photo-button" ${mode==='master'?'id="editTripSettings"':''}>◎ Ganti foto</button></div>
-   </section>
-   <section class="mobile-dashboard-menu"><div class="mobile-section-label">TRIP MENU</div><div class="mobile-dashboard-menu-grid">${menuHtml}</div></section>
-   <section class="mobile-summary-grid">
-     <article class="mobile-summary-card"><div class="summary-card-head"><span>Budget Overview</span><span class="summary-icon">${hpIcon("wallet")}</span></div><strong>${money(budget)}</strong><div class="summary-track"><i style="width:${pct}%"></i></div><small>${pct.toFixed(1)}% spent · ${money(spent)} used</small></article>
-     <article class="mobile-summary-card"><div class="summary-card-head"><span>Upcoming Itinerary</span><span class="summary-icon">${hpIcon("calendar")}</span></div>${next?`<strong class="summary-title">${esc(next.title||next.activity||"Upcoming")}</strong><small>${date(next.date)} · ${esc(next.time||"")}</small><small>${esc(next.place||next.location||"")}</small>`:`<strong class="summary-title">No itinerary yet</strong><small>Add your first itinerary item.</small>`}</article>
-   </section>
-   <button type="button" class="mobile-fab" data-page="Expense Planning">＋</button>
- </div>`;
- const desktopDashboard=`<div class="desktop-dashboard">
- <section class="hero" style="background-image:url('${cover}')"><span class="pill">TRIP SPACE</span><h2>${esc(t.name)}</h2><p>${date(t.start)} – ${date(t.end)}　·　${esc(t.destination)}</p></section>
- <div class="stats dashboard-stats"><div class="stat"><span class="stat-icon">${hpIcon("users")}</span><small>Participants</small><b>${total} People</b></div><div class="stat"><span class="stat-icon">${hpIcon("wallet")}</span><small>Planned Budget</small><b>${money(budget)}</b></div><div class="stat"><span class="stat-icon">${hpIcon("chart")}</span><small>Total Spent</small><b>${money(spent)}</b></div><div class="stat"><span class="stat-icon">${hpIcon("calendar")}</span><small>Remaining</small><b>${money(budget-spent)}</b></div></div>
+ $("#content").innerHTML=`<section class="hero" style="background-image:url('${esc(t.cover||"")}')"><span class="pill">TRIP SPACE</span><h2>${esc(t.name)}</h2><p>${date(t.start)} – ${date(t.end)}　·　${esc(t.destination)}</p></section>
+ <div class="stats dashboard-stats">
+ <div class="stat"><span class="stat-icon">${hpIcon("users")}</span><small>Participants</small><b>${(t.participants||[]).length} People</b></div>
+ <div class="stat"><span class="stat-icon">${hpIcon("wallet")}</span><small>Planned Budget</small><b>${money(budget)}</b></div>
+ <div class="stat"><span class="stat-icon">${hpIcon("chart")}</span><small>Total Spent</small><b>${money(spent)}</b></div>
+ <div class="stat"><span class="stat-icon">${hpIcon("calendar")}</span><small>Remaining</small><b>${money(budget-spent)}</b></div></div>
  <div class="two"><section class="section"><h2>Budget Overview</h2><div class="bar"><i style="width:${pct}%"></i></div><b>${pct.toFixed(1)}%</b><p>Spent ${money(spent)} · Budget ${money(budget)}</p></section><section class="section"><h2>Upcoming Itinerary</h2>${next?`<b>${esc(next.title||next.activity||"")}</b><p>${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p>`:"No itinerary added yet."}</section></div>
- <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div><div class="actions">${mobileMenu.map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section></div>`;
- $("#content").innerHTML=mobileDashboard+desktopDashboard;
+ <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div><div class="actions">${[["General","pin"],["Participants","users"],["Income Planning","chart"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
 }
 function general(t){
  const ro=mode==="member"?"disabled":"";
