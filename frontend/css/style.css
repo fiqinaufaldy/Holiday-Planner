@@ -799,19 +799,83 @@ html[data-theme="dark"] .backup-actions button:not(.primary),
 body[data-theme="dark"] .backup-actions button:not(.primary){background:#1b2a40;border-color:#40536c;color:#eee8df}
 .backup-actions button:focus-visible,.theme-toggle:focus-visible,#nav button:focus-visible{outline:2px solid #d5a84f;outline-offset:3px}
 
-/* Mobile Trip Navigation: dashboard action cards stay hidden; full trip menu lives in More. */
-@media(max-width:700px){
-  .dashboard-overview .actions{display:none!important;}
-  .mobile-more-overlay{position:fixed;inset:0;z-index:120;display:flex;align-items:flex-end;background:rgba(3,10,18,.58);backdrop-filter:blur(5px);opacity:0;transition:opacity .18s ease;}
-  .mobile-more-overlay.show{opacity:1;}
-  .mobile-more-card{width:100%;max-height:78vh;overflow:auto;background:#102139;border:1px solid rgba(255,255,255,.12);border-radius:24px 24px 0 0;padding:20px 16px calc(24px + env(safe-area-inset-bottom));box-shadow:0 -18px 50px rgba(0,0,0,.35);transform:translateY(16px);transition:transform .18s ease;}
-  .mobile-more-overlay.show .mobile-more-card{transform:translateY(0);}
-  .mobile-more-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-  .mobile-more-head small{font-size:9px;letter-spacing:.16em;color:#aebed2;font-weight:700;}
-  .mobile-more-head h3{margin:3px 0 0;color:#f5f1e9;font:600 22px 'Playfair Display',serif;}
-  .mobile-more-head button{border:0;background:rgba(255,255,255,.08);color:#f5f1e9;width:34px;height:34px;border-radius:50%;font-size:22px;}
-  .mobile-more-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
-  .mobile-more-grid button{display:flex;align-items:center;gap:10px;min-height:54px;padding:12px;border:1px solid #304b69;border-radius:13px;background:#1b304d;color:#f1f5fb;font:500 11px 'DM Sans',sans-serif;text-align:left;}
-  .mobile-more-grid button .hp-icon{width:20px;height:20px;color:#d9b46b;flex:0 0 20px;}
-  .mobile-more-grid button:active{transform:scale(.98);}
+/* Mobile trip navigation: native app-style bottom bar + More sheet */
+@media (max-width:700px){
+  body:not(.trip-welcome-mode) #app>main>header{
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+    padding:4px 0 16px!important;
+  }
+  body:not(.trip-welcome-mode) #app>main>header>div:first-child{min-width:0;flex:1}
+  body:not(.trip-welcome-mode) #app>main>header small{font-size:8px!important;letter-spacing:.18em!important}
+  body:not(.trip-welcome-mode) #app>main>header h1{
+    font-size:32px!important;line-height:1.05!important;margin:5px 0 5px!important;
+    word-break:normal!important;overflow-wrap:anywhere!important;
+  }
+  body:not(.trip-welcome-mode) #app>main>header p{font-size:10px!important;line-height:1.5!important;margin:0!important}
+  body:not(.trip-welcome-mode) #content{padding-bottom:20px!important}
+  .mobile-nav.is-visible{
+    left:12px!important;right:12px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;
+    min-height:68px!important;padding:7px 5px!important;border-radius:19px!important;
+    grid-template-columns:repeat(5,1fr)!important;
+  }
+  .mobile-nav button{font-size:9px!important;min-height:52px!important}
+  .mobile-nav button .hp-icon{width:19px!important;height:19px!important}
+  .mobile-nav button.active{background:#263d5d!important;color:#ffd27c!important}
 }
+.mobile-more-sheet{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;pointer-events:auto}
+.mobile-more-backdrop{position:absolute;inset:0;background:rgba(5,14,25,.56);backdrop-filter:blur(4px)}
+.mobile-more-panel{
+  position:relative;width:100%;max-height:min(76vh,620px);overflow:auto;
+  background:#102139;border:1px solid rgba(255,255,255,.12);border-bottom:0;
+  border-radius:25px 25px 0 0;padding:10px 18px calc(24px + env(safe-area-inset-bottom));
+  box-shadow:0 -18px 50px rgba(0,0,0,.35);transform:translateY(100%);transition:transform .22s ease;
+}
+.mobile-more-sheet.open .mobile-more-panel{transform:translateY(0)}
+.mobile-more-handle{width:42px;height:4px;border-radius:10px;background:#71829a;margin:3px auto 16px}
+.mobile-more-head{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:0 2px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.mobile-more-head small{font-size:8px;letter-spacing:.18em;color:#91a1b4}
+.mobile-more-head h3{font:600 20px/1.1 "Playfair Display",serif;color:#f4f0e8;margin:4px 0 0}
+.mobile-more-close{width:34px;height:34px;border:0;border-radius:50%;background:#223955;color:#f1f4f7;font-size:24px;line-height:1}
+.mobile-more-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding-top:16px}
+.mobile-more-grid button{
+  min-height:82px;border:1px solid #304a68;border-radius:15px;background:#172d49;color:#e8edf3;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  font:500 10px "DM Sans",sans-serif;padding:10px 5px;
+}
+.mobile-more-grid button .hp-icon{width:22px;height:22px;color:#d9b46b}
+.mobile-more-grid button:hover,.mobile-more-grid button:active{background:#253f60;border-color:#56708f}
+@media(max-width:700px){
+  .mobile-more-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(min-width:701px){.mobile-more-sheet{display:none!important}}
+
+
+/* Mobile trip launcher: app-style menu that mirrors the desktop trip navigation. */
+.mobile-trip-menu{display:none}
+@media(max-width:700px){
+  .mobile-trip-menu{display:block;margin:18px 0 14px;padding:0}
+  .mobile-trip-menu-head{margin:0 2px 12px}
+  .mobile-trip-menu-head .eyebrow{display:block;font-size:9px;letter-spacing:.16em;color:#8d9c8f;font-weight:800;margin-bottom:4px}
+  .mobile-trip-menu-head h2{margin:0;color:#f2eee6;font:600 23px 'Playfair Display',serif}
+  .mobile-trip-menu-head p{margin:5px 0 0;color:#91a0b1;font-size:10px}
+  .mobile-trip-menu-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .mobile-trip-menu-grid button{min-height:92px;border:1px solid rgba(116,143,171,.38);border-radius:16px;background:linear-gradient(180deg,#1b2d46 0%,#15263d 100%);color:#f3f5f7;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:10px;padding:14px 12px;text-align:left;box-shadow:0 5px 16px rgba(0,0,0,.12);cursor:pointer}
+  .mobile-trip-menu-grid button:active{transform:scale(.98);background:#223a59}
+  .mobile-trip-menu-icon{width:34px;height:34px;border-radius:11px;background:rgba(213,177,104,.13);display:grid;place-items:center;color:#e2c27f}
+  .mobile-trip-menu-icon .hp-icon{width:19px;height:19px}
+  .mobile-trip-menu-label{font-size:10px;font-weight:650;line-height:1.25;color:#f0f3f5}
+  .desktop-trip-overview{display:none!important}
+  .two{margin-top:8px}
+}
+@media(max-width:380px){
+  .mobile-trip-menu-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .mobile-trip-menu-grid button{min-height:88px}
+}
+html[data-theme="light"] .mobile-trip-menu-head h2{color:#173d2e}
+html[data-theme="light"] .mobile-trip-menu-head p{color:#788177}
+html[data-theme="light"] .mobile-trip-menu-grid button{background:linear-gradient(180deg,#fffdfa 0%,#f6f2e9 100%);border-color:#e4ddcf;color:#284438}
+html[data-theme="light"] .mobile-trip-menu-label{color:#284438}
+html[data-theme="light"] .mobile-trip-menu-icon{background:#f2e7cf;color:#8a6426}
