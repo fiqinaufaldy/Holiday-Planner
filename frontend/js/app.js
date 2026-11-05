@@ -189,8 +189,6 @@ async function hydrateTripsFromCloud(){
  }
 
  // Merge cloud rows with local details; never discard local-only records.
- if(mode==="admin")db.cloudAssignedTripIds=cloudRows.map(r=>r.id);
- if(mode==="admin")db.cloudAssignedTripIds=cloudRows.map(r=>r.id);
  const localById=new Map(localSnapshot.map(t=>[t.id,t]));
  const localByCloudId=new Map(Object.entries(map).map(([localId,cloudId])=>[cloudId,localById.get(localId)]).filter(([,v])=>!!v));
  const localByName=new Map(localSnapshot.map(t=>[(t.name||"").trim().toLowerCase(),t]));
@@ -202,7 +200,7 @@ async function hydrateTripsFromCloud(){
  });
  const represented=new Set(merged.map(t=>t.id));
  const cloudMappedLocalIds=new Set(Object.keys(map));
- const localOnly=mode==="admin"?[]:localSnapshot.filter(t=>!cloudMappedLocalIds.has(t.id)&&!represented.has(t.id)&&!cloudRows.some(r=>(r.name||"").trim().toLowerCase()===(t.name||"").trim().toLowerCase()));
+ const localOnly=localSnapshot.filter(t=>!cloudMappedLocalIds.has(t.id)&&!represented.has(t.id)&&!cloudRows.some(r=>(r.name||"").trim().toLowerCase()===(t.name||"").trim().toLowerCase()));
  db.trips=[...merged,...localOnly];
  db.cloudTripMap=map;
  // Restore complete per-trip workspace snapshots from Supabase before enabling cloud writes.
@@ -242,15 +240,12 @@ $("#pin").addEventListener("keydown",e=>{if(e.key==="Enter")enter(e.target.value
 if($("#lock"))$("#lock").onclick=auth;
 function assignedTrips(){
  if(mode==="master")return db.trips;
- if(mode==="admin")return db.trips.filter(t=>{
-  const assigned=db.cloudAssignedTripIds||[];
-  return assigned.includes(t.id);
- });
+ if(mode==="admin")return db.trips;
  return[];
 }
 function navItems(){
  if(mode==="master")return tripId?[["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"],["All Trips","back"]]:[["All Trips","grid"],["Create Trip","plus"],["Access Management","users"],["Settings","settings"]];
- if(mode==="admin")return tripId?[["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"],["Assigned Trips","back"]]:[["Assigned Trips","grid"],["Settings","settings"]];
+ if(mode==="admin")return tripId?[["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"],["Settings","settings"],["Assigned Trips","back"]]:[["Assigned Trips","grid"],["Settings","settings"]];
  if(mode==="member")return [["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]];
  return [];
 }
@@ -273,19 +268,28 @@ function showApp(){
  $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("back")}<span>Log out</span></button>`;
  const mobileNav=$("#mobileNav");
  if(mobileNav){
-   let items=[];
-   if(tripId){
-     items=[["Dashboard","home"],["General","settings"],["Expense Planning","wallet"],["Itinerary","calendar"],["More","more"]];
-   }else if(mode==="admin"){
-     items=[["Assigned Trips","grid"],["Settings","settings"]];
-   }
-   mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n==="More"?(plannerLanguage==="id"?"Lainnya":"More"):n}</span></button>`).join("");
+   const items=mode==="master"?[]:[["Dashboard","home"],["Expense Planning","wallet"],["Itinerary","calendar"],["Participants","users"],["More","more"]];
+   mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-${n==="More"?"action":"page"}="${n==="More"?"mobile-more":n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n==="More"?(plannerLanguage==="id"?"Lainnya":"More"):n}</span></button>`).join("");
    mobileNav.classList.toggle("is-visible",items.length>0&&!pendingTripWelcome);
  }
  if(pendingTripWelcome&&tripId){document.body.classList.add("trip-welcome-mode");renderTripWelcome();return;}
  document.body.classList.remove("trip-welcome-mode");
  render();
 }
+function openMobileMore(){
+ const existing=document.getElementById("mobileMoreMenu");
+ if(existing){existing.remove();return;}
+ const items=navItems().filter(([n])=>n!=="Settings"&&n!=="Assigned Trips");
+ const overlay=document.createElement("div");
+ overlay.id="mobileMoreMenu";
+ overlay.className="mobile-more-overlay";
+ overlay.innerHTML=`<div class="mobile-more-card"><div class="mobile-more-head"><div><small>TRIP MENU</small><h3>More</h3></div><button type="button" data-action="close-mobile-more">×</button></div><div class="mobile-more-grid">${items.map(([n,ic])=>`<button type="button" data-more-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></div>`;
+ document.body.appendChild(overlay);
+ requestAnimationFrame(()=>overlay.classList.add("show"));
+ overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.remove();});
+}
+function closeMobileMore(){document.getElementById("mobileMoreMenu")?.remove();}
+
 function renderTripWelcome(){
  const t=trip();
  const role=mode==="master"?"Master Access":mode==="admin"?"Admin Access":"Member Access";
@@ -716,7 +720,7 @@ $("#cancelTrip").onclick=()=>$("#tripModal").close();
 document.addEventListener("click",async e=>{let b=e.target.closest("button");if(!b)return;
 if(b.hasAttribute("data-villa-prev")){setVillaGallery(villaGalleryIndex-1);return;}
 if(b.hasAttribute("data-villa-next")){setVillaGallery(villaGalleryIndex+1);return;}
-if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
+if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.dataset.action==="mobile-more"){openMobileMore();return;}if(b.dataset.action==="close-mobile-more"){closeMobileMore();return;}if(b.dataset.morePage){closeMobileMore();page=b.dataset.morePage;render();return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
 if(b.id==="createAdmin"){
  if(mode!=="master")return toast("Master Access required.");
  const name=$("#newAdminName").value.trim(),pin=$("#newAdminPin").value.trim(),trips=[...document.querySelectorAll('input[name="adminTrip"]:checked')].map(o=>o.value);
