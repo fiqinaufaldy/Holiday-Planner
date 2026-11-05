@@ -336,7 +336,13 @@ function mobileTripMenu(){
  const items=[["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]];
  const el=document.createElement("section");
  el.className="mobile-trip-menu";
- el.innerHTML=`<div class="mobile-trip-menu-head"><div><span class="eyebrow">TRIP MENU</span><h2>Plan your trip</h2></div></div><div class="mobile-trip-menu-grid">${items.map(([n,ic])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div>`;
+ const t=trip();
+ el.innerHTML=`<div class="mobile-page-header">
+   <div class="mobile-page-brand"><span class="mobile-brand-mark">✈</span><div><strong>Holiday<br>Planner</strong><small>${esc(t.name||"Your Trip")}</small></div></div>
+   <div class="mobile-page-actions"><button type="button" aria-label="Refresh">↻</button><button type="button" aria-label="Search">⌕</button><button type="button" aria-label="Notifications">♧</button></div>
+ </div>
+ <div class="mobile-trip-context"><div><span class="mobile-trip-kicker">YOUR TRAVEL SPACE</span><h1>${esc(t.name||"Your Trip")}</h1><p>${esc(t.destination||"—")} · ${date(t.start)} – ${date(t.end)}</p></div><div class="mobile-role-pill">${mode.toUpperCase()}</div></div>
+ <div class="mobile-trip-menu-head"><div><span class="eyebrow">TRIP MENU</span><h2>Plan your trip</h2></div></div><div class="mobile-trip-menu-grid">${items.map(([n,ic])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div>`;
  content.prepend(el);
 }
 function render(){
@@ -699,8 +705,10 @@ function dashboard(t){
      <div class="mobile-trip-photo-bottom"><button type="button" class="mobile-participant-badge" data-page="Participants">${hpIcon("users")} <b>${total} Participants</b><span>›</span></button><button type="button" class="mobile-photo-button" ${mode==='master'?'id="editTripSettings"':''}>◎ Ganti foto</button></div>
    </section>
    <section class="mobile-dashboard-menu"><div class="mobile-section-label">TRIP MENU</div><div class="mobile-dashboard-menu-grid">${menuHtml}</div></section>
-   <section class="mobile-info-card"><div><span class="mobile-info-icon">▣</span><div><h3>Agenda Hari Ini</h3><p>${next?`${esc(next.title||next.activity||"Agenda")}${next.time?` · ${esc(next.time)}`:""}`:"Tidak ada agenda atau tugas hari ini."}</p></div></div><button type="button" data-page="Itinerary">＋</button></section>
-   <section class="mobile-info-card due-card"><div><span class="mobile-info-icon due">↔</span><div><h3>Akan Jatuh Tempo</h3><p>${t.cashflow&&t.cashflow.length?`${esc(t.cashflow[0].description||"Pembayaran")}${t.cashflow[0].amount?` · ${money(t.cashflow[0].amount)}`:""}`:"Belum ada pembayaran jatuh tempo."}</p></div></div><span class="due-badge">${t.cashflow&&t.cashflow.length?"Upcoming":"—"}</span></section>
+   <section class="mobile-summary-grid">
+     <article class="mobile-summary-card"><div class="summary-card-head"><span>Budget Overview</span><span class="summary-icon">${hpIcon("wallet")}</span></div><strong>${money(budget)}</strong><div class="summary-track"><i style="width:${pct}%"></i></div><small>${pct.toFixed(1)}% spent · ${money(spent)} used</small></article>
+     <article class="mobile-summary-card"><div class="summary-card-head"><span>Upcoming Itinerary</span><span class="summary-icon">${hpIcon("calendar")}</span></div>${next?`<strong class="summary-title">${esc(next.title||next.activity||"Upcoming")}</strong><small>${date(next.date)} · ${esc(next.time||"")}</small><small>${esc(next.place||next.location||"")}</small>`:`<strong class="summary-title">No itinerary yet</strong><small>Add your first itinerary item.</small>`}</article>
+   </section>
    <button type="button" class="mobile-fab" data-page="Expense Planning">＋</button>
  </div>`;
  const desktopDashboard=`<div class="desktop-dashboard">

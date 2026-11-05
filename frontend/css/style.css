@@ -865,3 +865,74 @@ body[data-theme="dark"] .backup-actions button:not(.primary){background:#1b2a40;
  .mobile-fab{bottom:83px}
 }
 @media(max-width:380px){.mobile-trip-name{font-size:18px}.mobile-trip-hero-top{padding:14px 12px 0}.mobile-trip-stats small{font-size:6.5px}.mobile-trip-stats b{font-size:9px}.mobile-dashboard-menu-grid{gap:13px 3px}.mobile-dashboard-menu-item{font-size:7.5px}.mobile-dashboard-menu-item .hp-icon{width:35px;height:35px}.mobile-trip-photo-bottom{padding-left:9px;padding-right:9px}.mobile-participant-badge,.mobile-photo-button{font-size:7.5px;padding:6px 8px}}
+
+/* MOBILE APP SYSTEM — shared visual language across every Trip page */
+@media(max-width:700px){
+  body{overflow-x:hidden}
+  .shell main{background:var(--mobile-bg,#f7f4ee);min-height:100vh}
+  .mobile-page-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 2px 12px}
+  .mobile-page-brand{display:flex;align-items:center;gap:8px;min-width:0;color:#173d2e}
+  .mobile-page-brand .mobile-brand-mark{font-size:18px;flex:0 0 auto}
+  .mobile-page-brand strong{display:block;font:600 16px/.88 "Playfair Display",serif;letter-spacing:-.2px}
+  .mobile-page-brand small{display:block;margin-top:5px;font:500 8px/1.1 "DM Sans",sans-serif;color:#8a918b;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mobile-page-actions{display:flex;gap:2px;flex:0 0 auto}
+  .mobile-page-actions button{width:30px;height:30px;border:0;background:transparent;color:#405246;font-size:19px;padding:0}
+  .mobile-trip-context{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:2px 2px 13px}
+  .mobile-trip-context h1{margin:2px 0 3px;font:600 25px/1.02 "Playfair Display",serif;color:#24352e;letter-spacing:-.25px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mobile-trip-context p{margin:0;color:#7b837d;font:500 9px/1.35 "DM Sans",sans-serif}
+  .mobile-trip-kicker{font:800 7px/1.1 "DM Sans",sans-serif;letter-spacing:1.35px;color:#9a8a6b}
+  .mobile-role-pill{margin-top:5px;padding:6px 9px;border:1px solid #e4ddcf;border-radius:999px;background:#fffdfa;color:#8a6426;font:700 7px "DM Sans",sans-serif;white-space:nowrap}
+  .mobile-trip-menu{margin-bottom:18px}
+  .mobile-trip-menu-head{margin:0 2px 9px!important}
+  .mobile-trip-menu-head h2{font-size:17px!important;color:#24352e!important}
+  .mobile-trip-menu-grid{gap:9px!important}
+  .mobile-trip-menu-grid button{min-height:61px!important;border-radius:16px!important;background:#fffdfa!important;border-color:#e8e1d6!important;color:#294538!important;box-shadow:0 6px 18px rgba(38,47,39,.055)!important}
+  .mobile-trip-menu-grid button .hp-icon{width:21px!important;height:21px!important;color:#8d6c2f!important}
+  .mobile-trip-menu-grid button.active{background:#173d2e!important;border-color:#173d2e!important;color:#fff!important}
+  .mobile-trip-menu-grid button.active .hp-icon{color:#f1d08b!important}
+  .mobile-trip-menu-grid button span{font-size:9px;line-height:1.15}
+  .section{border-radius:18px!important}
+  .section h2,.toolbar h2{font-family:"Playfair Display",serif!important;color:#24352e!important}
+  .toolbar p{font-size:9px!important;color:#7b837d!important}
+  .people-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .people-stats .stat{border-radius:14px!important}
+  .people-stats .stat small{font-size:8px!important;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis}
+  .people-stats .stat b{font-size:13px!important;white-space:nowrap}
+  .table-wrap,.section table{max-width:100%;overflow-x:auto}
+  html[data-theme="dark"] .shell main,body[data-theme="dark"] .shell main{background:#0d1728}
+  html[data-theme="dark"] .mobile-page-brand,body[data-theme="dark"] .mobile-page-brand{color:#f0e9df}
+  html[data-theme="dark"] .mobile-page-brand small,body[data-theme="dark"] .mobile-page-brand small{color:#a89f94}
+  html[data-theme="dark"] .mobile-page-actions button,body[data-theme="dark"] .mobile-page-actions button{color:#cfc7bc}
+  html[data-theme="dark"] .mobile-trip-context h1,body[data-theme="dark"] .mobile-trip-context h1{color:#f1ece4}
+  html[data-theme="dark"] .mobile-trip-context p,body[data-theme="dark"] .mobile-trip-context p{color:#aaa095}
+  html[data-theme="dark"] .mobile-role-pill,body[data-theme="dark"] .mobile-role-pill{background:#182b44;border-color:#405873;color:#e7c477}
+  html[data-theme="dark"] .mobile-trip-menu-head h2,body[data-theme="dark"] .mobile-trip-menu-head h2{color:#f1ece4!important}
+}
+
+/* Dashboard cards use the same content as the desktop dashboard. */
+.mobile-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 2px 4px}
+.mobile-summary-card{min-width:0;border:1px solid #e8e1d6;background:#fffdfa;border-radius:18px;padding:14px;box-shadow:0 6px 20px rgba(35,48,38,.045)}
+.summary-card-head{display:flex;align-items:center;justify-content:space-between;gap:7px;color:#7c827c;font:800 7px/1.1 "DM Sans",sans-serif;text-transform:uppercase;letter-spacing:.8px}
+.summary-icon{width:25px;height:25px;border-radius:9px;background:#edf0e9;color:#6d7b70;display:grid;place-items:center}
+.summary-icon .hp-icon{width:14px;height:14px}
+.mobile-summary-card>strong{display:block;margin-top:9px;color:#24352e;font:700 15px/1.1 "DM Sans",sans-serif}
+.mobile-summary-card .summary-title{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mobile-summary-card small{display:block;margin-top:5px;color:#81877f;font:500 8px/1.35 "DM Sans",sans-serif}
+.summary-track{height:6px;background:#ece8df;border-radius:99px;overflow:hidden;margin-top:10px}
+.summary-track i{display:block;height:100%;background:#caa24a;border-radius:inherit}
+html[data-theme="dark"] .mobile-summary-card,body[data-theme="dark"] .mobile-summary-card{background:#142238;border-color:#30445e;color:#eee8df}
+html[data-theme="dark"] .mobile-summary-card>strong,body[data-theme="dark"] .mobile-summary-card>strong{color:#f1ece4}
+html[data-theme="dark"] .mobile-summary-card small,body[data-theme="dark"] .mobile-summary-card small{color:#aaa095}
+html[data-theme="dark"] .summary-card-head,body[data-theme="dark"] .summary-card-head{color:#a99e91}
+html[data-theme="dark"] .summary-icon,body[data-theme="dark"] .summary-icon{background:#1d314b;color:#d7b56c}
+html[data-theme="dark"] .summary-track,body[data-theme="dark"] .summary-track{background:#2c4058}
+
+@media(max-width:380px){
+  .mobile-trip-context h1{font-size:22px}
+  .mobile-page-brand strong{font-size:15px}
+  .mobile-trip-menu-grid{gap:7px!important}
+  .mobile-trip-menu-grid button{min-height:58px!important;padding:9px 8px!important}
+  .mobile-trip-menu-grid button span{font-size:8px}
+  .mobile-summary-grid{gap:8px}
+  .mobile-summary-card{padding:12px}
+}
