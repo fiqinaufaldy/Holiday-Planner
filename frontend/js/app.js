@@ -280,7 +280,7 @@ function showApp(){
  if(mobileNav){
    let items=[];
    if(tripId){
-     items=[["Dashboard","home"],["Expense Planning","wallet"],["Villas & Stay","bed"],["More","more"]];
+     items=[["Dashboard","home"],["Expense Planning","wallet"],["Participants","users"],["Villas & Stay","bed"],["More","more"]];
    }else if(mode==="admin"){
      items=[["Assigned Trips","grid"],["Settings","settings"]];
    }else if(mode==="master"){
