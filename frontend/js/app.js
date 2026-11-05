@@ -163,29 +163,18 @@ async function hydrateTripsFromCloud(){
  const unmappedLocal=localSnapshot.filter(t=>!map[t.id]&&!cloudRows.some(r=>r.id===t.id));
  const candidates=unmappedLocal.filter(t=>!remoteNames.has((t.name||"").trim().toLowerCase()));
 
- // Offer migration only when there are local trips not already represented in Supabase.
+ // Supabase is now the primary source of truth.
+ // Local-only trips are kept only as a browser fallback/backup and are NOT
+ // offered for automatic import during normal login. This prevents the
+ // migration popup from appearing on every device/browser that still has
+ // an old localStorage snapshot.
+ //
+ // If a local trip has the same name as a Supabase trip, its local detail
+ // snapshot may still be merged below until the cloud workspace is loaded.
+ // Trips that exist only in localStorage are intentionally excluded from
+ // the active cloud dataset.
  if(candidates.length){
-  const migrate=confirm("Ditemukan " + candidates.length + " trip lokal yang belum ada di Supabase. Impor data dasar trip sekarang? Data detail tetap dipertahankan di browser untuk sementara.");
-  if(migrate){
-   const createdMap={};
-   try{
-    for(const t of candidates){
-     const created=await window.HolidayPlannerCloud.createTrip({name:t.name,destination:t.destination,start:t.start,end:t.end,cover:t.cover,description:"Migrated from Holiday Planner local data"});
-     if(!created?.id) throw new Error("Supabase tidak mengembalikan ID untuk trip: "+t.name);
-     createdMap[t.id]=created.id;
-    }
-    Object.assign(map,createdMap);
-    cloudRows=await window.HolidayPlannerCloud.listTrips();
-   }catch(error){
-    // Do not replace or clear local data on any partial/failed import.
-    db.trips=localSnapshot; db.cloudTripMap=map; save();
-    throw new Error("Impor trip belum selesai. Data lokal tetap dipertahankan. Detail: "+(error?.message||error));
-   }
-  }else{
-   // Cancel means stay in local mode for these trips; never replace them with an empty cloud list.
-   db.trips=localSnapshot; db.cloudTripMap=map; save();
-   return;
-  }
+  console.info("Ignoring local-only trips during cloud login:", candidates.map(t=>t.name));
  }
 
  // Merge cloud rows with local details; never discard local-only records.
@@ -200,7 +189,9 @@ async function hydrateTripsFromCloud(){
  });
  const represented=new Set(merged.map(t=>t.id));
  const cloudMappedLocalIds=new Set(Object.keys(map));
- const localOnly=localSnapshot.filter(t=>!cloudMappedLocalIds.has(t.id)&&!represented.has(t.id)&&!cloudRows.some(r=>(r.name||"").trim().toLowerCase()===(t.name||"").trim().toLowerCase()));
+ // Do not surface local-only trips in the active app when Supabase is available.
+ // They remain in localStorage only as a fallback/backup.
+ const localOnly=[];
  db.trips=[...merged,...localOnly];
  db.cloudTripMap=map;
  // Restore complete per-trip workspace snapshots from Supabase before enabling cloud writes.
