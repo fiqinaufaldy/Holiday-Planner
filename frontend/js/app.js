@@ -673,14 +673,42 @@ function dashboard(t){
  const spent=(t.cashflow||[]).filter(x=>x.type==="Expense").reduce((a,x)=>a+Number(x.amount||0),0);
  const pct=budget?Math.min(100,spent/budget*100):0;
  const next=(t.itinerary||[]).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];
- $("#content").innerHTML=`<section class="hero" style="background-image:url('${esc(t.cover||"")}')"><span class="pill">TRIP SPACE</span><h2>${esc(t.name)}</h2><p>${date(t.start)} – ${date(t.end)}　·　${esc(t.destination)}</p></section>
- <div class="stats dashboard-stats">
- <div class="stat"><span class="stat-icon">${hpIcon("users")}</span><small>Participants</small><b>${(t.participants||[]).length} People</b></div>
- <div class="stat"><span class="stat-icon">${hpIcon("wallet")}</span><small>Planned Budget</small><b>${money(budget)}</b></div>
- <div class="stat"><span class="stat-icon">${hpIcon("chart")}</span><small>Total Spent</small><b>${money(spent)}</b></div>
- <div class="stat"><span class="stat-icon">${hpIcon("calendar")}</span><small>Remaining</small><b>${money(budget-spent)}</b></div></div>
+ const participants=Array.isArray(t.participants)?t.participants:[];
+ const confirmed=participants.filter(x=>String(x.status||"").toLowerCase()==="confirmed").length;
+ const pending=participants.filter(x=>String(x.status||"").toLowerCase()==="pending").length;
+ const notJoining=participants.filter(x=>String(x.status||"").toLowerCase().replace(/\s+/g,"")==="notjoining").length;
+ const total=participants.length;
+ const cover=esc(t.cover||"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1600&q=85");
+ const mobileMenu=[
+  ["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],
+  ["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]
+ ];
+ const menuHtml=mobileMenu.map(([n,ic])=>`<button type="button" class="mobile-dashboard-menu-item" data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("");
+ const mobileStats=`<div class="mobile-trip-stats">
+  <article><span>${hpIcon("users")}</span><small>Total Participants</small><b>${total} People</b></article>
+  <article><span>${hpIcon("check")}</span><small>Confirmed</small><b>${confirmed} People</b></article>
+  <article><span>${hpIcon("clock")}</span><small>Pending</small><b>${pending} People</b></article>
+  <article><span>${hpIcon("close")}</span><small>Not Joining</small><b>${notJoining} People</b></article>
+ </div>`;
+ const mobileDashboard=`<div class="mobile-dashboard">
+   <div class="mobile-dashboard-top"><div class="mobile-brand"><span class="mobile-brand-mark">✈</span><div><strong>Holiday<br>Planner</strong></div></div><div class="mobile-top-actions"><button type="button" aria-label="Refresh">↻</button><button type="button" aria-label="Search">⌕</button><button type="button" aria-label="Notifications">♧</button></div></div>
+   <section class="mobile-trip-hero" style="--mobile-trip-cover:url('${cover}')">
+     <div class="mobile-trip-overlay"></div>
+     <div class="mobile-trip-hero-top"><div><span class="mobile-trip-name">${esc(t.name)}</span><span class="mobile-trip-meta">⌖ ${esc(t.destination||"—")}</span><span class="mobile-trip-meta">▣ ${date(t.start)} – ${date(t.end)}</span></div><div class="mobile-trip-clock"><strong>${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</strong><small>${new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</small></div></div>
+     ${mobileStats}
+     <div class="mobile-trip-photo-bottom"><button type="button" class="mobile-participant-badge" data-page="Participants">${hpIcon("users")} <b>${total} Participants</b><span>›</span></button><button type="button" class="mobile-photo-button" ${mode==='master'?'id="editTripSettings"':''}>◎ Ganti foto</button></div>
+   </section>
+   <section class="mobile-dashboard-menu"><div class="mobile-section-label">TRIP MENU</div><div class="mobile-dashboard-menu-grid">${menuHtml}</div></section>
+   <section class="mobile-info-card"><div><span class="mobile-info-icon">▣</span><div><h3>Agenda Hari Ini</h3><p>${next?`${esc(next.title||next.activity||"Agenda")}${next.time?` · ${esc(next.time)}`:""}`:"Tidak ada agenda atau tugas hari ini."}</p></div></div><button type="button" data-page="Itinerary">＋</button></section>
+   <section class="mobile-info-card due-card"><div><span class="mobile-info-icon due">↔</span><div><h3>Akan Jatuh Tempo</h3><p>${t.cashflow&&t.cashflow.length?`${esc(t.cashflow[0].description||"Pembayaran")}${t.cashflow[0].amount?` · ${money(t.cashflow[0].amount)}`:""}`:"Belum ada pembayaran jatuh tempo."}</p></div></div><span class="due-badge">${t.cashflow&&t.cashflow.length?"Upcoming":"—"}</span></section>
+   <button type="button" class="mobile-fab" data-page="Expense Planning">＋</button>
+ </div>`;
+ const desktopDashboard=`<div class="desktop-dashboard">
+ <section class="hero" style="background-image:url('${cover}')"><span class="pill">TRIP SPACE</span><h2>${esc(t.name)}</h2><p>${date(t.start)} – ${date(t.end)}　·　${esc(t.destination)}</p></section>
+ <div class="stats dashboard-stats"><div class="stat"><span class="stat-icon">${hpIcon("users")}</span><small>Participants</small><b>${total} People</b></div><div class="stat"><span class="stat-icon">${hpIcon("wallet")}</span><small>Planned Budget</small><b>${money(budget)}</b></div><div class="stat"><span class="stat-icon">${hpIcon("chart")}</span><small>Total Spent</small><b>${money(spent)}</b></div><div class="stat"><span class="stat-icon">${hpIcon("calendar")}</span><small>Remaining</small><b>${money(budget-spent)}</b></div></div>
  <div class="two"><section class="section"><h2>Budget Overview</h2><div class="bar"><i style="width:${pct}%"></i></div><b>${pct.toFixed(1)}%</b><p>Spent ${money(spent)} · Budget ${money(budget)}</p></section><section class="section"><h2>Upcoming Itinerary</h2>${next?`<b>${esc(next.title||next.activity||"")}</b><p>${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p>`:"No itinerary added yet."}</section></div>
- <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div><div class="actions">${[["General","pin"],["Participants","users"],["Income Planning","chart"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
+ <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div><div class="actions">${mobileMenu.map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section></div>`;
+ $("#content").innerHTML=mobileDashboard+desktopDashboard;
 }
 function general(t){
  const ro=mode==="member"?"disabled":"";
