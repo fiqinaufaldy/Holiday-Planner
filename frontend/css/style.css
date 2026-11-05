@@ -798,3 +798,154 @@ body[data-theme="dark"] .budget-topline h2{
 html[data-theme="dark"] .backup-actions button:not(.primary),
 body[data-theme="dark"] .backup-actions button:not(.primary){background:#1b2a40;border-color:#40536c;color:#eee8df}
 .backup-actions button:focus-visible,.theme-toggle:focus-visible,#nav button:focus-visible{outline:2px solid #d5a84f;outline-offset:3px}
+
+
+
+/* Holiday Planner — mobile responsive pass (v4.0)
+   Scope: mobile layout only. Desktop styles remain unchanged. */
+@media (max-width: 700px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  body{font-size:14px}
+
+  /* Login */
+  .login{min-height:100svh;height:auto;padding:18px 14px;background-position:center}
+  .loginbox{width:min(100%,380px);padding:28px 22px;border-radius:20px}
+  .logo{font-size:23px;margin-bottom:24px}
+  .login h1{font-size:30px;line-height:1.12}
+  .login input{font-size:19px;letter-spacing:7px;padding:14px 10px}
+
+  /* Main shell */
+  .shell{width:100%;max-width:100%;overflow-x:hidden}
+  .shell main{margin-left:0!important;width:100%;max-width:none;padding:18px 14px 108px!important}
+  .shell header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+  .shell header>div{min-width:0;flex:1}
+  .shell header small{font-size:8px;letter-spacing:1.2px}
+  .shell h1{font-size:28px;line-height:1.1;margin:4px 0}
+  .shell header p{font-size:11px;line-height:1.45}
+  .theme-toggle{margin-left:0!important;padding:9px 11px;font-size:10px;white-space:nowrap}
+  .theme-toggle .hp-icon{width:15px;height:15px}
+
+  /* Cards / sections */
+  .section{padding:17px 15px;margin-top:14px;border-radius:15px}
+  .section h2{font-size:20px;line-height:1.2}
+  .hero{min-height:160px;padding:22px 20px;border-radius:15px}
+  .hero h2{font-size:30px;line-height:1.08}
+  .hero p{font-size:11px;line-height:1.5}
+  .grid{grid-template-columns:1fr!important;gap:12px;margin-top:14px}
+  .trip{border-radius:15px}
+  .cover{height:175px}
+  .tripbody{padding:14px}
+  .trip h3{font-size:18px}
+  .tripfoot{font-size:9px}
+
+  /* Stats */
+  .stats,.dashboard-stats,.stay-stats,.people-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px}
+  .stat,.dashboard-stats .stat{padding:13px;min-width:0;border-radius:13px}
+  .stat b{font-size:15px;overflow-wrap:anywhere}
+  .stat small{font-size:9px}
+  .stat-icon{width:30px;height:30px}
+
+  /* Buttons / toolbars */
+  .toolbar{align-items:flex-start;flex-direction:column;gap:9px}
+  .toolbar .actions,.actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .actions button{min-height:42px;padding:9px 10px}
+  .backup-actions{display:grid;grid-template-columns:1fr;gap:8px}
+  .backup-actions button{width:100%}
+
+  /* Forms */
+  .formgrid,.twocol{grid-template-columns:1fr!important;gap:10px}
+  .formgrid label,dialog label{font-size:10px}
+  .formgrid input,dialog input,dialog select,dialog textarea{font-size:12px;padding:11px}
+
+  /* Tables: turn wide tables into horizontal scroll containers */
+  .table-wrap{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px}
+  .table-wrap table{min-width:680px}
+  table{min-width:620px}
+  .section table{font-size:10px}
+  th,td{padding:10px 9px;white-space:nowrap}
+
+  /* Timeline */
+  .event{grid-template-columns:1fr;gap:5px;padding:12px 0}
+  .event small{font-size:10px}
+
+  /* Villa / Stay */
+  .stay-intro{min-height:145px;padding:20px 18px;border-radius:15px}
+  .stay-intro h2{font-size:25px;line-height:1.08}
+  .stay-intro p{font-size:10px;max-width:75%}
+  .stay-intro-count{width:58px;height:58px;flex:0 0 58px}
+  .stay-intro-count b{font-size:21px}
+  .stay-toolbar{display:grid;grid-template-columns:1fr;gap:8px;margin:14px 0}
+  .stay-search{width:100%;max-width:none;min-width:0}
+  .stay-toolbar select{width:100%}
+  .stay-card{grid-template-columns:1fr!important;min-width:0}
+  .stay-photo{min-height:180px}
+  .stay-card-body{padding:15px}
+  .stay-card-top{flex-direction:column;gap:8px}
+  .stay-card h3{font-size:19px}
+  .stay-meta{gap:9px;margin:13px 0;font-size:10px}
+  .stay-card-actions{flex-wrap:wrap}
+  .stay-card-actions button{flex:1;min-width:120px}
+  .villa-detail-dialog{width:calc(100% - 20px);max-height:92svh}
+  .villa-detail{grid-template-columns:1fr!important}
+  .villa-detail-image{min-height:220px}
+  .villa-detail-content{padding:19px}
+  .villa-detail-content h2{font-size:25px}
+
+  /* Budget */
+  .budget-page{width:100%;max-width:none;padding:0 0 25px}
+  .budget-topline{display:flex;flex-direction:column;align-items:flex-start;gap:14px;margin-bottom:20px}
+  .budget-topline h2{font-size:32px;line-height:1.08}
+  .budget-topline p{font-size:11px;line-height:1.5}
+  .budget-top-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .budget-top-actions button{width:100%;height:44px;padding:0 10px}
+  .budget-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px;margin-bottom:16px}
+  .budget-summary-card{min-height:112px;padding:15px;border-radius:16px}
+  .budget-summary-card strong{font-size:20px;white-space:normal;overflow-wrap:anywhere}
+  .budget-health{padding:17px 15px;border-radius:17px;margin-bottom:17px}
+  .budget-health-head{align-items:flex-start;flex-direction:column;gap:8px}
+  .budget-tabs{width:100%;overflow-x:auto;justify-content:flex-start;gap:3px}
+  .budget-tabs button{flex:0 0 auto;padding:9px 12px}
+  .budget-list-panel{padding:17px 14px;border-radius:17px}
+  .budget-list-heading{align-items:flex-start;flex-direction:column;gap:6px}
+  .budget-item{display:grid;grid-template-columns:auto 1fr auto;gap:9px;padding:12px 9px}
+  .budget-item-main{min-width:0}
+  .budget-item-main>strong{font-size:11px;overflow-wrap:anywhere}
+  .budget-item-amount strong{font-size:11px}
+  .budget-item-actions{grid-column:1 / -1;width:100%;margin:0;display:flex;justify-content:flex-end}
+  .budget-category-list{grid-template-columns:1fr!important;gap:14px}
+
+  /* Welcome screen */
+  .trip-welcome{min-height:100svh!important;height:100svh!important}
+  .trip-welcome-content{padding:28px 22px!important}
+  .trip-welcome h2{font-size:38px;line-height:1.05}
+  .welcome-copy{font-size:12px;line-height:1.7;max-width:100%}
+  .welcome-enter{width:100%;justify-content:space-between}
+
+  /* Mobile nav */
+  .mobile-nav.is-visible{left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));padding:7px 4px;border-radius:18px}
+  .mobile-nav button{font-size:8px;min-height:46px}
+  .mobile-nav button .hp-icon{width:19px;height:19px}
+
+  /* Dialogs */
+  dialog{width:calc(100% - 20px);max-width:none;max-height:90svh;padding:18px;overflow:auto;border-radius:16px}
+  dialog menu{flex-wrap:wrap;margin-top:8px}
+  dialog menu button{min-height:42px}
+
+  /* Prevent long text / IDs from breaking the page */
+  .section p,.section h2,.section h3,.trip p,.stay-card p,
+  .budget-item-main,.request-proposal pre{overflow-wrap:anywhere}
+}
+
+@media (max-width: 420px){
+  .shell main{padding-left:11px!important;padding-right:11px!important}
+  .shell h1{font-size:25px}
+  .section{padding:14px 12px}
+  .dashboard-stats .stat{padding:11px}
+  .dashboard-stats .stat b{font-size:14px}
+  .budget-summary-card{padding:13px}
+  .budget-summary-card strong{font-size:18px}
+  .actions{grid-template-columns:1fr!important}
+  .budget-top-actions{grid-template-columns:1fr!important}
+  .loginbox{padding:24px 18px}
+  .login h1{font-size:27px}
+}
