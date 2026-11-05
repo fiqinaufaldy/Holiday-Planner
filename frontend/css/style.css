@@ -733,7 +733,7 @@ html[data-theme="dark"] .plan-setting-card input[type="checkbox"], body[data-the
  .two{grid-template-columns:1fr;gap:2px}
  .dashboard-overview .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
  .dashboard-overview .actions button{justify-content:flex-start;min-height:48px;padding:11px 12px;background:#1b2d45;color:#f1f5fb;border:1px solid #405873;border-radius:12px}
- .mobile-nav.is-visible{position:fixed;z-index:50;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:8px 5px;border:1px solid rgba(147,164,188,.28);border-radius:20px;background:rgba(13,25,44,.96);backdrop-filter:blur(18px);box-shadow:0 10px 35px rgba(0,0,0,.28)}
+ .mobile-nav.is-visible{position:fixed;z-index:50;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:8px 5px;border:1px solid rgba(147,164,188,.28);border-radius:20px;background:rgba(13,25,44,.96);backdrop-filter:blur(18px);box-shadow:0 10px 35px rgba(0,0,0,.28)}
  .mobile-nav button{min-width:0;border:0;background:transparent;color:#aebed2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 2px;border-radius:13px;font:500 9px "DM Sans",sans-serif}
  .mobile-nav button .hp-icon{width:20px;height:20px}
  .mobile-nav button.active{background:#263d5d;color:#ffd27c}
@@ -799,487 +799,83 @@ html[data-theme="dark"] .backup-actions button:not(.primary),
 body[data-theme="dark"] .backup-actions button:not(.primary){background:#1b2a40;border-color:#40536c;color:#eee8df}
 .backup-actions button:focus-visible,.theme-toggle:focus-visible,#nav button:focus-visible{outline:2px solid #d5a84f;outline-offset:3px}
 
-/* Holiday Planner mobile trip menu */
-.mobile-trip-menu{display:none}
-@media (max-width:820px){
-.mobile-trip-menu{display:block;margin:0 0 18px;padding:18px;border:1px solid rgba(37,71,51,.12);border-radius:24px;background:linear-gradient(145deg,#fbfaf4 0%,#f3eee2 100%);box-shadow:0 12px 30px rgba(32,48,38,.08)}
-.mobile-trip-menu-head{margin-bottom:13px}.mobile-trip-menu-head span{display:block;font-size:10px;letter-spacing:.18em;font-weight:800;color:#8a7650;margin-bottom:4px}.mobile-trip-menu-head h3{margin:0;font-family:'Playfair Display',serif;font-size:20px;line-height:1.15;color:#193326;font-weight:600}
-.mobile-trip-menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.mobile-trip-menu-grid button{min-width:0;min-height:68px;padding:11px 12px;border:1px solid rgba(37,71,51,.10);border-radius:17px;background:rgba(255,255,255,.82);display:flex;align-items:center;gap:10px;text-align:left;color:#26382d;box-shadow:0 5px 16px rgba(32,48,38,.05);font-family:inherit}
-.mobile-trip-menu-grid button svg{width:18px;height:18px;flex:0 0 18px;color:#466c52}.mobile-trip-menu-grid button span{display:block;min-width:0;font-size:12px;line-height:1.2;font-weight:700;white-space:normal;overflow-wrap:normal;word-break:normal}.mobile-trip-menu-grid button.active{background:#234b37;color:#fff;border-color:#234b37}.mobile-trip-menu-grid button.active svg{color:#fff}
-#mobileNav{background:rgba(250,248,241,.96);border-top:1px solid rgba(35,75,55,.10);backdrop-filter:blur(18px)}#mobileNav button{font-size:10px;font-weight:700;color:#66736a}#mobileNav button.active{color:#234b37}#mobileNav button span{white-space:nowrap;font-size:10px}
-}
-@media (max-width:390px){.mobile-trip-menu{padding:15px;border-radius:21px}.mobile-trip-menu-grid{gap:8px}.mobile-trip-menu-grid button{min-height:62px;padding:9px 10px;border-radius:15px}.mobile-trip-menu-grid button span{font-size:11px}}
-
-/* MOBILE APP UI — visual reference implementation */
-@media(max-width:700px){
-  body{background:#f8f5ee;color:#171b18}
-  .shell main{padding:0 14px 104px!important}
-  .shell main>header{height:76px;margin:0 -1px 10px;padding:18px 4px 10px;display:flex;align-items:center;justify-content:space-between;position:relative}
-  .shell main>header>div{display:none}
-  .mobile-brand{display:flex;align-items:center;gap:7px;font:600 17px/1 'Playfair Display',serif;color:#173d2e;letter-spacing:-.02em}
-  .mobile-brand-mark{font:20px Arial,sans-serif;line-height:1;color:#17633e}
-  .shell main>header:after{content:attr(data-role);display:flex;align-items:center;justify-content:center;min-height:31px;padding:0 13px;border-radius:999px;background:#e6f1d7;color:#245d39;font:700 11px 'DM Sans',sans-serif;white-space:nowrap}
-  .shell main>header[data-role="Admin Access"]:after{background:#f9e9c5;color:#7b531f}
-  .shell main>header[data-role="Master Access"]:after{background:#e9e4f8;color:#3f386c}
-  .mobile-trip-hero{position:relative;min-height:204px;margin:0 0 15px;border-radius:20px;overflow:hidden;background:var(--trip-cover) center/cover no-repeat;color:#fff;box-shadow:0 12px 28px rgba(35,49,40,.13)}
-  .mobile-trip-hero-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,22,17,.18),rgba(8,22,17,.67) 74%,rgba(8,22,17,.82))}
-  .mobile-trip-hero-top{position:relative;display:flex;justify-content:space-between;gap:10px;padding:13px 13px 0}
-  .mobile-trip-hero-top h2{margin:0 0 4px;font:600 20px/1.05 'Playfair Display',serif;color:#fff}
-  .mobile-trip-hero-top p{margin:3px 0;font-size:9px;color:#fff;opacity:.94}
-  .mobile-trip-time{text-align:right;white-space:nowrap}.mobile-trip-time strong{display:block;font-size:18px}.mobile-trip-time span{display:block;font-size:9px;margin-top:2px}
-  .mobile-trip-stats{position:absolute;left:10px;right:10px;bottom:37px;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(20,30,25,.53);border-radius:12px 12px 0 0;padding:8px 3px 7px;border-top:1px solid rgba(255,255,255,.18)}
-  .mobile-trip-stats>div{text-align:center;min-width:0;border-right:1px solid rgba(255,255,255,.18)}.mobile-trip-stats>div:last-child{border-right:0}.mobile-trip-stats span{display:block;height:15px}.mobile-trip-stats span .hp-icon{width:15px;height:15px}.mobile-trip-stats small{display:block;font-size:7px;line-height:1.05;color:#fff;opacity:.95}.mobile-trip-stats b{display:block;font-size:9px;color:#fff;margin-top:3px;white-space:nowrap}
-  .mobile-trip-actions{position:absolute;left:10px;right:10px;bottom:8px;display:flex;justify-content:space-between;gap:8px}.mobile-trip-actions button{border:0;border-radius:999px;background:#fff;color:#1d2921;font:700 9px 'DM Sans',sans-serif;padding:7px 11px;display:flex;align-items:center;gap:5px;box-shadow:0 4px 12px rgba(0,0,0,.12)}.mobile-trip-actions button .hp-icon{width:14px;height:14px}.mobile-trip-actions button b{font-size:13px;line-height:8px}.mobile-trip-actions .photo-action{padding-inline:12px}
-  .mobile-dashboard-menu{background:transparent;margin:0 0 14px;padding:0 2px}.mobile-dashboard-menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 7px}.mobile-dashboard-menu-grid button{border:0;background:transparent;padding:0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px;color:#202720;font:700 9px/1.05 'DM Sans',sans-serif}.mobile-dashboard-menu-grid button>span:last-child{min-height:19px;display:flex;align-items:flex-start;justify-content:center;text-align:center;max-width:70px}.mobile-dashboard-menu-grid .menu-icon{width:37px;height:37px;border-radius:11px;display:grid;place-items:center;color:#fff;box-shadow:0 6px 12px rgba(31,48,37,.12)}.mobile-dashboard-menu-grid .menu-icon .hp-icon{width:18px;height:18px}.mobile-dashboard-menu-grid .menu-icon.settings{background:#f0b91e}.mobile-dashboard-menu-grid .menu-icon.users{background:#2ba4c7}.mobile-dashboard-menu-grid .menu-icon.income{background:#6d72c8}.mobile-dashboard-menu-grid .menu-icon.wallet{background:#ee6c74}.mobile-dashboard-menu-grid .menu-icon.chart{background:#ef8b2c}.mobile-dashboard-menu-grid .menu-icon.bed{background:#7db542}.mobile-dashboard-menu-grid .menu-icon.pin{background:#28aaa8}.mobile-dashboard-menu-grid .menu-icon.calendar{background:#a34dbd}
-  .mobile-dashboard-cards{display:grid;gap:10px}.mobile-dashboard-card{background:#fffdfa;border:1px solid #ece7dc;border-radius:17px;padding:15px;box-shadow:0 7px 20px rgba(35,48,39,.06);position:relative}.mobile-dashboard-card .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.mobile-dashboard-card .card-head h3{margin:0;display:flex;align-items:center;gap:8px;font:700 13px 'DM Sans',sans-serif}.mobile-dashboard-card .card-head h3 .hp-icon{width:17px;height:17px;color:#173d2e}.mobile-dashboard-card .card-head>b{font-size:20px;font-weight:400;color:#26382d}.mobile-dashboard-card small{font-size:9px;color:#6d776f}.mobile-dashboard-card p{margin:5px 0;font-size:11px;color:#59655d}.mobile-dashboard-card p strong{font-size:17px;color:#172019}.mini-progress{height:7px;border-radius:99px;background:#ebe9e1;margin:10px 28px 0 0;overflow:hidden}.mini-progress i{display:block;height:100%;background:#267345;border-radius:99px}.mobile-dashboard-card>span{position:absolute;right:15px;bottom:15px;font-size:10px;font-weight:700;color:#263b2c}.upcoming-row{display:grid;grid-template-columns:64px 1fr auto;gap:9px;align-items:center}.upcoming-thumb{height:45px;border-radius:8px;background-size:cover;background-position:center}.upcoming-row strong{display:block;font-size:11px}.upcoming-row small{display:block;font-size:9px;color:#788177;margin-top:3px}.upcoming-row em{font-style:normal;background:#f2efe8;border-radius:8px;padding:7px 8px;font-size:9px;font-weight:700}
-  /* remove dashboard-only menu from every other page */
-  .mobile-trip-menu{display:none!important}
-  /* page headers and cards */
-  #content>.section{margin-top:0;border-radius:18px;padding:16px;background:#fffdfa;border-color:#ebe5da;box-shadow:0 7px 20px rgba(35,48,39,.055)}
-  #content>.section:first-child{margin-top:0}
-  #content>.section h2{font-size:19px;margin-bottom:13px}
-  #content>.section .toolbar{margin-bottom:12px}
-  #content>.section .toolbar p{display:none}
-  .budget-page{padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
-  .budget-topline{padding:0!important;margin:0 0 13px!important;background:transparent!important;border:0!important}
-  .budget-topline h2{font-size:23px!important;margin:0!important;color:#182019!important}
-  .budget-top-actions{display:none!important}
-  .budget-summary-grid{grid-template-columns:1fr 1fr!important;gap:9px!important}
-  .budget-summary-card{min-height:94px!important;padding:14px!important;border-radius:16px!important}
-  .budget-summary-card strong{font-size:17px!important}
-  .budget-summary-card small{font-size:8px!important}
-  .budget-health,.budget-list-panel{border-radius:17px!important;padding:15px!important}
-  .budget-tabs{display:flex!important;width:100%!important}.budget-tabs button{flex:1!important}
-  .budget-item{border-radius:12px!important;background:#fffdfa!important;margin-bottom:7px!important}
-  .people-stats{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
-  .people-stats .stat{padding:10px 5px!important;border-radius:12px!important;text-align:center}.people-stats .stat small{font-size:7px!important}.people-stats .stat b{font-size:13px!important}
-  .twocol{grid-template-columns:1fr!important}
-  .stay-intro{min-height:auto!important;margin:0 0 10px!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}.stay-intro h2{font-size:22px!important}.stay-intro p{display:none}.stay-intro-count{display:none}.stay-stats{display:none!important}
-  .stay-toolbar{margin-bottom:10px!important}.stay-toolbar .stay-search{display:none}.stay-toolbar select{display:none}.stay-toolbar .primary{width:100%;border-radius:12px}
-  .stay-list{display:grid!important;gap:10px!important}.stay-card{grid-template-columns:1fr!important;border-radius:17px!important;background:#fffdfa!important;overflow:hidden!important;box-shadow:0 7px 20px rgba(35,48,39,.06)!important}.stay-photo{min-height:155px!important}.stay-card-body{padding:13px!important}.stay-card h3{font-size:15px!important}.stay-card-actions{display:none!important}.stay-card-top .status{display:none!important}.stay-meta{font-size:9px!important}
-  /* mobile more sheet */
-  .mobile-more-sheet{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end}.mobile-more-backdrop{position:absolute;inset:0;background:rgba(12,24,18,.36);backdrop-filter:blur(4px)}.mobile-more-panel{position:relative;width:100%;background:#fbf9f3;border-radius:24px 24px 0 0;padding:18px 15px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -15px 45px rgba(0,0,0,.18);animation:moreUp .18s ease-out}.mobile-more-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.mobile-more-head span{font-size:8px;letter-spacing:.16em;font-weight:800;color:#8a7650}.mobile-more-head h3{margin:2px 0 0;font:600 20px 'Playfair Display',serif;color:#193326}.mobile-more-head button{border:0;background:transparent;font-size:26px;color:#26352c}.mobile-more-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.mobile-more-grid button{min-height:54px;border:1px solid #ebe5d9;border-radius:14px;background:#fffdfa;display:flex;align-items:center;gap:9px;padding:11px;color:#23352b;font:700 10px 'DM Sans',sans-serif;text-align:left;box-shadow:0 5px 15px rgba(35,48,39,.045)}.mobile-more-grid button .hp-icon{width:18px;height:18px;color:#246341}.mobile-more-grid button b{margin-left:auto;font-size:18px;font-weight:400;color:#7a847c}
-  @keyframes moreUp{from{transform:translateY(18px);opacity:.5}to{transform:none;opacity:1}}
-  #mobileNav{left:10px!important;right:10px!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;background:rgba(255,253,249,.97)!important;border:1px solid #e6dfd2!important;border-radius:20px!important;box-shadow:0 10px 35px rgba(35,48,39,.15)!important;padding:7px 5px!important}
-  #mobileNav button{color:#718078!important;background:transparent!important}.mobile-nav button.active{color:#1d5a37!important;background:#edf5e5!important}.mobile-nav button .hp-icon{width:19px;height:19px}.mobile-nav button span{font-size:8px!important;line-height:1.05!important}
-}
-@media(max-width:390px){
- .mobile-trip-hero{min-height:194px}.mobile-trip-hero-top h2{font-size:18px}.mobile-trip-stats small{font-size:6.5px}.mobile-trip-stats b{font-size:8px}.mobile-dashboard-menu-grid{gap:10px 4px}.mobile-dashboard-menu-grid .menu-icon{width:34px;height:34px}.mobile-dashboard-menu-grid button{font-size:8px}.mobile-more-grid button{font-size:9px}
-}
-
-/* MOBILE ROLE-AWARE NAVIGATION + ASSIGNED TRIPS */
-@media(max-width:700px){
-  /* Navigation is contextual: trip modules only appear when a trip is open. */
-  #mobileNav.is-visible{grid-template-columns:repeat(4,minmax(0,1fr));}
-  #mobileNav.is-visible:has(button:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,120px));justify-content:center;gap:10px}
-  #mobileNav.is-visible:has(button:nth-child(4):last-child){grid-template-columns:repeat(4,minmax(0,1fr));}
-  #mobileNav button span{white-space:normal!important;text-align:center!important;max-width:82px!important;overflow-wrap:normal!important;word-break:normal!important}
-
-  .assigned-trips-page{padding-top:0}
-  .assigned-trips-heading{margin:0 0 20px}
-  .assigned-trips-heading h2{margin:0 0 7px;font:600 25px/1.1 'Playfair Display',serif}
-  .assigned-trips-heading p{margin:0;font-size:9px;line-height:1.45;color:#7d857f}
-  .assigned-trips-page .grid{display:grid;grid-template-columns:1fr;gap:13px;margin:0}
-  .assigned-trips-page .assigned-trip-card{border-radius:12px;overflow:hidden;box-shadow:none;background:#fffdfa;border:1px solid #dfe5dd}
-  .assigned-trips-page .assigned-trip-card .cover{height:104px;background-position:center}
-  .assigned-trips-page .assigned-trip-card .tripbody{padding:11px 12px 12px}
-  .assigned-trips-page .assigned-trip-card h3{font:600 15px/1.15 'Playfair Display',serif;margin:0 0 6px}
-  .assigned-trips-page .assigned-trip-card p{font-size:8px;margin:4px 0;color:#7b827c}
-  .assigned-trips-page .assigned-trip-card .actions{margin-top:9px}
-  .assigned-trips-page .assigned-trip-card .actions .primary{padding:7px 10px;border-radius:6px;font-size:8px}
-  html[data-theme="dark"] .assigned-trips-page .assigned-trip-card,
-  body[data-theme="dark"] .assigned-trips-page .assigned-trip-card{background:#142238;border-color:#30445e;color:#eee8df}
-  html[data-theme="dark"] .assigned-trips-heading h2,
-  body[data-theme="dark"] .assigned-trips-heading h2{color:#eee8df}
-  html[data-theme="dark"] .assigned-trips-heading p,
-  body[data-theme="dark"] .assigned-trips-heading p{color:#9eacbb}
-  html[data-theme="dark"] .assigned-trips-page .assigned-trip-card p,
-  body[data-theme="dark"] .assigned-trips-page .assigned-trip-card p{color:#aab5c3}
-}
-
-/* MOBILE CONTEXTUAL NAV + ASSIGNED TRIPS */
-@media(max-width:700px){
-  #mobileNav.is-visible:has(button:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,120px));justify-content:center;gap:10px}
-  #mobileNav.is-visible:has(button:nth-child(4):last-child){grid-template-columns:repeat(4,minmax(0,1fr));}
-  #mobileNav button span{white-space:normal!important;text-align:center!important;max-width:82px!important;overflow-wrap:normal!important;word-break:normal!important}
-  .assigned-trips-page{padding-top:0}
-  .assigned-trips-heading{margin:0 0 20px}
-  .assigned-trips-heading h2{margin:0 0 7px;font:600 25px/1.1 'Playfair Display',serif}
-  .assigned-trips-heading p{margin:0;font-size:9px;line-height:1.45;color:#7d857f}
-  .assigned-trips-page .grid{display:grid;grid-template-columns:1fr;gap:13px;margin:0}
-  .assigned-trips-page .assigned-trip-card{border-radius:12px;overflow:hidden;box-shadow:none;background:#fffdfa;border:1px solid #dfe5dd}
-  .assigned-trips-page .assigned-trip-card .cover{height:104px;background-position:center}
-  .assigned-trips-page .assigned-trip-card .tripbody{padding:11px 12px 12px}
-  .assigned-trips-page .assigned-trip-card h3{font:600 15px/1.15 'Playfair Display',serif;margin:0 0 6px}
-  .assigned-trips-page .assigned-trip-card p{font-size:8px;margin:4px 0;color:#7b827c}
-  .assigned-trips-page .assigned-trip-card .actions{margin-top:9px}
-  .assigned-trips-page .assigned-trip-card .actions .primary{padding:7px 10px;border-radius:6px;font-size:8px}
-  html[data-theme="dark"] .assigned-trips-page .assigned-trip-card,body[data-theme="dark"] .assigned-trips-page .assigned-trip-card{background:#142238;border-color:#30445e;color:#eee8df}
-  html[data-theme="dark"] .assigned-trips-heading h2,body[data-theme="dark"] .assigned-trips-heading h2{color:#eee8df}
-  html[data-theme="dark"] .assigned-trips-heading p,body[data-theme="dark"] .assigned-trips-heading p{color:#9eacbb}
-  html[data-theme="dark"] .assigned-trips-page .assigned-trip-card p,body[data-theme="dark"] .assigned-trips-page .assigned-trip-card p{color:#aab5c3}
-}
-
-/* FINAL MOBILE TRIP NAV / HEADER FIX — keep trip navigation horizontal and contextual */
-@media(max-width:700px){
-  body:not(.trip-welcome-mode){overflow-x:hidden!important;}
-  .shell main{padding:0 14px 104px!important;min-width:0!important;width:100%!important;}
-  .shell main>header{height:68px!important;margin:0 -1px 10px!important;padding:16px 4px 9px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;position:relative!important;overflow:visible!important;}
-  .shell main>header>div{display:none!important;}
-  .shell main>header .mobile-brand{display:flex!important;align-items:center!important;gap:7px!important;font:600 17px/0.95 'Playfair Display',serif!important;color:#173d2e!important;letter-spacing:-.02em!important;white-space:nowrap!important;}
-  .shell main>header .mobile-brand-mark{font:20px/1 Arial,sans-serif!important;color:#17633e!important;}
-  .shell main>header:after{content:attr(data-role)!important;display:flex!important;align-items:center!important;justify-content:center!important;min-height:30px!important;padding:0 12px!important;border-radius:999px!important;background:#e6f1d7!important;color:#245d39!important;font:700 10px 'DM Sans',sans-serif!important;white-space:nowrap!important;}
-  .shell main>header[data-role="Admin Access"]:after{background:#f9e9c5!important;color:#7b531f!important;}
-  .shell main>header[data-role="Master Access"]:after{background:#e9e4f8!important;color:#3f386c!important;}
-  #mobileNav.is-visible{position:fixed!important;left:10px!important;right:10px!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;z-index:999!important;display:flex!important;flex-direction:row!important;align-items:stretch!important;justify-content:space-between!important;gap:2px!important;padding:7px 5px!important;min-height:58px!important;width:auto!important;box-sizing:border-box!important;}
-  #mobileNav.is-visible button{flex:1 1 0!important;width:auto!important;min-width:0!important;min-height:44px!important;height:44px!important;margin:0!important;padding:5px 2px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;border:0!important;background:transparent!important;white-space:normal!important;text-align:center!important;}
-  #mobileNav.is-visible button .hp-icon{display:block!important;width:19px!important;height:19px!important;flex:0 0 19px!important;}
-  #mobileNav.is-visible button span{display:block!important;width:100%!important;max-width:none!important;font-size:8px!important;line-height:1.05!important;white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important;text-align:center!important;}
-  #mobileNav.is-visible button.active{background:#edf5e5!important;color:#1d5a37!important;border-radius:13px!important;}
-  #mobileNav.is-visible button.active .hp-icon{color:#1d5a37!important;}
-  #mobileNav.is-visible:has(button:nth-child(2):last-child){display:flex!important;}
-  #mobileNav.is-visible:has(button:nth-child(2):last-child) button{flex:0 1 120px!important;}
-  #mobileNav.is-visible:has(button:nth-child(4):last-child) button{flex:1 1 0!important;}
-  .mobile-trip-hero{margin-top:0!important;}
-  .mobile-dashboard-menu{margin-top:0!important;}
-}
-
-
-/* FINAL FIX — MOBILE BOTTOM NAV MUST STAY HORIZONTAL */
+/* Mobile trip navigation: native app-style bottom bar + More sheet */
 @media (max-width:700px){
-  #mobileNav.mobile-nav.is-visible,
-  .mobile-nav#mobileNav.is-visible{
-    position:fixed!important;
-    left:10px!important;
-    right:10px!important;
-    bottom:calc(10px + env(safe-area-inset-bottom))!important;
-    width:auto!important;
-    height:64px!important;
-    min-height:64px!important;
-    max-height:64px!important;
-    display:grid!important;
-    grid-template-columns:repeat(4,minmax(0,1fr))!important;
-    grid-template-rows:1fr!important;
-    align-items:stretch!important;
-    justify-items:stretch!important;
-    gap:2px!important;
-    padding:5px!important;
-    margin:0!important;
-    box-sizing:border-box!important;
-    overflow:hidden!important;
-    z-index:9999!important;
-    border-radius:20px!important;
-    background:rgba(255,253,249,.97)!important;
-    border:1px solid #e6dfd2!important;
-    box-shadow:0 10px 35px rgba(35,48,39,.15)!important;
-  }
-
-  #mobileNav.mobile-nav.is-visible > button,
-  .mobile-nav#mobileNav.is-visible > button{
-    width:auto!important;
-    min-width:0!important;
-    max-width:none!important;
-    height:54px!important;
-    min-height:54px!important;
-    max-height:54px!important;
-    margin:0!important;
-    padding:4px 2px!important;
-    box-sizing:border-box!important;
+  body:not(.trip-welcome-mode) #app>main>header{
     display:flex!important;
-    flex-direction:column!important;
-    align-items:center!important;
-    justify-content:center!important;
-    gap:3px!important;
-    border:0!important;
-    border-radius:13px!important;
-    background:transparent!important;
-    color:#718078!important;
-    white-space:nowrap!important;
-    overflow:hidden!important;
+    align-items:flex-start!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+    padding:4px 0 16px!important;
   }
-
-  #mobileNav.mobile-nav.is-visible > button .hp-icon,
-  .mobile-nav#mobileNav.is-visible > button .hp-icon{
-    width:18px!important;
-    height:18px!important;
-    flex:0 0 18px!important;
-    display:block!important;
+  body:not(.trip-welcome-mode) #app>main>header>div:first-child{min-width:0;flex:1}
+  body:not(.trip-welcome-mode) #app>main>header small{font-size:8px!important;letter-spacing:.18em!important}
+  body:not(.trip-welcome-mode) #app>main>header h1{
+    font-size:32px!important;line-height:1.05!important;margin:5px 0 5px!important;
+    word-break:normal!important;overflow-wrap:anywhere!important;
   }
-
-  #mobileNav.mobile-nav.is-visible > button > span,
-  .mobile-nav#mobileNav.is-visible > button > span{
-    display:block!important;
-    width:100%!important;
-    max-width:none!important;
-    margin:0!important;
-    font-size:8px!important;
-    line-height:1!important;
-    text-align:center!important;
-    white-space:nowrap!important;
-    overflow:hidden!important;
-    text-overflow:clip!important;
-    word-break:normal!important;
-    overflow-wrap:normal!important;
+  body:not(.trip-welcome-mode) #app>main>header p{font-size:10px!important;line-height:1.5!important;margin:0!important}
+  body:not(.trip-welcome-mode) #content{padding-bottom:20px!important}
+  .mobile-nav.is-visible{
+    left:12px!important;right:12px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;
+    min-height:68px!important;padding:7px 5px!important;border-radius:19px!important;
+    grid-template-columns:repeat(5,1fr)!important;
   }
-
-  #mobileNav.mobile-nav.is-visible > button.active,
-  .mobile-nav#mobileNav.is-visible > button.active{
-    background:#edf5e5!important;
-    color:#1d5a37!important;
-  }
-
-  /* Trip nav is always exactly 5 columns. */
-  #mobileNav.mobile-nav.is-visible:has(> button:nth-child(5):last-child),
-  .mobile-nav#mobileNav.is-visible:has(> button:nth-child(5):last-child){
-    grid-template-columns:repeat(4,minmax(0,1fr))!important;
-  }
+  .mobile-nav button{font-size:9px!important;min-height:52px!important}
+  .mobile-nav button .hp-icon{width:19px!important;height:19px!important}
+  .mobile-nav button.active{background:#263d5d!important;color:#ffd27c!important}
 }
-
-
-/* FINAL MOBILE BOTTOM NAV: four items in one row; icon above label. */
-@media (max-width:820px){
-  #mobileNav.is-visible{
-    display:grid !important;
-    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-    grid-template-rows:1fr !important;
-    grid-auto-flow:column !important;
-    flex-direction:initial !important;
-    align-items:stretch !important;
-    justify-items:stretch !important;
-    width:auto !important;
-    height:64px !important;
-    min-height:64px !important;
-    max-height:64px !important;
-    overflow:hidden !important;
-  }
-  #mobileNav.is-visible > button{
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:center !important;
-    justify-content:center !important;
-    width:auto !important;
-    min-width:0 !important;
-    height:54px !important;
-    min-height:54px !important;
-    margin:0 !important;
-    padding:4px 2px !important;
-    gap:3px !important;
-  }
-  #mobileNav.is-visible > button .hp-icon{
-    display:block !important;
-    flex:0 0 18px !important;
-    width:18px !important;
-    height:18px !important;
-  }
-  #mobileNav.is-visible > button > span{
-    display:block !important;
-    width:100% !important;
-    text-align:center !important;
-    white-space:nowrap !important;
-    word-break:normal !important;
-    overflow-wrap:normal !important;
-    font-size:8px !important;
-    line-height:1 !important;
-  }
+.mobile-more-sheet{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;pointer-events:auto}
+.mobile-more-backdrop{position:absolute;inset:0;background:rgba(5,14,25,.56);backdrop-filter:blur(4px)}
+.mobile-more-panel{
+  position:relative;width:100%;max-height:min(76vh,620px);overflow:auto;
+  background:#102139;border:1px solid rgba(255,255,255,.12);border-bottom:0;
+  border-radius:25px 25px 0 0;padding:10px 18px calc(24px + env(safe-area-inset-bottom));
+  box-shadow:0 -18px 50px rgba(0,0,0,.35);transform:translateY(100%);transition:transform .22s ease;
 }
-
-
-/* FINAL MOBILE TRIP BOTTOM NAV — 5 ITEMS HORIZONTAL */
-@media (max-width:820px){
-  #mobileNav.is-visible{
-    position:fixed !important;
-    left:10px !important;
-    right:10px !important;
-    bottom:calc(10px + env(safe-area-inset-bottom)) !important;
-    z-index:99999 !important;
-    display:flex !important;
-    flex-direction:row !important;
-    align-items:stretch !important;
-    justify-content:stretch !important;
-    width:auto !important;
-    height:64px !important;
-    min-height:64px !important;
-    max-height:64px !important;
-    padding:7px 5px !important;
-    gap:0 !important;
-    overflow:hidden !important;
-    box-sizing:border-box !important;
-  }
-  #mobileNav.is-visible > button{
-    flex:1 1 20% !important;
-    width:20% !important;
-    min-width:20% !important;
-    max-width:20% !important;
-    height:50px !important;
-    min-height:50px !important;
-    margin:0 !important;
-    padding:4px 2px !important;
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:center !important;
-    justify-content:center !important;
-    gap:3px !important;
-    border:0 !important;
-    background:transparent !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-  }
-  #mobileNav.is-visible > button .hp-icon{
-    display:block !important;
-    width:19px !important;
-    height:19px !important;
-    min-width:19px !important;
-    min-height:19px !important;
-    flex:0 0 19px !important;
-  }
-  #mobileNav.is-visible > button > span{
-    display:block !important;
-    width:100% !important;
-    max-width:100% !important;
-    margin:0 !important;
-    text-align:center !important;
-    white-space:nowrap !important;
-    word-break:normal !important;
-    overflow-wrap:normal !important;
-    overflow:hidden !important;
-    text-overflow:clip !important;
-    font-size:8px !important;
-    line-height:1.05 !important;
-  }
-  #mobileNav.is-visible > button.active{
-    background:#edf5e5 !important;
-    color:#1d5a37 !important;
-    border-radius:13px !important;
-  }
+.mobile-more-sheet.open .mobile-more-panel{transform:translateY(0)}
+.mobile-more-handle{width:42px;height:4px;border-radius:10px;background:#71829a;margin:3px auto 16px}
+.mobile-more-head{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:0 2px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.mobile-more-head small{font-size:8px;letter-spacing:.18em;color:#91a1b4}
+.mobile-more-head h3{font:600 20px/1.1 "Playfair Display",serif;color:#f4f0e8;margin:4px 0 0}
+.mobile-more-close{width:34px;height:34px;border:0;border-radius:50%;background:#223955;color:#f1f4f7;font-size:24px;line-height:1}
+.mobile-more-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding-top:16px}
+.mobile-more-grid button{
+  min-height:82px;border:1px solid #304a68;border-radius:15px;background:#172d49;color:#e8edf3;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  font:500 10px "DM Sans",sans-serif;padding:10px 5px;
 }
-
-/* FINAL: viewport-fixed mobile bottom navigation. Keep this block LAST. */
-@media (max-width:820px){
-  body{padding-bottom:0 !important;}
-  #mobileNav.is-visible,
-  .mobile-nav#mobileNav.is-visible{
-    position:fixed !important;
-    left:10px !important;
-    right:10px !important;
-    bottom:calc(10px + env(safe-area-inset-bottom)) !important;
-    top:auto !important;
-    width:auto !important;
-    height:68px !important;
-    min-height:68px !important;
-    max-height:68px !important;
-    margin:0 !important;
-    padding:7px 5px !important;
-    box-sizing:border-box !important;
-    display:flex !important;
-    flex-direction:row !important;
-    align-items:stretch !important;
-    justify-content:space-between !important;
-    gap:0 !important;
-    overflow:hidden !important;
-    z-index:2147483647 !important;
-    isolation:isolate !important;
-    transform:none !important;
-  }
-
-  #mobileNav.is-visible > button,
-  .mobile-nav#mobileNav.is-visible > button{
-    flex:1 1 0 !important;
-    width:auto !important;
-    min-width:0 !important;
-    max-width:none !important;
-    height:54px !important;
-    min-height:54px !important;
-    margin:0 !important;
-    padding:4px 2px !important;
-    box-sizing:border-box !important;
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:center !important;
-    justify-content:center !important;
-    gap:3px !important;
-    border:0 !important;
-    background:transparent !important;
-    text-align:center !important;
-  }
-
-  #mobileNav.is-visible > button .hp-icon,
-  .mobile-nav#mobileNav.is-visible > button .hp-icon{
-    width:19px !important;
-    height:19px !important;
-    min-width:19px !important;
-    min-height:19px !important;
-    flex:0 0 19px !important;
-  }
-
-  #mobileNav.is-visible > button > span,
-  .mobile-nav#mobileNav.is-visible > button > span{
-    display:block !important;
-    width:100% !important;
-    max-width:none !important;
-    font-size:8px !important;
-    line-height:1.05 !important;
-    white-space:nowrap !important;
-    word-break:normal !important;
-    overflow:hidden !important;
-    text-overflow:clip !important;
-    text-align:center !important;
-  }
-
-  /* Reserve space so the last content is never hidden behind the fixed nav. */
-  #content{padding-bottom:92px !important;}
+.mobile-more-grid button .hp-icon{width:22px;height:22px;color:#d9b46b}
+.mobile-more-grid button:hover,.mobile-more-grid button:active{background:#253f60;border-color:#56708f}
+@media(max-width:700px){
+  .mobile-more-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media(min-width:701px){.mobile-more-sheet{display:none!important}}
 
-/* FINAL VIEWPORT NAV: visible from first paint and never participates in page scroll */
-@media (max-width: 820px){
-  html, body { min-height:100%; }
-  #mobileNav.is-visible {
-    position: fixed !important;
-    inset: auto 10px calc(10px + env(safe-area-inset-bottom)) 10px !important;
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: stretch !important;
-    justify-content: stretch !important;
-    width: auto !important;
-    height: 68px !important;
-    min-height: 68px !important;
-    max-height: 68px !important;
-    margin: 0 !important;
-    padding: 6px !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
-    z-index: 2147483647 !important;
-    transform: translateZ(0) !important;
-  }
-  #mobileNav.is-visible > button {
-    position: relative !important;
-    flex: 1 1 0 !important;
-    width: 20% !important;
-    max-width: 20% !important;
-    min-width: 0 !important;
-    height: 54px !important;
-    margin: 0 !important;
-    padding: 3px 1px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 3px !important;
-  }
-  #mobileNav.is-visible > button > span {
-    display: block !important;
-    width: 100% !important;
-    white-space: nowrap !important;
-    text-align: center !important;
-    font-size: 8px !important;
-    line-height: 1 !important;
-  }
-  #mobileNav.is-visible > button .hp-icon {
-    width: 19px !important;
-    height: 19px !important;
-    flex: 0 0 19px !important;
-  }
-  #content { padding-bottom: 100px !important; }
+
+/* Mobile trip launcher: app-style menu that mirrors the desktop trip navigation. */
+.mobile-trip-menu{display:none}
+@media(max-width:700px){
+  .mobile-trip-menu{display:block;margin:18px 0 14px;padding:0}
+  .mobile-trip-menu-head{margin:0 2px 12px}
+  .mobile-trip-menu-head .eyebrow{display:block;font-size:9px;letter-spacing:.16em;color:#8d9c8f;font-weight:800;margin-bottom:4px}
+  .mobile-trip-menu-head h2{margin:0;color:#f2eee6;font:600 23px 'Playfair Display',serif}
+  .mobile-trip-menu-head p{margin:5px 0 0;color:#91a0b1;font-size:10px}
+  .mobile-trip-menu-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .mobile-trip-menu-grid button{min-height:92px;border:1px solid rgba(116,143,171,.38);border-radius:16px;background:linear-gradient(180deg,#1b2d46 0%,#15263d 100%);color:#f3f5f7;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:10px;padding:14px 12px;text-align:left;box-shadow:0 5px 16px rgba(0,0,0,.12);cursor:pointer}
+  .mobile-trip-menu-grid button:active{transform:scale(.98);background:#223a59}
+  .mobile-trip-menu-icon{width:34px;height:34px;border-radius:11px;background:rgba(213,177,104,.13);display:grid;place-items:center;color:#e2c27f}
+  .mobile-trip-menu-icon .hp-icon{width:19px;height:19px}
+  .mobile-trip-menu-label{font-size:10px;font-weight:650;line-height:1.25;color:#f0f3f5}
+  .desktop-trip-overview{display:none!important}
+  .two{margin-top:8px}
 }
+@media(max-width:380px){
+  .mobile-trip-menu-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .mobile-trip-menu-grid button{min-height:88px}
+}
+html[data-theme="light"] .mobile-trip-menu-head h2{color:#173d2e}
+html[data-theme="light"] .mobile-trip-menu-head p{color:#788177}
+html[data-theme="light"] .mobile-trip-menu-grid button{background:linear-gradient(180deg,#fffdfa 0%,#f6f2e9 100%);border-color:#e4ddcf;color:#284438}
+html[data-theme="light"] .mobile-trip-menu-label{color:#284438}
+html[data-theme="light"] .mobile-trip-menu-icon{background:#f2e7cf;color:#8a6426}
