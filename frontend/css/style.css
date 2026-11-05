@@ -1153,3 +1153,79 @@ body[data-theme="dark"] .backup-actions button:not(.primary){background:#1b2a40;
     border-radius:13px !important;
   }
 }
+
+/* FINAL: viewport-fixed mobile bottom navigation. Keep this block LAST. */
+@media (max-width:820px){
+  body{padding-bottom:0 !important;}
+  #mobileNav.is-visible,
+  .mobile-nav#mobileNav.is-visible{
+    position:fixed !important;
+    left:10px !important;
+    right:10px !important;
+    bottom:calc(10px + env(safe-area-inset-bottom)) !important;
+    top:auto !important;
+    width:auto !important;
+    height:68px !important;
+    min-height:68px !important;
+    max-height:68px !important;
+    margin:0 !important;
+    padding:7px 5px !important;
+    box-sizing:border-box !important;
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:stretch !important;
+    justify-content:space-between !important;
+    gap:0 !important;
+    overflow:hidden !important;
+    z-index:2147483647 !important;
+    isolation:isolate !important;
+    transform:none !important;
+  }
+
+  #mobileNav.is-visible > button,
+  .mobile-nav#mobileNav.is-visible > button{
+    flex:1 1 0 !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+    height:54px !important;
+    min-height:54px !important;
+    margin:0 !important;
+    padding:4px 2px !important;
+    box-sizing:border-box !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:3px !important;
+    border:0 !important;
+    background:transparent !important;
+    text-align:center !important;
+  }
+
+  #mobileNav.is-visible > button .hp-icon,
+  .mobile-nav#mobileNav.is-visible > button .hp-icon{
+    width:19px !important;
+    height:19px !important;
+    min-width:19px !important;
+    min-height:19px !important;
+    flex:0 0 19px !important;
+  }
+
+  #mobileNav.is-visible > button > span,
+  .mobile-nav#mobileNav.is-visible > button > span{
+    display:block !important;
+    width:100% !important;
+    max-width:none !important;
+    font-size:8px !important;
+    line-height:1.05 !important;
+    white-space:nowrap !important;
+    word-break:normal !important;
+    overflow:hidden !important;
+    text-overflow:clip !important;
+    text-align:center !important;
+  }
+
+  /* Reserve space so the last content is never hidden behind the fixed nav. */
+  #content{padding-bottom:92px !important;}
+}

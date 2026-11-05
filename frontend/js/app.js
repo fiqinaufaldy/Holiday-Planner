@@ -278,6 +278,11 @@ function showApp(){
  $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("back")}<span>Log out</span></button>`;
  const mobileNav=$("#mobileNav");
  if(mobileNav){
+   // Keep the mobile navigation outside scrolling/transformed page containers.
+   // This makes the bottom navigation truly viewport-fixed on mobile.
+   if(window.innerWidth<=820 && mobileNav.parentElement!==document.body){
+     document.body.appendChild(mobileNav);
+   }
    let items=[];
    if(tripId){
      items=[["Dashboard","home"],["Expense Planning","wallet"],["Participants","users"],["Villas & Stay","bed"],["More","more"]];
@@ -289,11 +294,13 @@ function showApp(){
    mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n}</span></button>`).join("");
    mobileNav.classList.toggle("is-visible",items.length>0&&!pendingTripWelcome);
    if(window.innerWidth<=820 && items.length){
-     mobileNav.style.display="grid";
-     mobileNav.style.gridTemplateColumns=`repeat(${items.length},minmax(0,1fr))`;
-     mobileNav.style.gridTemplateRows="1fr";
-     mobileNav.style.gridAutoFlow="column";
-     mobileNav.style.flexDirection="initial";
+     // Layout is controlled by the final mobile CSS so old inline grid rules
+     // cannot turn the fixed navigation into a vertical/scrolling block.
+     mobileNav.style.display="flex";
+     mobileNav.style.gridTemplateColumns="";
+     mobileNav.style.gridTemplateRows="";
+     mobileNav.style.gridAutoFlow="";
+     mobileNav.style.flexDirection="row";
      mobileNav.querySelectorAll("button").forEach(btn=>{
        btn.style.display="flex";
        btn.style.flexDirection="column";
