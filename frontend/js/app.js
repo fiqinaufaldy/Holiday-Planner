@@ -259,6 +259,16 @@ function showApp(){
  $("#access").textContent=mode==="master"?"MASTER ACCESS":mode==="admin"?"ADMIN ACCESS":"MEMBER ACCESS · "+(trip().name||"");
  applyPlannerTheme();
  const appHeader=document.querySelector("#app>main>header");
+ if(appHeader){
+   const role=mode==="master"?"Master Access":mode==="admin"?"Admin Access":"Member Access";
+   appHeader.dataset.role=role;
+   if(!appHeader.querySelector(".mobile-brand")){
+     const brand=document.createElement("div");
+     brand.className="mobile-brand";
+     brand.innerHTML=`<span class="mobile-brand-mark">✈</span><span>Holiday<br>Planner</span>`;
+     appHeader.prepend(brand);
+   }
+ }
  if(appHeader&&!$("#themeToggle")){const themeBtn=document.createElement("button");themeBtn.id="themeToggle";themeBtn.className="theme-toggle";appHeader.appendChild(themeBtn);}
  if(appHeader&&!$("#languageToggle")){const langBtn=document.createElement("button");langBtn.id="languageToggle";langBtn.className="theme-toggle language-toggle";appHeader.appendChild(langBtn);}
  applyPlannerTheme();applyPlannerLanguage();
@@ -754,7 +764,7 @@ $("#cancelTrip").onclick=()=>$("#tripModal").close();
 document.addEventListener("click",async e=>{let b=e.target.closest("button");if(!b)return;
 if(b.hasAttribute("data-villa-prev")){setVillaGallery(villaGalleryIndex-1);return;}
 if(b.hasAttribute("data-villa-next")){setVillaGallery(villaGalleryIndex+1);return;}
-if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){if(b.dataset.page==="More"){mobileMoreMenu();return;}page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
+if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){if(b.dataset.page==="More"){mobileMoreMenu();return;}page=b.dataset.page;window.scrollTo({top:0,left:0,behavior:"auto"});document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
 if(b.dataset.morePage){const sheet=document.getElementById("mobileMoreSheet");if(sheet)sheet.remove();page=b.dataset.morePage;render();return}
 if(b.hasAttribute("data-more-close")){const sheet=document.getElementById("mobileMoreSheet");if(sheet)sheet.remove();return}
 if(b.id==="createAdmin"){
