@@ -23,6 +23,20 @@
    if(!profile?.is_active)throw new Error("Akun tidak aktif.");
    return {session:sessionData.session,user:data.user,profile};
   },
+  async createAdminAccount(name,pin,tripIds){
+   await requireSession();
+   const {data:{session},error:sessionError}=await client.auth.getSession();fail(sessionError);
+   const {data,error}=await client.functions.invoke("create-admin",{body:{name,pin,tripIds},headers:{Authorization:`Bearer ${session.access_token}`}});
+   fail(error);
+   if(!data?.success)throw new Error(data?.error||"Gagal membuat Admin.");
+   return data;
+  },
+  async listMyTripAccess(){
+   await requireSession();
+   const {data:{user},error:userError}=await client.auth.getUser();fail(userError);
+   const {data,error}=await client.from("trip_access").select("id,trip_id,user_id,access_role,created_at").eq("user_id",user.id).eq("access_role","admin").order("created_at");
+   fail(error);return data||[];
+  },
   async signOut(){const {error}=await client.auth.signOut();fail(error);return{ok:true};},
   async getSession(){const {data,error}=await client.auth.getSession();fail(error);return data.session;},
   async getMyProfile(){await requireSession();const {data,error}=await client.from("profiles").select("id,display_name,role,is_active").single();fail(error);return data;},

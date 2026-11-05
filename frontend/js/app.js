@@ -219,8 +219,21 @@ async function enter(pin){
   if(loginBtn){loginBtn.disabled=true;loginBtn.textContent="Connecting…";}
   try{
    const result=await window.HolidayPlannerCloud.loginWithPin(pin);
-   if(result?.profile?.role!=="master")throw new Error("Akun ini belum memiliki akses Master.");
-   mode="master";tripId=null;page="All Trips";await hydrateTripsFromCloud();showApp();return;
+   const role=result?.profile?.role;
+   if(role==="master"){
+    mode="master";tripId=null;page="All Trips";
+    await hydrateTripsFromCloud();showApp();return;
+   }
+   if(role==="admin"){
+    const access=await window.HolidayPlannerCloud.listMyTripAccess();
+    activeAdmin=result.user.id;
+    db.admins=db.admins.filter(a=>a.id!==activeAdmin);
+    db.admins.push({id:activeAdmin,name:result.profile.display_name||"Admin",pin,trips:access.map(x=>x.trip_id)});
+    memberName=result.profile.display_name||"Admin";
+    mode="admin";tripId=null;page="Assigned Trips";
+    await hydrateTripsFromCloud();showApp();return;
+   }
+   throw new Error("Akun ini belum memiliki akses Admin atau Master.");
   }catch(error){err(error.message||"PIN tidak sesuai. Coba lagi.");return;}
   finally{if(loginBtn){loginBtn.disabled=false;loginBtn.textContent="Continue →";}}
  }
@@ -703,7 +716,13 @@ if(b.id==="createAdmin"){
  if(!name||!/^[0-9]{6}$/.test(pin))return toast("Isi nama dan PIN 6 digit.");
  if(pin===db.admin.pin||db.admins.some(a=>a.pin===pin)||db.trips.some(t=>t.pin===pin))return toast("PIN sudah digunakan.");
  if(!trips.length)return toast("Pilih minimal satu trip untuk Admin ini.");
- db.admins.push({id:"admin_"+Date.now(),name,pin,trips});save();accessManagement();toast("Admin account created.");
+ const btn=$("#createAdmin");if(btn)btn.disabled=true;
+ try{
+  const result=await window.HolidayPlannerCloud.createAdminAccount(name,pin,trips);
+  if(!result?.user_id)throw new Error("Supabase tidak mengembalikan user ID Admin.");
+  db.admins.push({id:result.user_id,name,pin,trips});save();accessManagement();toast("Admin account created.");
+ }catch(error){toast(error.message||"Gagal membuat Admin account.");}
+ finally{if(btn)btn.disabled=false;}
 }
 if(b.dataset.removeadmin){if(mode!=="master")return;db.admins=db.admins.filter(a=>a.id!==b.dataset.removeadmin);save();accessManagement();toast("Admin removed.");}
 

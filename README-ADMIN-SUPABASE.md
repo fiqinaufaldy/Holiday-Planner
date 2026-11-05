@@ -1,0 +1,1 @@
+Admin cloud setup:\n1. Run supabase/create_admin_profile.sql in Supabase SQL Editor.\n2. Deploy supabase/functions/create-admin/index.ts as Edge Function create-admin.\n3. Keep service-role key only in Edge Function secrets.\n4. Frontend Create Admin now creates Auth user + profile + trip_access.\n5. Admin PIN login uses existing pin-login + verify_pin.\n
