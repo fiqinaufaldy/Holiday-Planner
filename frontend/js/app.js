@@ -268,17 +268,11 @@ function showApp(){
  $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("back")}<span>Log out</span></button>`;
  const mobileNav=$("#mobileNav");
  if(mobileNav){
-   // Outside a trip, mirror the desktop sidebar for the current access role.
-   // Inside a trip, keep the dedicated 5-item trip navigation.
-   const items=tripId
-     ? [["Dashboard","home"],["Expense Planning","wallet"],["Itinerary","calendar"],["Participants","users"],["More","more"]]
-     : [...navItems(),["Log out","back"]];
-   mobileNav.style.setProperty("--mobile-nav-count",String(items.length));
-   mobileNav.innerHTML=items.map(([n,ic])=>{
-     if(n==="More") return `<button type="button" data-action="mobile-more">${hpIcon(ic)}<span>${plannerLanguage==="id"?"Lainnya":"More"}</span></button>`;
-     if(n==="Log out") return `<button type="button" data-action="exit-trip">${hpIcon(ic)}<span>${plannerLanguage==="id"?"Keluar":"Log out"}</span></button>`;
-     return `<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n}</span></button>`;
-   }).join("");
+   const items=tripId ? [["Dashboard","home"],["Expense Planning","wallet"],["Villas & Stay","bed"],["More","more"]] : [];
+   mobileNav.innerHTML=items.map(([n,ic])=>n==="More"
+     ? `<button type="button" data-action="mobile-more">${hpIcon(ic)}<span>${plannerLanguage==="id"?"Lainnya":"More"}</span></button>`
+     : `<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n}</span></button>`
+   ).join("");
    mobileNav.classList.toggle("is-visible",items.length>0&&!pendingTripWelcome);
  }
  if(pendingTripWelcome&&tripId){document.body.classList.add("trip-welcome-mode");renderTripWelcome();return;}
@@ -289,7 +283,7 @@ function openMobileMore(){
  const existing=$("#mobileMoreSheet");
  if(existing){existing.remove();return;}
  if(!tripId)return;
- const items=navItems().filter(([n])=>!["Dashboard","Expense Planning","Itinerary","Participants","Log out"].includes(n));
+ const items=navItems().filter(([n])=>!["Dashboard","Expense Planning","Villas & Stay"].includes(n));
  const sheet=document.createElement("div");
  sheet.id="mobileMoreSheet";
  sheet.className="mobile-more-sheet";
