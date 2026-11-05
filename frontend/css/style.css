@@ -879,3 +879,16 @@ html[data-theme="light"] .mobile-trip-menu-head p{color:#788177}
 html[data-theme="light"] .mobile-trip-menu-grid button{background:linear-gradient(180deg,#fffdfa 0%,#f6f2e9 100%);border-color:#e4ddcf;color:#284438}
 html[data-theme="light"] .mobile-trip-menu-label{color:#284438}
 html[data-theme="light"] .mobile-trip-menu-icon{background:#f2e7cf;color:#8a6426}
+
+/* FNVERSE logo */
+.logo-image{display:flex!important;align-items:center!important;justify-content:flex-start!important;text-decoration:none!important}
+.logo-image img{display:block;width:auto;height:54px;max-width:150px;object-fit:contain}
+#login .logo-image{justify-content:center;margin:0 auto 18px}
+#login .logo-image img{height:76px;max-width:190px}
+@media (max-width:820px){
+  #login .logo-image img{height:68px;max-width:170px}
+}
+html[data-theme="dark"] .logo-image img,
+body[data-theme="dark"] .logo-image img{content:url("../assets/logo/B FNVERSE.webp")}
+html[data-theme="light"] .logo-image img,
+body[data-theme="light"] .logo-image img{content:url("../assets/logo/A FNVERSE.webp")}
