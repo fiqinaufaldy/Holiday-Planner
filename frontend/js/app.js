@@ -259,8 +259,13 @@ function showApp(){
  $("#access").textContent=mode==="master"?"MASTER ACCESS":mode==="admin"?"ADMIN ACCESS":"MEMBER ACCESS · "+(trip().name||"");
  applyPlannerTheme();
  const appHeader=document.querySelector("#app>main>header");
- if(appHeader&&!$("#themeToggle")){const themeBtn=document.createElement("button");themeBtn.id="themeToggle";themeBtn.className="theme-toggle";appHeader.appendChild(themeBtn);}
- if(appHeader&&!$("#languageToggle")){const langBtn=document.createElement("button");langBtn.id="languageToggle";langBtn.className="theme-toggle language-toggle";appHeader.appendChild(langBtn);}
+ if(appHeader){
+   let accessBadge=appHeader.querySelector("#headerAccess");
+   if(!accessBadge){accessBadge=document.createElement("span");accessBadge.id="headerAccess";accessBadge.className="header-access-badge";appHeader.appendChild(accessBadge);}
+   accessBadge.textContent=mode==="master"?"Master Access":mode==="admin"?"Admin Access":"Member Access";
+   if(!appHeader.querySelector("#themeToggle")){const themeBtn=document.createElement("button");themeBtn.id="themeToggle";themeBtn.className="theme-toggle";appHeader.appendChild(themeBtn);}
+   if(!appHeader.querySelector("#languageToggle")){const langBtn=document.createElement("button");langBtn.id="languageToggle";langBtn.className="theme-toggle language-toggle";appHeader.appendChild(langBtn);}
+ }
  applyPlannerTheme();applyPlannerLanguage();
  
  document.body.classList.toggle("member-view",mode==="member");
@@ -269,7 +274,7 @@ function showApp(){
  const mobileNav=$("#mobileNav");
  if(mobileNav){
    const items=mode==="master"?[]:[["Dashboard","home"],["Expense Planning","wallet"],["Participants","users"],["Villas & Stay","bed"],["More","more"]];
-   mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n==="More"?"General":n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n==="More"?(plannerLanguage==="id"?"Lainnya":"More"):n}</span></button>`).join("");
+   mobileNav.innerHTML=items.map(([n,ic])=>n==="More"?`<button type="button" data-action="open-more" class="more-nav-button">${hpIcon(ic)}<span>${plannerLanguage==="id"?"Lainnya":"More"}</span></button>`:`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n}</span></button>`).join("");
    mobileNav.classList.toggle("is-visible",items.length>0&&!pendingTripWelcome);
  }
  if(pendingTripWelcome&&tripId){document.body.classList.add("trip-welcome-mode");renderTripWelcome();return;}
@@ -405,24 +410,19 @@ function applyApprovedChange(r){
 function allTrips(){page="All Trips";pageHead("All Trips","Plan, organize, and keep track of all your journeys.");$("#nav").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.page==="All Trips"));let cards=db.trips.map(t=>{let budget=t.budget.reduce((a,x)=>a+ +x.amount,0),spent=t.cashflow.filter(x=>x.type==="Expense").reduce((a,x)=>a+ +x.amount,0),pct=budget?Math.min(100,spent/budget*100):0;return `<article class="trip"><div class="cover" style="background-image:url('${esc(t.cover||"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1000&q=80")}')"></div><div class="tripbody"><h3>${esc(t.name)}</h3><p>▦ ${date(t.start)} – ${date(t.end)}</p><p>◎ ${esc(t.destination)}</p><div class="tripfoot"><span>${money(spent)} spent</span><b>${pct.toFixed(0)}%</b></div><div class="bar"><i style="width:${pct}%"></i></div><div class="actions"><button class="primary" data-open="${t.id}">Open trip</button><button data-edittrip="${t.id}">Trip Settings / PIN</button><button data-deltrip="${t.id}">Delete</button></div></div></article>`}).join("");$("#content").innerHTML=`<section class="hero" style="background-image:url('https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1600&q=85')"><span class="pill">MASTER ACCESS</span><h2>Every trip, one place.</h2><p>Keep your journeys organized and ready for the next adventure.</p></section><div class="toolbar"><div><h2 style="font:600 23px 'Playfair Display'">My Trips (${db.trips.length})</h2><p>Choose a trip to open its private workspace.</p></div><button class="primary" id="newTrip">＋ Create New Trip</button></div><div class="grid">${cards||'<div class="empty">Belum ada perjalanan. Buat trip pertamamu.</div>'}</div>`}
 function settings(){page="Settings";pageHead("Settings","Manage your profile and backup data.");const isAdmin=mode==="admin",scopeTrips=isAdmin?assignedTrips():db.trips;const profile=isAdmin?"":`<section class="section"><h2>Profile Settings</h2><div class="profile-setting">${db.admin.photo?`<img id="profilePreview" src="${db.admin.photo}" alt="Profile photo">`:`<div class="profile-placeholder" id="profilePreview">${esc((db.admin.name||"AD").split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase())}</div>`}<div><strong>${esc(db.admin.name||"Fiqi Naufaldy")}</strong><p style="font-size:11px;color:#788177;margin:5px 0 9px">Account profile</p><label class="profile-upload" for="profilePhoto">↑ Upload profile photo</label><input id="profilePhoto" type="file" accept="image/png,image/jpeg,image/webp" hidden></div></div><div class="formgrid"><label>Display name<input id="adminName" value="${esc(db.admin.name)}"></label><label>New Master PIN (optional)<input id="adminPin" inputmode="numeric" maxlength="6" placeholder="Leave blank to keep current"></label></div><p><button class="primary" id="saveAdmin">Save Settings</button></p><p style="font-size:11px;color:#788177">Foto dan nama ini ditampilkan di footer sidebar sebagai identitas pemilik akun.</p></section>`;const scopeText=isAdmin?`Backup hanya mencakup ${scopeTrips.length} trip yang ditugaskan ke akun Admin ini. Data trip lain dan pengaturan akses Master tidak akan berubah saat restore.`:"Backup mencakup seluruh trip, akun Admin, dan profil Master.";$("#content").innerHTML=`${profile}<section class="section"><h2>Backup & Restore</h2><p>${scopeText}</p><div class="actions backup-actions"><button class="primary" id="export">${hpIcon("download")}<span>${isAdmin?"Export Assigned Trips":"Export All Data"}</span></button><button id="import">${hpIcon("upload")}<span>Import Backup</span></button></div><p style="font-size:11px;color:#788177">Simpan file backup di tempat aman. Saat import, data pada cakupan backup akan menggantikan data yang sekarang.</p></section>`}
 const labels={General:"Trip information",Participants:"People joining this trip",Budgeting:"Plan trip expenses", "Cash Flow":"Track income and expenses","Villas & Stay":"Accommodation options",Destinations:"Places to explore",Itinerary:"Schedule your trip"};
-function mobileTripMenu(){
- const items=[["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]];
- return `<section class="mobile-trip-menu"><div class="mobile-trip-menu-head"><span>TRIP MENU</span><h3>Plan your trip</h3></div><div class="mobile-trip-menu-grid">${items.map(([n,ic])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
-}
 function tripPage(){
  let t=trip();
  pageHead(page==="Dashboard"?t.name:page,labels[page]||"Your trip workspace");
  $("#nav").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
- const inject=()=>{if(window.innerWidth<=820 && page!=="Dashboard") $("#content").insertAdjacentHTML("afterbegin",mobileTripMenu());};
- if(page==="Destinations"){planningCollectionPage(t,"destinations");inject();return;}
- if(page==="Itinerary"){planningCollectionPage(t,"itinerary");inject();return;}
- if(page==="Cash Flow"){cashFlowPage(t);inject();return;}
+ if(page==="Destinations"){planningCollectionPage(t,"destinations");return;}
+ if(page==="Itinerary"){planningCollectionPage(t,"itinerary");return;}
+ if(page==="Cash Flow"){cashFlowPage(t);return;}
  if(page==="Dashboard")return dashboard(t);
- if(page==="General"){general(t);inject();return;}
- if(page==="Participants"){participantsPage(t);inject();return;}
- if(page==="Expense Planning"){budgetPage(t);inject();return;}
- if(page==="Income Planning"){incomePage(t);inject();return;}
- if(page==="Villas & Stay"){villasPage(t);inject();return;}
+ if(page==="General")return general(t);
+ if(page==="Participants")return participantsPage(t);
+ if(page==="Expense Planning")return budgetPage(t);
+ if(page==="Income Planning")return incomePage(t);
+ if(page==="Villas & Stay")return villasPage(t);
 }
 
 function budgetPage(t){
@@ -688,7 +688,7 @@ function dashboard(t){
  <div class="stat"><span class="stat-icon">${hpIcon("chart")}</span><small>Total Spent</small><b>${money(spent)}</b></div>
  <div class="stat"><span class="stat-icon">${hpIcon("calendar")}</span><small>Remaining</small><b>${money(budget-spent)}</b></div></div>
  <div class="two"><section class="section"><h2>Budget Overview</h2><div class="bar"><i style="width:${pct}%"></i></div><b>${pct.toFixed(1)}%</b><p>Spent ${money(spent)} · Budget ${money(budget)}</p></section><section class="section"><h2>Upcoming Itinerary</h2>${next?`<b>${esc(next.title||next.activity||"")}</b><p>${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p>`:"No itinerary added yet."}</section></div>
- <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div><div class="actions">${[["General","pin"],["Participants","users"],["Income Planning","chart"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
+ <section class="section dashboard-trip-menu"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div><div class="actions">${[["General","pin"],["Participants","users"],["Income Planning","chart"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
 }
 function general(t){
  const ro=mode==="member"?"disabled":"";
@@ -721,10 +721,22 @@ $("#tripForm").onsubmit=async e=>{
  finally{if(submit){submit.disabled=false;submit.textContent="Create Trip";}}
 };
 $("#cancelTrip").onclick=()=>$("#tripModal").close();
+function openMobileMoreMenu(){
+ const existing=document.querySelector(".mobile-more-sheet");
+ if(existing){existing.remove();return;}
+ const items=[["General","settings"],["Income Planning","income"],["Cash Flow","chart"],["Destinations","pin"],["Itinerary","calendar"]];
+ const sheet=document.createElement("div");
+ sheet.className="mobile-more-sheet";
+ sheet.innerHTML=`<div class="mobile-more-backdrop" data-action="close-more"></div><section class="mobile-more-panel"><div class="mobile-more-head"><div><small>TRIP MENU</small><h3>More</h3></div><button type="button" data-action="close-more">×</button></div><div class="mobile-more-list">${items.map(([n,ic])=>`<button type="button" data-page="${n}" data-action="more-page">${hpIcon(ic)}<span>${n}</span><b>›</b></button>`).join("")}</div></section>`;
+ document.body.appendChild(sheet);
+}
 document.addEventListener("click",async e=>{let b=e.target.closest("button");if(!b)return;
 if(b.hasAttribute("data-villa-prev")){setVillaGallery(villaGalleryIndex-1);return;}
 if(b.hasAttribute("data-villa-next")){setVillaGallery(villaGalleryIndex+1);return;}
-if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
+if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}
+if(b.dataset.action==="open-more"){openMobileMoreMenu();return;}
+if(b.dataset.action==="close-more"){document.querySelector(".mobile-more-sheet")?.remove();return;}
+if(b.dataset.action==="more-page"){document.querySelector(".mobile-more-sheet")?.remove();page=b.dataset.page;render();return;}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
 if(b.id==="createAdmin"){
  if(mode!=="master")return toast("Master Access required.");
  const name=$("#newAdminName").value.trim(),pin=$("#newAdminPin").value.trim(),trips=[...document.querySelectorAll('input[name="adminTrip"]:checked')].map(o=>o.value);
