@@ -845,7 +845,7 @@ function dashboard(t){
   </section>
 
   <section class="section upcoming-card">
-   <div class="dashboard-card-head"><div><span class="dashboard-card-eyebrow">NEXT</span><h2>Upcoming Itinerary</h2></div><button data-page="Itinerary" style="border:0;background:none;padding:0;color:var(--accent);font-weight:700;font-size:12px;cursor:pointer">View All <span aria-hidden="true">→</span></button></div>
+   <div class="dashboard-card-head"><div><span class="dashboard-card-eyebrow">NEXT</span><h2>Upcoming Itinerary</h2></div><button data-page="Itinerary" class="dashboard-view-all" style="border:1px solid var(--border);background:rgba(255,255,255,.055);padding:8px 12px;border-radius:999px;color:var(--text);font-weight:700;font-size:12px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;gap:4px">View All <span aria-hidden="true" style="font-size:13px">&gt;</span></button></div>
    <div class="upcoming-list" style="width:100%">${upcomingHtml}</div>
   </section>
 
