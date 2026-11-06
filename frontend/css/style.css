@@ -27,7 +27,7 @@
 .status{display:inline-block;padding:5px 9px;border-radius:20px;background:#edf1e9;color:#47644c;font-size:10px;font-weight:600;white-space:nowrap}.status.pending{background:#f7f0df;color:#94723b}.status.not.joining{background:#f5e9e6;color:#9a5b50}.people-stats{grid-template-columns:repeat(4,minmax(0,1fr))}dialog textarea,dialog select{font:inherit;padding:12px;border:1px solid #e7e2d8;border-radius:9px;background:#fffefa;color:#20251f}dialog textarea{resize:vertical}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}.section table td strong{font-size:12px}@media(max-width:700px){.people-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.twocol{grid-template-columns:1fr}}
 
 /* Luxury Booking Catalog — Villas & Stay */
-.stay-intro{min-height:190px;border-radius:18px;padding:30px 34px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,#f4f0e4f2,#f4f0e4b8,transparent),url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1800&q=85') center 48%/cover;color:#1c2c22;overflow:hidden}.stay-intro .eyebrow{letter-spacing:2px}.stay-intro h2{font:600 36px 'Playfair Display';margin:10px 0 6px}.stay-intro p{font-size:12px;color:#59665b;margin:0}.stay-intro-count{width:88px;height:88px;border-radius:50%;background:#fffdf0d9;display:grid;place-content:center;text-align:center}.stay-intro-count b{font:600 27px 'Playfair Display'}.stay-intro-count span{font-size:9px;color:#788177}.stay-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:15px 0}.stay-stats>div{background:#fffdfa;border:1px solid #ece8df;border-radius:13px;padding:13px 16px}.stay-stats small{display:block;color:#788177;font-size:10px}.stay-stats b{display:block;font-size:19px;margin-top:5px}.stay-toolbar{display:flex;gap:10px;margin:19px 0;align-items:center}.stay-search{display:flex;align-items:center;gap:9px;background:#fffdfa;border:1px solid #e8e3d9;border-radius:10px;padding:0 13px;flex:1;max-width:480px;color:#778176}.stay-search input{border:0;outline:0;background:transparent;padding:12px 0;width:100%;font-size:11px}.stay-toolbar select{border:1px solid #e8e3d9;background:#fffdfa;border-radius:10px;padding:12px;color:#405246;font:inherit;font-size:11px}.stay-list{display:grid;gap:16px}.stay-card{display:grid;grid-template-columns:minmax(260px,38%) 1fr;background:#fffdfa;border:1px solid #ece8df;border-radius:17px;overflow:hidden;box-shadow:0 8px 25px #2330260b;min-height:220px}.stay-photo{border:0;border-radius:0;background-size:cover;background-position:center;min-height:220px;transition:transform .35s;position:relative}.stay-photo:hover{filter:brightness(.96)}.stay-card-body{padding:20px 23px;display:flex;flex-direction:column;justify-content:center}.stay-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.stay-card h3{font:600 22px 'Playfair Display';margin:0 0 6px}.stay-card p{font-size:11px;color:#788177;margin:0}.stay-meta{display:flex;gap:20px;flex-wrap:wrap;margin:17px 0;color:#5f6b61;font-size:11px}.stay-price{font-size:18px;font-weight:700;color:#17251c}.stay-price small,.villa-detail-price small{font-size:10px;font-weight:400;color:#788177}.stay-card-actions{display:flex;gap:8px;margin-top:16px;padding-top:13px;border-top:1px solid #eee9df}.stay-card-actions button{border:0;background:#efeee7;border-radius:8px;padding:9px 13px;color:#405246;font-size:10px}.stay-card-actions button:first-child{background:#173d2e;color:#fff}.stay-empty{text-align:center;background:#fffdfa;border:1px dashed #d9d6ca;border-radius:16px;padding:50px 20px}.stay-empty>span{font:40px 'Playfair Display';color:#8b9a8a}.stay-empty h3{font:600 22px 'Playfair Display';margin:8px}.stay-empty p{font-size:11px;color:#788177}.villa-detail-dialog{width:min(850px,calc(100% - 24px));padding:0;overflow:hidden}.villa-detail{position:relative;display:grid;grid-template-columns:1fr 1fr;min-height:450px}.villa-detail-image{background-size:cover;background-position:center;min-height:450px}.villa-detail-content{padding:30px}.villa-detail-content h2{font:600 30px 'Playfair Display';margin:13px 0 4px}.villa-location{font-size:11px;color:#788177}.villa-detail-price{font-size:21px;font-weight:700;margin:20px 0 0}.villa-detail-section{border-top:1px solid #eee9df;padding-top:13px;margin-top:15px}.villa-detail-section h3{font:600 16px 'Playfair Display';margin:0 0 7px}.villa-detail-section p{font-size:11px;line-height:1.7;color:#667066}.villa-detail-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.villa-detail-actions a,.villa-detail-actions button{font-size:10px;text-decoration:none;border:0;border-radius:8px;padding:10px 13px}.villa-close{position:absolute;z-index:2;right:12px;top:12px;border:0;border-radius:50%;width:34px;height:34px;background:#fff;color:#173d2e;font-size:22px;cursor:pointer}
+.stay-intro{min-height:190px;border-radius:18px;padding:30px 34px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,#f4f0e4f2,#f4f0e4b8,transparent),url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1800&q=85') center 48%/cover;color:#1c2c22;overflow:hidden}.stay-intro .eyebrow{letter-spacing:2px}.stay-intro h2{font:600 36px 'Playfair Display';margin:10px 0 6px}.stay-intro p{font-size:12px;color:#59665b;margin:0}.stay-intro-count{width:88px;height:88px;border-radius:50%;background:#fffdf0d9;display:grid;place-content:center;text-align:center}.stay-intro-count b{font:600 27px 'Playfair Display'}.stay-intro-count span{font-size:9px;color:#788177}.stay-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:15px 0}.stay-stats>div{background:#fffdfa;border:1px solid #ece8df;border-radius:13px;padding:13px 16px}.stay-stats small{display:block;color:#788177;font-size:10px}.stay-stats b{display:block;font-size:19px;margin-top:5px}.stay-toolbar{display:flex;gap:10px;margin:19px 0;align-items:center}.stay-search{display:flex;align-items:center;gap:9px;background:#fffdfa;border:1px solid #e8e3d9;border-radius:10px;padding:0 13px;flex:1;max-width:480px;color:#778176}.stay-search input{border:0;outline:0;background:transparent;padding:12px 0;width:100%;font-size:11px}.stay-toolbar select{border:1px solid #e8e3d9;background:#fffdfa;border-radius:10px;padding:12px;color:#405246;font:inherit;font-size:11px}.stay-list{display:grid;gap:16px}.stay-card{display:grid;grid-template-columns:minmax(260px,38%) 1fr;background:#fffdfa;border:1px solid #ece8df;border-radius:17px;overflow:hidden;box-shadow:0 8px 25px #2330260b;min-height:220px}.stay-photo{border:0;border-radius:0;background-size:cover;background-position:center;min-height:220px;transition:transform .35s;position:relative}.stay-photo:hover{filter:brightness(.96)}.stay-card-body{padding:20px 23px;display:flex;flex-direction:column;justify-content:center}.stay-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.stay-card h3{font:600 22px 'Playfair Display';margin:0 0 6px}.stay-card p{font-size:11px;color:#788177;margin:0}.stay-meta{display:flex;gap:20px;flex-wrap:wrap;margin:17px 0;color:#5f6b61;font-size:11px}.stay-price{font-size:18px;font-weight:700;color:#17251c}.stay-price small,.villa-detail-price small{font-size:10px;font-weight:400;color:#788177}.stay-card-actions{display:flex;gap:8px;margin-top:16px;padding-top:13px;border-top:1px solid #eee9df}.stay-card-actions button{border:0;background:#efeee7;border-radius:8px;padding:9px 13px;color:#405246;font-size:10px}.stay-card-actions button:first-child{background:#173d2e;color:#fff}.stay-empty{text-align:center;background:#fffdfa;border:1px dashed #d9d6ca;border-radius:16px;padding:50px 20px}.stay-empty>span{font:40px 'Playfair Display';color:#8b9a8a}.stay-empty h3{font:600 22px 'Playfair Display';margin:8px}.stay-empty p{font-size:11px;color:#788177}.villa-detail-dialog{width:min(850px,calc(100% - 24px));padding:0;overflow:hidden}.villa-detail{position:relative;display:grid;grid-template-columns:1fr 1fr;min-height:450px}.villa-detail-image{background-size:cover;background-position:center;min-height:450px}.villa-detail-content{padding:30px}.villa-detail-content h2{font:600 30px 'Playfair Display';margin:13px 0 4px}.villa-location{font-size:11px;color:#788177}.villa-detail-price{font-size:21px;font-weight:700;margin:20px 0 0}.villa-detail-section{border-top:1px solid #eee9df;padding-top:13px;margin-top:15px}.villa-detail-section h3{font:600 16px 'Playfair Display';margin:0 0 7px}.villa-detail-section p{font-size:11px;line-height:1.7;color:#667066;white-space:pre-line}.villa-detail-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.villa-detail-actions a,.villa-detail-actions button{font-size:10px;text-decoration:none;border:0;border-radius:8px;padding:10px 13px}.villa-close{position:absolute;z-index:2;right:12px;top:12px;border:0;border-radius:50%;width:34px;height:34px;background:#fff;color:#173d2e;font-size:22px;cursor:pointer}
 @media(max-width:900px){.stay-card{grid-template-columns:34% 1fr}.stay-detail{grid-template-columns:1fr}.villa-detail{grid-template-columns:1fr}.villa-detail-image{min-height:240px}.villa-detail-content{padding:22px}}
 @media(max-width:700px){.stay-intro{min-height:155px;padding:22px}.stay-intro h2{font-size:27px}.stay-intro-count{width:65px;height:65px}.stay-stats{grid-template-columns:repeat(2,1fr)}.stay-toolbar{flex-wrap:wrap}.stay-search{max-width:none;flex-basis:100%}.stay-card{grid-template-columns:1fr}.stay-photo{min-height:190px}.stay-card-body{padding:17px}.stay-card h3{font-size:20px}.stay-meta{gap:12px}.villa-detail-dialog{max-height:90vh;overflow:auto}}
 /* Villa photo upload */
@@ -733,7 +733,7 @@ html[data-theme="dark"] .plan-setting-card input[type="checkbox"], body[data-the
  .two{grid-template-columns:1fr;gap:2px}
  .dashboard-overview .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
  .dashboard-overview .actions button{justify-content:flex-start;min-height:48px;padding:11px 12px;background:#1b2d45;color:#f1f5fb;border:1px solid #405873;border-radius:12px}
- .mobile-nav.is-visible{position:fixed;z-index:50;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:8px 5px;border:1px solid rgba(147,164,188,.28);border-radius:20px;background:rgba(13,25,44,.96);backdrop-filter:blur(18px);box-shadow:0 10px 35px rgba(0,0,0,.28)}
+ .mobile-nav.is-visible{position:fixed;z-index:50;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:8px 5px;border:1px solid rgba(147,164,188,.28);border-radius:20px;background:rgba(13,25,44,.96);backdrop-filter:blur(18px);box-shadow:0 10px 35px rgba(0,0,0,.28)}
  .mobile-nav button{min-width:0;border:0;background:transparent;color:#aebed2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 2px;border-radius:13px;font:500 9px "DM Sans",sans-serif}
  .mobile-nav button .hp-icon{width:20px;height:20px}
  .mobile-nav button.active{background:#263d5d;color:#ffd27c}
@@ -798,126 +798,3 @@ body[data-theme="dark"] .budget-topline h2{
 html[data-theme="dark"] .backup-actions button:not(.primary),
 body[data-theme="dark"] .backup-actions button:not(.primary){background:#1b2a40;border-color:#40536c;color:#eee8df}
 .backup-actions button:focus-visible,.theme-toggle:focus-visible,#nav button:focus-visible{outline:2px solid #d5a84f;outline-offset:3px}
-
-/* Mobile trip navigation: native app-style bottom bar + More sheet */
-@media (max-width:700px){
-  body:not(.trip-welcome-mode) #app>main>header{
-    display:flex!important;
-    align-items:flex-start!important;
-    justify-content:space-between!important;
-    gap:12px!important;
-    padding:4px 0 16px!important;
-  }
-  body:not(.trip-welcome-mode) #app>main>header>div:first-child{min-width:0;flex:1}
-  body:not(.trip-welcome-mode) #app>main>header small{font-size:8px!important;letter-spacing:.18em!important}
-  body:not(.trip-welcome-mode) #app>main>header h1{
-    font-size:32px!important;line-height:1.05!important;margin:5px 0 5px!important;
-    word-break:normal!important;overflow-wrap:anywhere!important;
-  }
-  body:not(.trip-welcome-mode) #app>main>header p{font-size:10px!important;line-height:1.5!important;margin:0!important}
-  body:not(.trip-welcome-mode) #content{padding-bottom:20px!important}
-  .mobile-nav.is-visible{
-    left:12px!important;right:12px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;
-    min-height:68px!important;padding:7px 5px!important;border-radius:19px!important;
-    grid-template-columns:repeat(4,1fr)!important;
-  }
-  .mobile-nav button{font-size:9px!important;min-height:52px!important}
-  .mobile-nav button .hp-icon{width:19px!important;height:19px!important}
-  .mobile-nav button.active{background:#263d5d!important;color:#ffd27c!important}
-}
-.mobile-more-sheet{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;pointer-events:auto}
-.mobile-more-backdrop{position:absolute;inset:0;background:rgba(5,14,25,.56);backdrop-filter:blur(4px)}
-.mobile-more-panel{
-  position:relative;width:100%;max-height:min(76vh,620px);overflow:auto;
-  background:#102139;border:1px solid rgba(255,255,255,.12);border-bottom:0;
-  border-radius:25px 25px 0 0;padding:10px 18px calc(24px + env(safe-area-inset-bottom));
-  box-shadow:0 -18px 50px rgba(0,0,0,.35);transform:translateY(100%);transition:transform .22s ease;
-}
-.mobile-more-sheet.open .mobile-more-panel{transform:translateY(0)}
-.mobile-more-handle{width:42px;height:4px;border-radius:10px;background:#71829a;margin:3px auto 16px}
-.mobile-more-head{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:0 2px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
-.mobile-more-head small{font-size:8px;letter-spacing:.18em;color:#91a1b4}
-.mobile-more-head h3{font:600 20px/1.1 "Playfair Display",serif;color:#f4f0e8;margin:4px 0 0}
-.mobile-more-close{width:34px;height:34px;border:0;border-radius:50%;background:#223955;color:#f1f4f7;font-size:24px;line-height:1}
-.mobile-more-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding-top:16px}
-.mobile-more-grid button{
-  min-height:82px;border:1px solid #304a68;border-radius:15px;background:#172d49;color:#e8edf3;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  font:500 10px "DM Sans",sans-serif;padding:10px 5px;
-}
-.mobile-more-grid button .hp-icon{width:22px;height:22px;color:#d9b46b}
-.mobile-more-grid button:hover,.mobile-more-grid button:active{background:#253f60;border-color:#56708f}
-@media(max-width:700px){
-  .mobile-more-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(min-width:701px){.mobile-more-sheet{display:none!important}}
-
-
-/* Mobile trip launcher: app-style menu that mirrors the desktop trip navigation. */
-.mobile-trip-menu{display:none}
-@media(max-width:700px){
-  .mobile-trip-menu{display:block;margin:18px 0 14px;padding:0}
-  .mobile-trip-menu-head{margin:0 2px 12px}
-  .mobile-trip-menu-head .eyebrow{display:block;font-size:9px;letter-spacing:.16em;color:#8d9c8f;font-weight:800;margin-bottom:4px}
-  .mobile-trip-menu-head h2{margin:0;color:#f2eee6;font:600 23px 'Playfair Display',serif}
-  .mobile-trip-menu-head p{margin:5px 0 0;color:#91a0b1;font-size:10px}
-  .mobile-trip-menu-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-  .mobile-trip-menu-grid button{min-height:92px;border:1px solid rgba(116,143,171,.38);border-radius:16px;background:linear-gradient(180deg,#1b2d46 0%,#15263d 100%);color:#f3f5f7;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:10px;padding:14px 12px;text-align:left;box-shadow:0 5px 16px rgba(0,0,0,.12);cursor:pointer}
-  .mobile-trip-menu-grid button:active{transform:scale(.98);background:#223a59}
-  .mobile-trip-menu-icon{width:34px;height:34px;border-radius:11px;background:rgba(213,177,104,.13);display:grid;place-items:center;color:#e2c27f}
-  .mobile-trip-menu-icon .hp-icon{width:19px;height:19px}
-  .mobile-trip-menu-label{font-size:10px;font-weight:650;line-height:1.25;color:#f0f3f5}
-  .desktop-trip-overview{display:none!important}
-  .two{margin-top:8px}
-}
-@media(max-width:380px){
-  .mobile-trip-menu-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-  .mobile-trip-menu-grid button{min-height:88px}
-}
-html[data-theme="light"] .mobile-trip-menu-head h2{color:#173d2e}
-html[data-theme="light"] .mobile-trip-menu-head p{color:#788177}
-html[data-theme="light"] .mobile-trip-menu-grid button{background:linear-gradient(180deg,#fffdfa 0%,#f6f2e9 100%);border-color:#e4ddcf;color:#284438}
-html[data-theme="light"] .mobile-trip-menu-label{color:#284438}
-html[data-theme="light"] .mobile-trip-menu-icon{background:#f2e7cf;color:#8a6426}
-
-
-/* LOGIN REDESIGN — scoped to #login only */
-#login.login{position:relative;min-height:100svh;display:grid;place-items:center;padding:46px 20px 34px;overflow:hidden;isolation:isolate;background:linear-gradient(rgba(17,45,36,.16),rgba(17,45,36,.16)),url("https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=2200&q=90") center/cover no-repeat}
-#login .login-top-controls{position:absolute;top:18px;right:28px;display:flex;gap:9px;z-index:5}
-#login .login-control{min-width:76px;height:36px;padding:0 13px;border:1px solid rgba(255,255,255,.65);border-radius:20px;background:rgba(255,253,247,.9);color:#23332d;font:600 10px/1 "DM Sans",sans-serif;box-shadow:0 5px 18px rgba(17,31,23,.12)}
-#login .login-control:last-child{min-width:52px}
-#login .loginbox{width:min(610px,calc(100vw - 36px));min-height:560px;padding:42px 54px 50px;border:1px solid rgba(255,255,255,.72);border-radius:30px;background:rgba(255,251,244,.91);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 28px 80px rgba(12,31,23,.22);text-align:center;position:relative}
-#login .login-logo{display:flex;align-items:center;justify-content:center;gap:17px;margin:0 auto 28px;color:#0e4b3a}
-#login .login-logo .logo-mark{width:58px;height:48px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
-#login .login-logo .logo-img{width:100%;height:100%;object-fit:contain}
-#login .login-logo .logo-img-dark{display:block}
-#login .login-logo .logo-img-light{display:none}
-#login .login-brand{font:700 31px/1 "DM Sans",sans-serif;letter-spacing:-1.2px;white-space:nowrap}
-#login .eyebrow{margin:0 0 21px;font:800 10px/1 "DM Sans",sans-serif;letter-spacing:4px;color:#7b837f}
-#login h1#loginTitle{max-width:510px;margin:0 auto;color:#123d31;font:600 clamp(42px,5vw,62px)/.98 "Playfair Display",serif;letter-spacing:-1.7px}
-#login h1#loginTitle::after{content:"";display:block;width:120px;height:13px;margin:15px auto 19px;border-bottom:5px solid #c88b25;border-radius:50%;transform:rotate(-2deg)}
-#login #loginDesc{margin:0 0 25px;color:#6d7772;font:400 14px/1.5 "DM Sans",sans-serif}
-#login .login-pin-wrap{position:relative;width:100%;margin:0 0 18px}
-#login .login-pin-wrap input{width:100%;height:58px;margin:0;padding:0 22px 0 57px;text-align:left;letter-spacing:1px;font:500 15px/1 "DM Sans",sans-serif;color:#4d5d58;border:1px solid #bfc5c0;border-radius:13px;background:rgba(255,253,248,.72);outline:none}
-#login .login-pin-wrap input::placeholder{color:#76817c;opacity:1}
-#login .login-pin-wrap input:focus{border-color:#17523f;box-shadow:0 0 0 3px rgba(23,82,63,.1)}
-#login .login-pin-icon{position:absolute;left:20px;top:50%;transform:translateY(-50%);width:22px;height:22px;display:grid;place-items:center;color:#52615c;z-index:2;pointer-events:none}
-#login .login-pin-icon svg{width:21px;height:21px}
-#login .login-primary{width:100%;height:58px;border-radius:13px;display:flex;align-items:center;justify-content:center;gap:13px;background:#0d533d;color:#fff;font:700 16px/1 "DM Sans",sans-serif;box-shadow:0 13px 28px rgba(13,83,61,.18)}
-#login .continue-icon{display:flex;width:24px;height:24px}
-#login .continue-icon svg{width:24px;height:24px}
-#login .login-primary:disabled{opacity:.72;cursor:wait}
-html[data-theme="dark"] #login.login,body[data-theme="dark"] #login.login{background:linear-gradient(rgba(5,18,31,.48),rgba(5,18,31,.48)),url("https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=2200&q=90") center/cover no-repeat}
-html[data-theme="dark"] #login .loginbox,body[data-theme="dark"] #login .loginbox{background:rgba(12,29,43,.9);border-color:rgba(183,205,220,.4);box-shadow:0 28px 80px rgba(0,0,0,.42)}
-html[data-theme="dark"] #login .login-brand,body[data-theme="dark"] #login .login-brand{color:#f4f1ea}
-html[data-theme="dark"] #login .eyebrow,body[data-theme="dark"] #login .eyebrow{color:#aebbc5}
-html[data-theme="dark"] #login h1#loginTitle,body[data-theme="dark"] #login h1#loginTitle{color:#f4f1ea}
-html[data-theme="dark"] #login #loginDesc,body[data-theme="dark"] #login #loginDesc{color:#b7c0c5}
-html[data-theme="dark"] #login h1#loginTitle::after,body[data-theme="dark"] #login h1#loginTitle::after{border-color:#d3a14b}
-html[data-theme="dark"] #login .login-pin-wrap input,body[data-theme="dark"] #login .login-pin-wrap input{background:rgba(12,29,43,.58);border-color:#8b9ba8;color:#eef2f4}
-html[data-theme="dark"] #login .login-pin-wrap input::placeholder,body[data-theme="dark"] #login .login-pin-wrap input::placeholder{color:#aeb8c0}
-html[data-theme="dark"] #login .login-pin-icon,body[data-theme="dark"] #login .login-pin-icon{color:#ffffff!important;opacity:1;filter:none}html[data-theme="dark"] #login .login-pin-icon svg,body[data-theme="dark"] #login .login-pin-icon svg{display:block;width:24px;height:24px;color:#ffffff!important;fill:#ffffff!important}html[data-theme="dark"] #login .login-pin-icon svg path,body[data-theme="dark"] #login .login-pin-icon svg path{fill:#ffffff!important}
-html[data-theme="dark"] #login .login-primary,body[data-theme="dark"] #login .login-primary{background:#12664a}
-html[data-theme="dark"] #login .login-control,body[data-theme="dark"] #login .login-control{background:rgba(12,29,43,.88);border-color:#526d80;color:#eef2f4}
-@media(max-width:700px){#login.login{padding:24px 16px 28px}#login .login-top-controls{top:14px;right:14px}#login .login-control{height:33px;min-width:68px;font-size:9px}#login .loginbox{width:min(100%,430px);min-height:auto;padding:31px 24px 34px;border-radius:24px}#login .login-logo{gap:11px;margin-bottom:24px}#login .login-logo .logo-mark{width:44px;height:38px}#login .login-brand{font-size:25px;letter-spacing:-.9px}#login .eyebrow{font-size:8px;letter-spacing:3px;margin-bottom:16px}#login h1#loginTitle{font-size:37px;line-height:1;letter-spacing:-1px}#login h1#loginTitle::after{width:92px;height:10px;margin:12px auto 17px;border-width:4px}#login #loginDesc{font-size:12px;margin-bottom:21px}#login .login-pin-wrap input{height:53px;font-size:14px;padding-left:51px}#login .login-pin-icon{left:17px}#login .login-primary{height:53px;font-size:14px}}
-@media(max-width:380px){#login .loginbox{padding-left:19px;padding-right:19px}#login .login-brand{font-size:23px}#login h1#loginTitle{font-size:33px}}

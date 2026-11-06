@@ -1,27 +1,6 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Holiday Planner</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"></head><body>
-<section id="login" class="login">
-  <div class="login-top-controls" aria-label="Login preferences">
-    <button id="loginThemeToggle" type="button" class="login-control">☀ <span>Light</span></button>
-    <button id="loginLanguageToggle" type="button" class="login-control">EN⌄</button>
-  </div>
-  <div class="loginbox">
-    <div class="logo login-logo">
-      <span class="logo-mark"><img class="logo-img logo-img-dark" src="assets/logo/A FNVERSE.webp" alt="FNVERSE"><img class="logo-img logo-img-light" src="assets/logo/B FNVERSE.webp" alt="FNVERSE"></span>
-      <span class="login-brand">Holiday Planner</span>
-    </div>
-    <p class="eyebrow">YOUR PERSONAL TRAVEL SPACE</p>
-    <h1 id="loginTitle">Welcome to your Holiday Planner</h1>
-    <p id="loginDesc">Enter your Access PIN to continue.</p>
-    <div class="login-pin-wrap">
-      <span class="login-pin-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><title>padlock</title><path fill="currentColor" d="M12 13a1.49 1.49 0 0 0-1 2.61V17a1 1 0 0 0 2 0v-1.39A1.49 1.49 0 0 0 12 13m5-4V7A5 5 0 0 0 7 7v2a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-7a3 3 0 0 0-3-3M9 7a3 3 0 0 1 6 0v2H9Zm9 12a1 1 0 0 1-1-1H7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1Z"/></svg></span>
-      <input id="pin" type="password" name="holiday-planner-access-code" inputmode="numeric" maxlength="6" placeholder="Enter Access PIN" autocomplete="new-password" autocapitalize="off" spellcheck="false">
-    </div>
-    <button id="loginBtn" class="primary login-primary" type="button" onclick="window.holidayPlannerLogin && window.holidayPlannerLogin()">Continue <span class="continue-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><title>next</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.76 7.22v9.57c0 1.96 2.13 3.19 3.83 2.21l4.15-2.39l4.15-2.4c1.7-.98 1.7-3.43 0-4.41l-4.15-2.4c-1.7-.98-3.83.24-3.83 2.21m16.48 10.96V5.82"/></svg></span></button>
-    <small id="loginHint" hidden></small>
-    <p id="loginError" class="error"></p>
-  </div>
-</section>
-<div id="app" class="shell hidden"><aside><a href="#" class="logo" id="brandHome">✈ <b>Holiday<br>Planner</b></a><small id="access">MASTER ACCESS</small><nav id="nav"></nav>
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Holiday Planner</title><link rel="icon" type="image/webp" href="assets/logo/A FNVERSE.webp"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"></head><body>
+<section id="login" class="login"><div class="loginbox"><div class="logo brand-logo"><img class="brand-logo-img" src="assets/logo/A FNVERSE.webp" alt="FNVERSE"><span>Holiday Planner</span></div><p class="eyebrow">YOUR PERSONAL TRAVEL SPACE</p><h1 id="loginTitle">Welcome</h1><p id="loginDesc">Masukkan Master PIN atau Trip PIN.</p><input id="pin" type="password" name="holiday-planner-access-code" inputmode="numeric" maxlength="6" placeholder="6-digit PIN" autocomplete="new-password" autocapitalize="off" spellcheck="false"><button id="loginBtn" class="primary" type="button" onclick="window.holidayPlannerLogin && window.holidayPlannerLogin()">Continue →</button><small id="loginHint" hidden></small><p id="loginError" class="error"></p></div></section>
+<div id="app" class="shell hidden"><aside><a href="#" class="logo brand-logo" id="brandHome"><img class="brand-logo-img" src="assets/logo/A FNVERSE.webp" alt="FNVERSE"><span>Holiday Planner</span></a><small id="access">MASTER ACCESS</small><nav id="nav"></nav>
 <div class="sidebar-footer">
   <div class="sidebar-profile">
     <img src="assets/fiqi-profile.jpg" alt="Fiqi Naufaldy profile photo">
