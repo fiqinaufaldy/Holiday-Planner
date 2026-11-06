@@ -348,9 +348,9 @@ function showApp(){
  $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("logout")}<span>Log out</span></button>`;
  const mobileNav=$("#mobileNav");
  if(mobileNav){
-   const items=mode==="master"?[]:[["Dashboard","dashboard"],["Expense Planning","expense-report"],["Itinerary","itinerary"],["Participants","users-event"],["More","more"]];
-   mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n==="More"?"General":n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n==="More"?(plannerLanguage==="id"?"Lainnya":"More"):n}</span></button>`).join("");
-   mobileNav.classList.toggle("is-visible",items.length>0&&!pendingTripWelcome);
+   mobileNav.innerHTML="";
+   mobileNav.classList.remove("is-visible");
+   mobileNav.style.display="none";
  }
  if(pendingTripWelcome&&tripId){document.body.classList.add("trip-welcome-mode");renderTripWelcome();return;}
  document.body.classList.remove("trip-welcome-mode");
@@ -863,19 +863,17 @@ function dashboard(t){
   </section>
 
   <section class="section villa-vote-card">
-   <div class="dashboard-card-head" style="align-items:flex-start;gap:20px">
-    <div style="min-width:0"><span class="dashboard-card-eyebrow">GROUP DECISION</span><h2>Villa Vote</h2><p>Vote for the stay you prefer.</p></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:9px;flex:0 0 auto;padding-top:2px">
-     <span class="dashboard-vote-total" style="font-size:12px;font-weight:700;white-space:nowrap">${voteTotal} Votes</span>
-     ${ranked.length?`<button class="villa-vote-button" type="button" data-page="Villas & Stay" style="margin:0;border:1px solid var(--border);border-radius:999px;padding:7px 12px;background:var(--accent);color:#fff;font-size:11px;font-weight:800;letter-spacing:.1px;line-height:1;box-shadow:0 6px 16px rgba(0,0,0,.12);cursor:pointer;white-space:nowrap">Vote Now <span aria-hidden="true">→</span></button>`:""}
+   <div class="dashboard-card-head">
+    <div><span class="dashboard-card-eyebrow">GROUP DECISION</span><h2>Villa Vote</h2><p>Vote for the stay you prefer.</p></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+     <span class="dashboard-vote-total">${voteTotal} Votes</span>
+     ${ranked.length?`<button class="villa-vote-button" type="button" data-page="Villas & Stay" style="margin:0">Vote Now →</button>`:""}
     </div>
    </div>
-   <div class="villa-vote-list" style="margin-top:18px">${villaRows}</div>
+   <div class="villa-vote-list">${villaRows}</div>
   </section>
  </div>
-
- <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div>
- <div class="actions">${[["General","pin"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
+`;
  const planEl=$("#dashboardPlan");
  if(planEl)planEl.onchange=()=>{const current=trip();if(activatePlan(current,planEl.value)){save();render();}};
 }
