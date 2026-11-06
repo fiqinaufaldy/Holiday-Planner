@@ -901,7 +901,7 @@ html[data-theme="light"] .mobile-trip-menu-icon{background:#f2e7cf;color:#8a6426
 #login .login-pin-wrap input{width:100%;height:58px;margin:0;padding:0 22px 0 57px;text-align:left;letter-spacing:1px;font:500 15px/1 "DM Sans",sans-serif;color:#4d5d58;border:1px solid #bfc5c0;border-radius:13px;background:rgba(255,253,248,.72);outline:none}
 #login .login-pin-wrap input::placeholder{color:#76817c;opacity:1}
 #login .login-pin-wrap input:focus{border-color:#17523f;box-shadow:0 0 0 3px rgba(23,82,63,.1)}
-#login .login-pin-icon{position:absolute;left:20px;top:50%;transform:translateY(-50%);width:22px;height:22px;display:grid;place-items:center;color:#52615c;z-index:2;pointer-events:none}
+#login .login-pin-icon{position:absolute;left:20px;top:50%;transform:translateY(-50%);width:22px;height:22px;display:grid;place-items:center;color:#0f4f3d;z-index:103;pointer-events:none}
 #login .login-pin-icon svg{width:21px;height:21px}
 #login .login-primary{width:100%;height:58px;border-radius:13px;display:flex;align-items:center;justify-content:center;gap:13px;background:#0d533d;color:#fff;font:700 16px/1 "DM Sans",sans-serif;box-shadow:0 13px 28px rgba(13,83,61,.18)}
 #login .continue-icon{display:flex;width:24px;height:24px}
@@ -1071,36 +1071,19 @@ body[data-theme="dark"] #login .login-pin-icon .login-padlock-icon{
 }
 
 
-/* FINAL LOGIN PADLOCK VISIBILITY — CSS ONLY */
-#login .login-pin-wrap{
-  position:relative !important;
-}
-
+/* LOGIN PADLOCK — FINAL FIX: input is z-index 102, icon must be above it */
 #login .login-pin-wrap > .login-pin-icon{
-  position:absolute !important;
-  left:20px !important;
-  top:50% !important;
-  transform:translateY(-50%) !important;
-  width:24px !important;
-  height:24px !important;
-  min-width:24px !important;
-  min-height:24px !important;
+  z-index:103 !important;
   display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
   visibility:visible !important;
   opacity:1 !important;
-  z-index:20 !important;
   pointer-events:none !important;
-  color:#0f4f3d !important;
 }
 
 #login .login-pin-wrap > .login-pin-icon .login-padlock-icon{
   display:block !important;
-  width:24px !important;
-  height:24px !important;
-  min-width:24px !important;
-  min-height:24px !important;
+  width:22px !important;
+  height:22px !important;
   visibility:visible !important;
   opacity:1 !important;
   color:#0f4f3d !important;
