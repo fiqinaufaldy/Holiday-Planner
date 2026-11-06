@@ -1,7 +1,36 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Holiday Planner | FNVERSE</title><link rel="icon" type="image/webp" href="assets/logo/A FNVERSE.webp"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"><style id="login-brand-size-adjustment">#login .login-logo .logo-mark{width:150px;height:72px}#login .login-logo .logo-img-dark,#login .login-logo .logo-img-light{transform:scale(1.8);transform-origin:center center}#login .login-brand{font-size:38px;letter-spacing:-1.4px;transform:translate(-30px,-6px)}</style><style id="mobile-login-fixed">@media (max-width: 768px){html:has(body:has(#login:not(.hidden))),body:has(#login:not(.hidden)){height:100%;overflow:hidden!important;overscroll-behavior:none!important}#login:not(.hidden){position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important}#login:not(.hidden) .loginbox{max-height:100dvh;overflow:hidden}}</style></head><body>
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Holiday Planner | FNVERSE</title><link rel="icon" type="image/webp" href="assets/logo/A FNVERSE.webp"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"><style id="login-brand-size-adjustment">#login .login-logo .logo-mark{width:150px;height:72px}#login .login-logo .logo-img-dark,#login .login-logo .logo-img-light{transform:scale(1.8);transform-origin:center center}#login .login-brand{font-size:38px;letter-spacing:-1.4px;transform:translate(-30px,-6px)}</style><style id="mobile-login-fixed">@media (max-width: 768px){html:has(body:has(#login:not(.hidden))),body:has(#login:not(.hidden)){height:100%;overflow:hidden!important;overscroll-behavior:none!important}#login:not(.hidden){position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important}#login:not(.hidden) .loginbox{max-height:100dvh;overflow:hidden}}</style><style id="mobile-login-aesthetic">@media(max-width:700px){
+  #login.login{padding:58px 16px 24px;align-items:center;justify-items:center;}
+  #login .login-top-controls{top:14px;right:14px;gap:8px;}
+  #login .login-control{height:34px;padding:0 12px;min-width:70px;font-size:9px;}
+  #login .login-control:last-child{min-width:48px;}
+  #login .loginbox{width:100%;max-width:360px;min-height:0;padding:26px 20px 27px;border-radius:24px;}
+  #login .login-logo{gap:9px;margin:0 auto 19px;justify-content:center;width:100%;}
+  #login .login-logo .logo-mark{width:58px;height:34px;flex:0 0 58px;}
+  #login .login-logo .logo-img{width:100%!important;height:100%!important;max-width:100%!important;object-fit:contain!important;}
+  #login .login-brand{font-size:21px;letter-spacing:-.7px;transform:none;white-space:nowrap;}
+  #login .eyebrow{font-size:7px;letter-spacing:2.6px;margin-bottom:14px;}
+  #login h1#loginTitle{max-width:100%;font-size:34px;line-height:1.01;letter-spacing:-.8px;}
+  #login h1#loginTitle::after{width:78px;height:9px;margin:10px auto 14px;border-width:3px;}
+  #login #loginDesc{font-size:11px;margin-bottom:17px;}
+  #login .login-pin-wrap{margin-bottom:14px;}
+  #login .login-pin-wrap input{height:49px;font-size:13px;padding:0 17px 0 47px;border-radius:11px;}
+  #login .login-pin-icon{left:15px;width:20px;height:20px;}
+  #login .login-pin-icon svg{width:19px;height:19px;}
+  #login .login-primary{height:49px;border-radius:11px;font-size:13px;gap:10px;}
+  #login .continue-icon,#login .continue-icon svg{width:21px;height:21px;}
+}
+@media(max-width:360px){
+  #login.login{padding-left:14px;padding-right:14px;}
+  #login .loginbox{padding-left:18px;padding-right:18px;}
+  #login .login-logo{gap:8px;}
+  #login .login-logo .logo-mark{width:52px;flex-basis:52px;}
+  #login .login-brand{font-size:20px;}
+  #login h1#loginTitle{font-size:32px;}
+}
+</style></head><body>
 <section id="login" class="login">
   <div class="login-top-controls" aria-label="Login preferences">
-    <button id="loginThemeToggle" type="button" class="login-control">☀ <span>Light</span></button>
+    <button id="loginThemeToggle" type="button" class="login-control" style="gap:8px">☀ <span>Light</span></button>
     <button id="loginLanguageToggle" type="button" class="login-control">EN⌄</button>
   </div>
   <div class="loginbox">
