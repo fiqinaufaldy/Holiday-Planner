@@ -1045,36 +1045,84 @@ html[data-theme="dark"] #login .login-control,body[data-theme="dark"] #login .lo
 
 
 /* Login PIN icon — Uil padlock */
+#login .login-pin-icon{
+  color:#52615c !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  z-index:5 !important;
+}
+#login .login-pin-icon .login-padlock-icon{
+  display:block !important;
+  width:22px !important;
+  height:22px !important;
+  color:currentColor !important;
+  fill:currentColor !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+html[data-theme="dark"] #login .login-pin-icon,
+body[data-theme="dark"] #login .login-pin-icon{
+  color:#ffffff !important;
+}
+html[data-theme="dark"] #login .login-pin-icon .login-padlock-icon,
+body[data-theme="dark"] #login .login-pin-icon .login-padlock-icon{
+  color:#ffffff !important;
+  fill:#ffffff !important;
+}
+
+
+/* FINAL LOGIN PADLOCK VISIBILITY — CSS ONLY */
+#login .login-pin-wrap{
+  position:relative !important;
+}
+
 #login .login-pin-wrap > .login-pin-icon{
   position:absolute !important;
   left:20px !important;
   top:50% !important;
   transform:translateY(-50%) !important;
-  width:22px !important;
-  height:22px !important;
-  display:grid !important;
-  place-items:center !important;
-  color:#0f4f3d !important;
-  opacity:1 !important;
+  width:24px !important;
+  height:24px !important;
+  min-width:24px !important;
+  min-height:24px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
   visibility:visible !important;
-  z-index:10 !important;
+  opacity:1 !important;
+  z-index:20 !important;
   pointer-events:none !important;
+  color:#0f4f3d !important;
 }
+
 #login .login-pin-wrap > .login-pin-icon .login-padlock-icon{
   display:block !important;
-  width:22px !important;
-  height:22px !important;
+  width:24px !important;
+  height:24px !important;
+  min-width:24px !important;
+  min-height:24px !important;
+  visibility:visible !important;
+  opacity:1 !important;
   color:#0f4f3d !important;
   fill:#0f4f3d !important;
-  opacity:1 !important;
-  visibility:visible !important;
 }
+
+#login .login-pin-wrap > .login-pin-icon .login-padlock-icon path{
+  fill:currentColor !important;
+}
+
 html[data-theme="dark"] #login .login-pin-wrap > .login-pin-icon,
 body[data-theme="dark"] #login .login-pin-wrap > .login-pin-icon{
   color:#ffffff !important;
 }
+
 html[data-theme="dark"] #login .login-pin-wrap > .login-pin-icon .login-padlock-icon,
 body[data-theme="dark"] #login .login-pin-wrap > .login-pin-icon .login-padlock-icon{
   color:#ffffff !important;
+  fill:#ffffff !important;
+}
+
+html[data-theme="dark"] #login .login-pin-wrap > .login-pin-icon .login-padlock-icon path,
+body[data-theme="dark"] #login .login-pin-wrap > .login-pin-icon .login-padlock-icon path{
   fill:#ffffff !important;
 }
