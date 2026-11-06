@@ -13,7 +13,16 @@
     <h1 id="loginTitle">Welcome to your Holiday Planner</h1>
     <p id="loginDesc">Enter your Access PIN to continue.</p>
     <div class="login-pin-wrap">
-      <span class="login-pin-icon" aria-hidden="true"><svg class="login-padlock-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" role="img" aria-hidden="true"><path fill="currentColor" d="M12 13a1.49 1.49 0 0 0-1 2.61V17a1 1 0 0 0 2 0v-1.39A1.49 1.49 0 0 0 12 13m5-4V7A5 5 0 0 0 7 7v2a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-7a3 3 0 0 0-3-3M9 7a3 3 0 0 1 6 0v2H9Zm9 12a1 1 0 0 1-1-1H7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1Z"/></svg></span>
+      <span class="login-pin-icon" aria-hidden="true"><svg class="login-padlock-icon" style="color:var(--text)"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  aria-hidden="true"
+  focusable="false">
+  <path fill="currentColor"
+    d="M17 8h-1V6a4 4 0 0 0-8 0v2H7a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-7a3 3 0 0 0-3-3M10 6a2 2 0 0 1 4 0v2h-4Zm7 13H7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1"/>
+</svg></span>
       <input id="pin" type="password" name="holiday-planner-access-code" inputmode="numeric" maxlength="6" placeholder="Enter Access PIN" autocomplete="new-password" autocapitalize="off" spellcheck="false">
     </div>
     <button id="loginBtn" class="primary login-primary" type="button" onclick="window.holidayPlannerLogin && window.holidayPlannerLogin()">Continue <span class="continue-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><title>next</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.76 7.22v9.57c0 1.96 2.13 3.19 3.83 2.21l4.15-2.39l4.15-2.4c1.7-.98 1.7-3.43 0-4.41l-4.15-2.4c-1.7-.98-3.83.24-3.83 2.21m16.48 10.96V5.82"/></svg></span></button>
