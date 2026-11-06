@@ -844,7 +844,7 @@ function dashboard(t){
 
   <section class="section upcoming-card">
    <div class="dashboard-card-head"><div><span class="dashboard-card-eyebrow">NEXT</span><h2>Upcoming Itinerary</h2></div></div>
-   ${upcoming.length?upcoming.map(next=>`<div class="upcoming-item"><div class="upcoming-date"><b>${new Date(next.date+"T00:00:00").getDate()}</b><span>${new Date(next.date+"T00:00:00").toLocaleDateString("en-US",{month:"short"})}</span></div><div><strong>${esc(next.title||next.activity||"")}</strong><p>${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p></div></div>`).join(""):"<div class=\"upcoming-empty\">No upcoming itinerary yet.</div>"}
+   ${upcoming.length?`<div class="upcoming-list" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">${upcoming.map(next=>`<div class="upcoming-item" style="min-width:0;height:100%"><div class="upcoming-date"><b>${new Date(next.date+"T00:00:00").getDate()}</b><span>${new Date(next.date+"T00:00:00").toLocaleDateString("en-US",{month:"short"})}</span></div><div><strong>${esc(next.title||next.activity||"")}</strong><p>${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p></div></div>`).join("")}</div>`:"<div class=\"upcoming-empty\">No upcoming itinerary yet.</div>"}
   </section>
 
   <section class="section expense-breakdown-card">
