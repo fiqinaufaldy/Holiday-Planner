@@ -129,7 +129,7 @@ function toast(s){let t=$("#toast");t.textContent=s;t.style.display="block";clea
 
 let plannerLanguage=localStorage.getItem("holidayPlannerLanguage")||"en";
 const languagePairs=[
-["YOUR TRAVEL SPACE","RUANG PERJALANANMU"],["Dashboard","Dasbor"],["General","Umum"],["Participants","Peserta"],
+["YOUR TRAVEL SPACE","RUANG PERJALANANMU"],["Dashboard","Dasbor"],["General","grid"],["Participants","Peserta"],
 ["Income Planning","Rencana Pemasukan"],["Expense Planning","Rencana Pengeluaran"],["Cash Flow","Arus Kas"],
 ["Villas & Stay","Villa & Penginapan"],["Destinations","Destinasi"],["Itinerary","Jadwal Perjalanan"],
 ["Assigned Trips","Trip yang Ditugaskan"],["Log out","Keluar"],["Light mode","Mode terang"],["Dark mode","Mode gelap"],
@@ -142,7 +142,7 @@ const languagePairs=[
 ["Accommodation options","Pilihan akomodasi"],["No description added yet.","Belum ada deskripsi."],
 ["No facilities listed yet.","Belum ada fasilitas."]
 ];
-languagePairs.push(...[["Your trip workspace", "Ruang perjalananmu"], ["Trip information", "Informasi perjalanan"], ["Trip Information", "Informasi Perjalanan"], ["Your trip schedule", "Jadwal perjalananmu"], ["Places to explore", "Tempat untuk dijelajahi"], ["Accommodation options", "Pilihan akomodasi"], ["Manage everyone joining this trip", "Kelola semua peserta perjalanan ini"], ["Manage every source of trip funding", "Kelola seluruh sumber dana perjalanan"], ["Plan the funds available for this trip.", "Rencanakan dana yang tersedia untuk perjalanan ini."], ["Plan and monitor the expenses for this trip.", "Rencanakan dan pantau pengeluaran perjalanan ini."], ["Track all money received and spent across this trip.", "Pantau seluruh uang masuk dan keluar selama perjalanan ini."], ["Manage places to explore for this trip.", "Kelola tempat yang ingin dikunjungi selama perjalanan ini."], ["Manage your trip schedule in one place.", "Kelola jadwal perjalanan dalam satu tempat."], ["Trip name", "Nama Trip"], ["Destination", "Destinasi"], ["Start date", "Tanggal Mulai"], ["End date", "Tanggal Selesai"], ["Save trip information", "Simpan Informasi Trip"], ["Plan Settings", "Pengaturan Plan"], ["Plan name", "Nama Plan"], ["Default plan", "Plan Default"], ["Save plan settings", "Simpan Pengaturan Plan"], ["Enable Plan A", "Aktifkan Plan A"], ["Enable Plan B", "Aktifkan Plan B"], ["Available", "Tersedia"], ["Disabled", "Nonaktif"], ["Available on Dashboard", "Tersedia di Dasbor"], ["Hidden from Dashboard", "Disembunyikan dari Dasbor"], ["Dashboard", "Dasbor"], ["General", "Umum"], ["Participants", "Peserta"], ["Income Planning", "Perencanaan Pemasukan"], ["Expense Planning", "Perencanaan Pengeluaran"], ["Cash Flow", "Arus Kas"], ["Villas & Stay", "Villa & Penginapan"], ["Destinations", "Destinasi"], ["Itinerary", "Jadwal Perjalanan"], ["Assigned Trips", "Daftar Trip"], ["Log out", "Keluar"], ["Add Participant", "Tambah Peserta"], ["Add Destination", "Tambah Destinasi"], ["Add Destinations", "Tambah Destinasi"], ["Add Itinerary", "Tambah Jadwal"], ["Add Villa", "Tambah Villa"], ["Add income", "Tambah Pemasukan"], ["Add expense", "Tambah Pengeluaran"], ["Add transaction", "Tambah Transaksi"], ["Add item", "Tambah Item"], ["Edit", "Ubah"], ["Delete", "Hapus"], ["Save changes", "Simpan Perubahan"], ["Cancel", "Batal"], ["Save", "Simpan"], ["Name", "Nama"], ["Area", "Area"], ["Notes", "Catatan"], ["Actions", "Aksi"], ["Action", "Aksi"], ["Status", "Status"], ["Role", "Peran"], ["Date", "Tanggal"], ["Time", "Waktu"], ["Activity", "Aktivitas"], ["Location", "Lokasi"], ["Description", "Deskripsi"], ["Amount", "Nominal"], ["Category", "Kategori"], ["Contact", "Kontak"], ["Planned expenses", "Rencana Pengeluaran"], ["Income Sources", "Sumber Pemasukan"], ["Expenses", "Pengeluaran"], ["Payments", "Pembayaran"], ["Search villa or location...", "Cari villa atau lokasi..."], ["Find your perfect stay.", "Temukan penginapan yang tepat."], ["No description added yet.", "Belum ada deskripsi."], ["No facilities listed yet.", "Belum ada fasilitas."], ["TRIP BUDGET", "ANGGARAN TRIP"], ["ALLOCATED", "DIALOKASIKAN"], ["PAID", "SUDAH DIBAYAR"], ["OUTSTANDING", "BELUM DIBAYAR"], ["BUDGET HEALTH", "KONDISI ANGGARAN"], ["PLANNED INCOME", "RENCANA PEMASUKAN"], ["RECEIVED", "SUDAH DITERIMA"], ["AWAITING", "MENUNGGU"], ["Total Income", "Total Pemasukan"], ["Total Expense", "Total Pengeluaran"], ["Net Cash Flow", "Arus Kas Bersih"], ["Total Spent", "Total Pengeluaran"], ["Remaining", "Sisa Anggaran"], ["Planned Budget", "Rencana Anggaran"], ["Budget Overview", "Ringkasan Anggaran"], ["Upcoming Itinerary", "Jadwal Berikutnya"], ["Trip Overview", "Ringkasan Trip"], ["Trip Participants", "Peserta Trip"], ["Properties", "Properti"], ["Total Villas", "Total Villa"], ["Booked", "Dipesan"], ["Shortlisted", "Favorit"], ["All properties", "Semua Properti"], ["Your stay collection starts here.", "Koleksi penginapanmu dimulai di sini."], ["No itinerary added yet.", "Belum ada jadwal perjalanan."], ["No transactions recorded yet.", "Belum ada transaksi."], ["No destinations added yet.", "Belum ada destinasi."], ["No income sources yet. Add your first source of funds.", "Belum ada sumber pemasukan. Tambahkan sumber dana pertamamu."], ["Enter your trip", "Masuk ke Trip"], ["A new journey begins", "Perjalanan baru dimulai"], ["Your trip workspace is ready.", "Ruang perjalananmu siap digunakan."], ["Switch to Indonesian", "Ganti ke Bahasa Indonesia"], ["Switch to English", "Ganti ke Bahasa Inggris"], ["Income marked as Received in Income Planning appears here automatically.", "Pemasukan yang ditandai Sudah Diterima di Perencanaan Pemasukan akan otomatis muncul di sini."], ["Track your trip expenses and payments.", "Pantau pengeluaran dan pembayaran perjalananmu."], ["Plan the funds available for this trip.", "Rencanakan dana yang tersedia untuk perjalanan ini."], ["No participants added yet.", "Belum ada peserta."], ["No expenses added yet.", "Belum ada pengeluaran."], ["Planned", "Direncanakan"], ["Received", "Diterima"], ["Pending", "Menunggu"], ["Confirmed", "Dikonfirmasi"], ["Master Access", "Akses Master"], ["Admin Access", "Akses Admin"], ["Member Access", "Akses Anggota"]]);
+languagePairs.push(...[["Your trip workspace", "Ruang perjalananmu"], ["Trip information", "Informasi perjalanan"], ["Trip Information", "Informasi Perjalanan"], ["Your trip schedule", "Jadwal perjalananmu"], ["Places to explore", "Tempat untuk dijelajahi"], ["Accommodation options", "Pilihan akomodasi"], ["Manage everyone joining this trip", "Kelola semua peserta perjalanan ini"], ["Manage every source of trip funding", "Kelola seluruh sumber dana perjalanan"], ["Plan the funds available for this trip.", "Rencanakan dana yang tersedia untuk perjalanan ini."], ["Plan and monitor the expenses for this trip.", "Rencanakan dan pantau pengeluaran perjalanan ini."], ["Track all money received and spent across this trip.", "Pantau seluruh uang masuk dan keluar selama perjalanan ini."], ["Manage places to explore for this trip.", "Kelola tempat yang ingin dikunjungi selama perjalanan ini."], ["Manage your trip schedule in one place.", "Kelola jadwal perjalanan dalam satu tempat."], ["Trip name", "Nama Trip"], ["Destination", "Destinasi"], ["Start date", "Tanggal Mulai"], ["End date", "Tanggal Selesai"], ["Save trip information", "Simpan Informasi Trip"], ["Plan Settings", "Pengaturan Plan"], ["Plan name", "Nama Plan"], ["Default plan", "Plan Default"], ["Save plan settings", "Simpan Pengaturan Plan"], ["Enable Plan A", "Aktifkan Plan A"], ["Enable Plan B", "Aktifkan Plan B"], ["Available", "Tersedia"], ["Disabled", "Nonaktif"], ["Available on Dashboard", "Tersedia di Dasbor"], ["Hidden from Dashboard", "Disembunyikan dari Dasbor"], ["Dashboard", "Dasbor"], ["General", "back-square"], ["Participants", "Peserta"], ["Income Planning", "Perencanaan Pemasukan"], ["Expense Planning", "Perencanaan Pengeluaran"], ["Cash Flow", "Arus Kas"], ["Villas & Stay", "Villa & Penginapan"], ["Destinations", "Destinasi"], ["Itinerary", "Jadwal Perjalanan"], ["Assigned Trips", "Daftar Trip"], ["Log out", "Keluar"], ["Add Participant", "Tambah Peserta"], ["Add Destination", "Tambah Destinasi"], ["Add Destinations", "Tambah Destinasi"], ["Add Itinerary", "Tambah Jadwal"], ["Add Villa", "Tambah Villa"], ["Add income", "Tambah Pemasukan"], ["Add expense", "Tambah Pengeluaran"], ["Add transaction", "Tambah Transaksi"], ["Add item", "Tambah Item"], ["Edit", "Ubah"], ["Delete", "Hapus"], ["Save changes", "Simpan Perubahan"], ["Cancel", "Batal"], ["Save", "Simpan"], ["Name", "Nama"], ["Area", "Area"], ["Notes", "Catatan"], ["Actions", "Aksi"], ["Action", "Aksi"], ["Status", "Status"], ["Role", "Peran"], ["Date", "Tanggal"], ["Time", "Waktu"], ["Activity", "Aktivitas"], ["Location", "Lokasi"], ["Description", "Deskripsi"], ["Amount", "Nominal"], ["Category", "Kategori"], ["Contact", "Kontak"], ["Planned expenses", "Rencana Pengeluaran"], ["Income Sources", "Sumber Pemasukan"], ["Expenses", "Pengeluaran"], ["Payments", "Pembayaran"], ["Search villa or location...", "Cari villa atau lokasi..."], ["Find your perfect stay.", "Temukan penginapan yang tepat."], ["No description added yet.", "Belum ada deskripsi."], ["No facilities listed yet.", "Belum ada fasilitas."], ["TRIP BUDGET", "ANGGARAN TRIP"], ["ALLOCATED", "DIALOKASIKAN"], ["PAID", "SUDAH DIBAYAR"], ["OUTSTANDING", "BELUM DIBAYAR"], ["BUDGET HEALTH", "KONDISI ANGGARAN"], ["PLANNED INCOME", "RENCANA PEMASUKAN"], ["RECEIVED", "SUDAH DITERIMA"], ["AWAITING", "MENUNGGU"], ["Total Income", "Total Pemasukan"], ["Total Expense", "Total Pengeluaran"], ["Net Cash Flow", "Arus Kas Bersih"], ["Total Spent", "Total Pengeluaran"], ["Remaining", "Sisa Anggaran"], ["Planned Budget", "Rencana Anggaran"], ["Budget Overview", "Ringkasan Anggaran"], ["Upcoming Itinerary", "Jadwal Berikutnya"], ["Trip Overview", "Ringkasan Trip"], ["Trip Participants", "Peserta Trip"], ["Properties", "Properti"], ["Total Villas", "Total Villa"], ["Booked", "Dipesan"], ["Shortlisted", "Favorit"], ["All properties", "Semua Properti"], ["Your stay collection starts here.", "Koleksi penginapanmu dimulai di sini."], ["No itinerary added yet.", "Belum ada jadwal perjalanan."], ["No transactions recorded yet.", "Belum ada transaksi."], ["No destinations added yet.", "Belum ada destinasi."], ["No income sources yet. Add your first source of funds.", "Belum ada sumber pemasukan. Tambahkan sumber dana pertamamu."], ["Enter your trip", "Masuk ke Trip"], ["A new journey begins", "Perjalanan baru dimulai"], ["Your trip workspace is ready.", "Ruang perjalananmu siap digunakan."], ["Switch to Indonesian", "Ganti ke Bahasa Indonesia"], ["Switch to English", "Ganti ke Bahasa Inggris"], ["Income marked as Received in Income Planning appears here automatically.", "Pemasukan yang ditandai Sudah Diterima di Perencanaan Pemasukan akan otomatis muncul di sini."], ["Track your trip expenses and payments.", "Pantau pengeluaran dan pembayaran perjalananmu."], ["Plan the funds available for this trip.", "Rencanakan dana yang tersedia untuk perjalanan ini."], ["No participants added yet.", "Belum ada peserta."], ["No expenses added yet.", "Belum ada pengeluaran."], ["Planned", "Direncanakan"], ["Received", "Diterima"], ["Pending", "Menunggu"], ["Confirmed", "Dikonfirmasi"], ["Master Access", "Akses Master"], ["Admin Access", "Akses Admin"], ["Member Access", "Akses Anggota"]]);
 languagePairs.push(...[["YOUR TRAVEL SPACE", "RUANG PERJALANANMU"], ["Trip workspace", "Ruang trip"], ["Trip name", "Nama Trip"], ["People", "Orang"], ["Guests", "Tamu"], ["Bedrooms", "Kamar Tidur"], ["Bathrooms", "Kamar Mandi"], ["Estimated ticket (Rp)", "Estimasi Tiket (Rp)"], ["Est. ticket (Rp)", "Estimasi Tiket (Rp)"], ["Planned amount (Rp)", "Nominal Rencana (Rp)"], ["Amount (Rp)", "Nominal (Rp)"], ["Income source", "Sumber Pemasukan"], ["Income", "Pemasukan"], ["Expense", "Pengeluaran"], ["Payment", "Pembayaran"], ["Source / Notes", "Sumber / Catatan"], ["Total expected funds", "Total dana yang direncanakan"], ["Funds already received", "Dana yang sudah diterima"], ["Expected but not received", "Dana yang belum diterima"], ["Overall budget limit", "Batas total anggaran"], ["of trip budget", "dari anggaran trip"], ["of allocated", "dari anggaran dialokasikan"], ["not allocated", "belum dialokasikan"], ["On track", "Sesuai rencana"], ["Watch", "Perlu diperhatikan"], ["Over budget", "Melebihi anggaran"], ["Planned expenses", "Rencana Pengeluaran"], ["Manage the costs you expect during your trip.", "Kelola biaya yang diperkirakan selama perjalanan."], ["Plan A", "Plan A"], ["Plan B", "Plan B"], ["Viewing Plan", "Plan yang Dilihat"], ["Trip details", "Detail Trip"], ["Trip Plans", "Pilihan Plan"], ["Plan Details", "Detail Plan"], ["Select the trips this Admin is allowed to manage.", "Pilih trip yang boleh dikelola Admin ini."], ["Create Admin Account", "Buat Akun Admin"], ["Admin Accounts", "Akun Admin"], ["Admin name", "Nama Admin"], ["Admin PIN", "PIN Admin"], ["Trip access", "Akses Trip"], ["Create trip", "Buat Trip"], ["All Trips", "Semua Trip"], ["Create Trip", "Buat Trip"], ["Access Management", "Manajemen Akses"], ["Settings", "Pengaturan"], ["Profile", "Profil"], ["Change PIN", "Ubah PIN"], ["Reference Link", "Tautan Referensi"], ["Overview", "Ringkasan"], ["Facilities", "Fasilitas"], ["Available properties", "Properti tersedia"], ["View details", "Lihat Detail"], ["Add Villa", "Tambah Villa"], ["Owner", "Pemilik"], ["Check-in", "Check-in"], ["Check-out", "Check-out"], ["Price", "Harga"], ["night", "malam"], ["Search", "Cari"], ["Filter", "Saring"], ["All", "Semua"], ["No date", "Belum ada tanggal"], ["No location", "Belum ada lokasi"], ["No notes", "Belum ada catatan"], ["Optional notes", "Catatan opsional"], ["Save Budget", "Simpan Anggaran"], ["Save Income", "Simpan Pemasukan"], ["Edit Budget Item", "Ubah Item Anggaran"], ["Edit Income", "Ubah Pemasukan"], ["Add Budget Item", "Tambah Item Anggaran"], ["Add Income", "Tambah Pemasukan"], ["Budget category", "Kategori Anggaran"], ["Category Plan", "Kategori Plan"], ["No transactions recorded yet.", "Belum ada transaksi yang tercatat."], ["Income marked as Received in Income Planning appears here automatically.", "Pemasukan yang ditandai Sudah Diterima akan otomatis muncul di sini."], ["Enter 6-digit PIN", "Masukkan PIN 6 digit"], ["6 digit PIN", "PIN 6 digit"], ["Continue", "Lanjutkan"], ["Welcome to Holiday Planner", "Selamat Datang di Holiday Planner"], ["Your personal travel space", "Ruang perjalanan pribadimu"], ["Member Access", "Akses Anggota"], ["Admin Access", "Akses Admin"], ["Master Access", "Akses Master"]]);
 const plannerOriginalTextNodes = new WeakMap();
 const plannerOriginalAttributes = new WeakMap();
@@ -275,9 +275,9 @@ function assignedTrips(){
  return[];
 }
 function navItems(){
- if(mode==="master")return tripId?[["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"],["All Trips","back"]]:[["All Trips","grid"],["Create Trip","plus"],["Access Management","users"],["Settings","settings"]];
- if(mode==="admin")return tripId?[["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"],["Settings","settings"],["Assigned Trips","back"]]:[["Assigned Trips","grid"],["Settings","settings"]];
- if(mode==="member")return [["Dashboard","home"],["General","settings"],["Participants","users"],["Income Planning","income"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]];
+ if(mode==="master")return tripId?[["Dashboard","dashboard"],["General","grid"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"],["All Trips","back"]]:[["All Trips","grid"],["Create Trip","plus"],["Access Management","users"],["Settings","settings"]];
+ if(mode==="admin")return tripId?[["Dashboard","dashboard"],["General","grid"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"],["Settings","settings"],["Assigned Trips","back-square"]]:[["Assigned Trips","grid"],["Settings","settings"]];
+ if(mode==="member")return [["Dashboard","dashboard"],["General","grid"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"]];
  return [];
 }
 function updateSidebarProfile(){
@@ -285,7 +285,56 @@ function updateSidebarProfile(){
  const role=mode==="master"?"Master Access":mode==="admin"?"Admin Access":"Member Access";
  el.innerHTML=`<div class="sidebar-profile-info"><strong>${role}</strong></div>`;
 }
+/* Desktop sidebar lock: keep the left menu visually fixed while browser zoom changes.
+   Mobile/tablet layout is intentionally untouched. */
+function ensureDesktopSidebarCSS(){
+ if(document.getElementById("hp-desktop-sidebar-lock"))return;
+ const style=document.createElement("style");
+ style.id="hp-desktop-sidebar-lock";
+ style.textContent=`@media (min-width:769px){
+.sidebar{position:fixed!important;left:0!important;top:0!important;bottom:0!important;height:100vh!important;max-height:100vh!important;box-sizing:border-box!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+.sidebar #nav{min-height:0!important;overflow:hidden!important;flex:1 1 auto!important}
+.sidebar #nav button{flex:0 0 auto!important}
+}`;
+ document.head.appendChild(style);
+}
+function lockDesktopSidebar(){
+ ensureDesktopSidebarCSS();
+ const apply=()=>{
+  const sidebar=document.querySelector(".sidebar");
+  const appMain=document.querySelector("#app > main");
+  if(!sidebar)return;
+  if(window.innerWidth<769){
+   sidebar.style.removeProperty("transform");
+   sidebar.style.removeProperty("width");
+   sidebar.style.removeProperty("zoom");
+   sidebar.style.removeProperty("--desktop-menu-scale");
+   if(appMain)appMain.style.removeProperty("margin-left");
+   return;
+  }
+  /* Browser zoom changes devicePixelRatio on Chromium desktop. Counter-scale
+     only the sidebar's CONTENT, while keeping the sidebar itself full-height. */
+  if(!window.__hpDesktopDpr)window.__hpDesktopDpr=window.devicePixelRatio||1;
+  const current=window.devicePixelRatio||1;
+  const scale=Math.max(.5,Math.min(1,window.__hpDesktopDpr/current));
+  sidebar.style.setProperty("--desktop-menu-scale",String(scale));
+  sidebar.style.width=`${240/scale}px`;
+  sidebar.style.transform="none";
+  sidebar.style.transformOrigin="left top";
+  /* Keep the physical sidebar width constant without scaling its 100vh height. */
+  sidebar.style.zoom=scale;
+  sidebar.style.height=`${100/scale}vh`;
+  if(appMain)appMain.style.marginLeft="240px";
+ };
+ apply();
+ if(!window.__hpDesktopSidebarResizeBound){
+  window.__hpDesktopSidebarResizeBound=true;
+  window.addEventListener("resize",apply,{passive:true});
+ }
+}
+
 function showApp(){
+ lockDesktopSidebar();
  $("#login").classList.add("hidden");$("#app").classList.remove("hidden");
  $("#access").textContent=mode==="master"?"MASTER ACCESS":mode==="admin"?"ADMIN ACCESS":"MEMBER ACCESS · "+(trip().name||"");
  applyPlannerTheme();
@@ -296,10 +345,10 @@ function showApp(){
  
  document.body.classList.toggle("member-view",mode==="member");
  updateSidebarProfile();
- $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("back")}<span>Log out</span></button>`;
+ $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("logout")}<span>Log out</span></button>`;
  const mobileNav=$("#mobileNav");
  if(mobileNav){
-   const items=mode==="master"?[]:[["Dashboard","home"],["Expense Planning","wallet"],["Itinerary","calendar"],["Participants","users"],["More","more"]];
+   const items=mode==="master"?[]:[["Dashboard","dashboard"],["Expense Planning","expense-report"],["Itinerary","itinerary"],["Participants","users-event"],["More","more"]];
    mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n==="More"?"General":n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n==="More"?(plannerLanguage==="id"?"Lainnya":"More"):n}</span></button>`).join("");
    mobileNav.classList.toggle("is-visible",items.length>0&&!pendingTripWelcome);
  }
@@ -666,7 +715,19 @@ $("#participantForm").onsubmit=e=>{if(!canManageTrip())return toast("Member haru
 };
 $("#cancelParticipant").onclick=()=>$("#participantModal").close();
 
+const menuSvgIcons={logout:`<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><title>log-out-fill</title><path fill="currentColor" d="M15 17v2a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v2a1 1 0 0 1-2 0V5a.997.997 0 0 0-1-1H5a.997.997 0 0 0-1 1v14a1 1 0 0 0 1 1h7a.997.997 0 0 0 1-1v-2a1 1 0 0 1 2 0m2.293-7.293a1 1 0 0 1 1.414-1.414l3 3a1 1 0 0 1 .009 1.405l-.008.008l-.001.001l-3 3a1 1 0 0 1-1.414-1.414L18.586 13H11a1 1 0 0 1 0-2h7.586Z"/></svg>`,
+ dashboard:`<svg class="hp-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><title>dashboard</title><path fill="currentColor" d="M13 9V3h8v6zM3 13V3h8v10zm10 8V11h8v10zM3 21v-6h8v6z"/></svg>`,
+ "users-event":`<svg class="hp-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><title>users-event</title><path fill="currentColor" fill-rule="evenodd" d="M7 9C5.07 9 3.5 7.43 3.5 5.5S5.07 2 7 2s3.5 1.57 3.5 3.5S8.93 9 7 9m0-5.5a2 2 0 1 0-.001 3.999A2 2 0 0 0 7 3.5m6.5 2C13.5 7.43 15.07 9 17 9s3.5-1.57 3.5-3.5S18.93 2 17 2s-3.5 1.57-3.5 3.5m1.5 0a2 2 0 1 1 3.999-.001A2 2 0 0 1 15 5.5m-6.5 7c0 1.93 1.57 3.5 3.5 3.5s3.5-1.57 3.5-3.5S13.93 9 12 9s-3.5 1.57-3.5 3.5m1.5 0a2 2 0 1 1 3.999-.001A2 2 0 0 1 10 12.5m5.92 7.425l.61 2.27v-.005l1.45-.39l-.61-2.265a2.75 2.75 0 0 0-2.655-2.04h-5.43c-1.24 0-2.335.84-2.655 2.04l-.61 2.27l1.45.39l.61-2.27c.145-.545.64-.925 1.205-.925h5.43c.565 0 1.06.38 1.205.925m4.505-7l.74 2.77l1.45-.39l-.74-2.765a2.75 2.75 0 0 0-2.655-2.04h-2.215V12h2.215c.565 0 1.06.38 1.205.925m-19.04 2.38l1.45.39v-.005l.74-2.77c.145-.545.64-.925 1.205-.925h2.215v-1.5H4.78c-1.24 0-2.335.84-2.655 2.04z" clip-rule="evenodd"/></svg>`,
+ "finance-manager":`<svg class="hp-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48" aria-hidden="true"><title>finance-manager</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M37.51 25.906a1.86 1.86 0 0 1-3.72 0a1.86 1.86 0 0 1 3.72 0"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M43.5 30.662a5 5 0 0 1-.423.018h-8.233a4.62 4.62 0 0 1-4.63-4.61v-.54a4.62 4.62 0 0 1 4.61-4.63h8.253q.215 0 .423.02"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M5.08 12.253h37.263c.64 0 1.157.517 1.157 1.158v26.786c0 .64-.516 1.157-1.157 1.157H5.657A1.155 1.155 0 0 1 4.5 40.201V13.308c0-1.228 1.866-1.883 3.33-2.132l26.23-4.465c2.528-.43 4.674 1.31 5.34 3.787l.45 1.676"/></svg>`,
+ "expense-report":`<svg class="hp-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><title>expense-report</title><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M5.85 2.75h12.3q.6 0 .6.6v17.3q0 .6-.5.27L17 20.08q-.5-.33-1 0l-1.25.84q-.5.33-1 0l-1.25-.84q-.5-.33-1 0l-1.25.84q-.5.33-1 0L8 20.08q-.5-.33-1 0l-1.25.84q-.5.33-.5-.27V3.35q0-.6.6-.6"/><path d="M13.93 10.08c-.28-.7-1.05-1.22-1.92-1.22c-1.12 0-1.92.63-1.92 1.5c0 1.99 4.02 1.12 4.02 3.25c0 .91-.88 1.54-2.1 1.54c-.94 0-1.75-.52-2.1-1.22M12 7.63v1.22m0 6.3v1.22"/></g></svg>`,
+ finance:`<svg class="hp-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><title>finance</title><path fill="currentColor" d="m6 16.5l-3 2.94V11h3m5 3.66l-1.57-1.34L8 14.64V7h3m5 6l-3 3V3h3m2.81 9.81L17 11h5v5l-1.79-1.79L13 21.36l-3.47-3.02L5.75 22H3l6.47-6.34L13 18.64"/></svg>`,
+ "holiday-village":`<svg class="hp-icon" xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1em" viewBox="0 0 36 24" aria-hidden="true"><title>holiday-village</title><path fill="currentColor" d="M20.912 18.228h2.091v2.091h-2.091zm7.228 0h2.091v2.091H28.14zm-1.754-7.416v-2.09h-2.898V9.74l1.081 1.073z"/><path fill="currentColor" d="M33.552 22.112v-4.409h.665l.618-.611l-7.322-7.322h-.909v1.269h-2.13L23.205 9.77h-3.516l-7.314 7.314l.618.618h.979v4.409h-1.911C9.203 19.377 8.443 13.176 8.71 8.563l.047-.094h.023c1.25 0 2.358.606 3.048 1.54l.007.01c.52.703.833 1.588.833 2.545c0 .66-.148 1.285-.414 1.844l.011-.026a3.84 3.84 0 0 0 1.518-.78l-.006.005a4.25 4.25 0 0 0 1.461-3.213c0-.955-.314-1.836-.844-2.546l.008.011A3.71 3.71 0 0 0 10.28 6.48l.026-.007c.265-.165.57-.311.891-.422l.032-.01a3.9 3.9 0 0 1 1.363-.241c1.083 0 2.064.433 2.781 1.134l-.001-.001a3.5 3.5 0 0 0-.093-1.685l.007.025a3.786 3.786 0 0 0-4.991-2.293l.025-.009a5 5 0 0 0-.702.303l.029-.014a4.6 4.6 0 0 0-.301-.909l.012.029C8.478.407 6.46-.525 4.847.29a3 3 0 0 0-1.09.95l-.006.01A3.66 3.66 0 0 1 6.53 3.003l.009.016a5 5 0 0 1-1.179-.417l-.034-.006C2.846 2.063.486 3.41.063 5.611a3.74 3.74 0 0 0 .109 1.812l-.007-.026a4.55 4.55 0 0 1 4.543-1.402l-.032-.007c.409.086.771.21 1.11.373l-.029-.013a4.11 4.11 0 0 0-4.117 2.04l-.011.02a4.6 4.6 0 0 0-.643 2.357c0 1.568.777 2.954 1.968 3.794l.015.01a4 4 0 0 0 1.709.648l.021.002a4.67 4.67 0 0 1-.671-2.423c0-.873.237-1.691.651-2.392l-.012.022a4.2 4.2 0 0 1 2.927-2.048l.025-.004c-1.417 6.453-1.809 10.949-.64 13.736H3.573v1.88h32.148v-1.88h-2.169zm-7.95-4.307h7.166v4.307h-5.435v-3.884h-2.749v3.884h-1.722v-5.161z"/></svg>`,
+ "maps-location-02":`<svg class="hp-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><title>maps-location-02</title><g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M22 10.5v-.783c0-1.94 0-2.909-.586-3.512c-.586-.602-1.528-.602-3.414-.602h-2.079c-.917 0-.925-.002-1.75-.415L10.84 3.521c-1.391-.696-2.087-1.044-2.828-1.02S6.6 2.918 5.253 3.704l-1.227.716c-.989.577-1.483.866-1.754 1.346C2 6.246 2 6.83 2 7.999v8.217c0 1.535 0 2.303.342 2.73c.228.285.547.476.9.54c.53.095 1.18-.284 2.478-1.042c.882-.515 1.73-1.05 2.785-.905c.884.122 1.705.68 2.495 1.075"/><path stroke-linejoin="round" d="M8 2.5v15"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 5.5v4"/><path d="M17.5 12c2.435 0 4.5 2.017 4.5 4.463c0 2.485-2.098 4.23-4.036 5.415a.94.94 0 0 1-.927 0C15.102 20.681 13 18.957 13 16.463C13 14.016 15.065 12 17.5 12Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M17.625 16.5H17.5m.25 0a.25 0.25 0 1 1-.5 0"/></g></svg>`,
+ itinerary:`<svg class="hp-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><title>itinerary</title><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="15.5" height="18.5" x="4.25" y="2.75" stroke-width="1.5" rx="2"/><path stroke-width="1.5" d="M8.25 7.25v9.5"/><path stroke-width="2" d="M8.25 7.25h.01M8.25 12h.01m-.01 4.75h.01"/><path stroke-width="1.5" d="M11.25 7.25h5m-5 4.75h5m-5 4.75h3.5"/></g></svg>`,
+ "back-square":`<svg class="hp-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><title>back-square</title><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M9 22h6c5 0 7-2 7-7V9c0-5-2-7-7-7H9C4 2 2 4 2 9v6c0 5 2 7 7 7"/><path stroke-miterlimit="10" d="M9 15.38h4.92c1.7 0 3.08-1.38 3.08-3.08s-1.38-3.08-3.08-3.08H7.15"/><path d="M8.57 10.77L7 9.19l1.57-1.57"/></g></svg>`
+};
 function hpIcon(name){
+ if(menuSvgIcons[name])return menuSvgIcons[name];
  const paths={
  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
  wallet:'<rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 8h18M16 14h.01"/>',
@@ -693,36 +754,22 @@ function dashboard(t){
  ensurePlans(t);
  const active=t.plans.find(p=>p.id===t.activePlanId)||t.plans[0]||{};
  const budgetItems=Array.isArray(active.budget)?active.budget:[];
- const cashflow=Array.isArray(active.cashflow)?active.cashflow:[];
- const expenseTx=cashflow.filter(x=>String(x.type||"").toLowerCase()==="expense");
  const plannedBudget=Number(active.budgetLimit||0)>0?Number(active.budgetLimit):budgetItems.reduce((a,x)=>a+Number(x.amount||0),0);
- const spent=expenseTx.reduce((a,x)=>a+Number(x.amount||0),0);
+ const spent=budgetItems.reduce((a,x)=>a+Number(x.amount||0),0);
  const pct=plannedBudget?Math.min(100,spent/plannedBudget*100):0;
  const remaining=Math.max(0,plannedBudget-spent);
- const expenseSource=expenseTx.length?expenseTx:budgetItems;
+ const next=(active.itinerary||[]).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];
+
+ const catColors=["#f7cf57","#4fa8f7","#45d4d0","#b98af6","#ed83c5","#8fa7c4"];
  const categories={};
- expenseSource.forEach(x=>{
-   let c=String(x.category||"Other").trim()||"Other";
-   if(c==="Food")c="Food & Beverage";
-   if(c==="Villa"||c==="Hotel"||c==="Accommodation")c="Accommodation";
+ budgetItems.forEach(x=>{
+   let c=String(x.category||"Others").trim()||"Others";
+   if(/^food$/i.test(c))c="Food & Beverage";
+   if(/^(villa|hotel|accommodation|stay)$/i.test(c))c="Accommodation";
    categories[c]=(categories[c]||0)+Number(x.amount||0);
  });
  const catEntries=Object.entries(categories).sort((a,b)=>b[1]-a[1]);
- const catColors=["#f7cf57","#4fa8f7","#45d4d0","#b98af6","#ed83c5","#8fa7c4"];
  const catTotal=catEntries.reduce((a,[,v])=>a+v,0);
- const donutParts=catEntries.length?catEntries.map(([name,value],i)=>{
-   const p=catTotal?(value/catTotal*100):0;
-   return `${catColors[i%catColors.length]} ${p}`;
- }).join(", "):"";
- const villaList=(active.stays||t.stays||[]).slice();
- const votes=v=>Number(v.votes||v.voteCount||0);
- const ranked=villaList.map((v,i)=>({v,i,votes:votes(v)})).sort((a,b)=>b.votes-a.votes);
- const voteTotal=ranked.reduce((a,x)=>a+x.votes,0);
- const next=(active.itinerary||[]).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];
-
- const dashboardPlan=`<select id="dashboardPlan" aria-label="Select plan">${t.plans.filter(p=>p.enabled).map(p=>`<option value="${p.id}" ${p.id===t.activePlanId?"selected":""}>${esc(p.name)}</option>`).join("")}</select>`;
-
- const budgetGradient=`conic-gradient(#f7cf57 ${pct}%, #33475f ${pct}% 100%)`;
  const expenseGradient=catEntries.length?`conic-gradient(${catEntries.map(([name,value],i)=>{
    const start=catEntries.slice(0,i).reduce((a,[,v])=>a+(catTotal?v/catTotal*100:0),0);
    const end=start+(catTotal?value/catTotal*100:0);
@@ -731,29 +778,34 @@ function dashboard(t){
 
  const expenseRows=catEntries.map(([name,value],i)=>{
    const p=catTotal?value/catTotal*100:0;
-   return `<div class="expense-row">
-     <span class="expense-dot" style="background:${catColors[i%catColors.length]}"></span>
-     <span class="expense-cat">${esc(name)}</span>
+   return `<div class="dashboard-expense-row">
+     <span class="dashboard-expense-dot" style="background:${catColors[i%catColors.length]}"></span>
+     <span class="dashboard-expense-cat">${esc(name)}</span>
      <strong>${money(value)}</strong>
-     <span class="expense-pct">${p.toFixed(1)}%</span>
+     <span class="dashboard-expense-pct">${p.toFixed(1)}%</span>
    </div>`;
- }).join("")||`<div class="expense-empty">No expense data yet.</div>`;
+ }).join("")||`<div class="dashboard-expense-empty">No expense data yet.</div>`;
 
+ const stays=Array.isArray(active.stays)?active.stays:[];
+ const ranked=stays.map((v,i)=>({v,i,votes:Number(v.votes||v.voteCount||0)})).sort((a,b)=>b.votes-a.votes);
+ const voteTotal=ranked.reduce((a,x)=>a+x.votes,0);
  const villaRows=ranked.slice(0,3).map((item,pos)=>{
    const v=item.v;
    const vp=voteTotal?item.votes/voteTotal*100:0;
    const photo=v.photos?.[0]||v.photo||"";
-   return `<div class="villa-vote-row ${pos===0&&item.votes>0?"leader":""}">
-      <div class="villa-rank">#${pos+1}</div>
-      <div class="villa-vote-photo" ${photo?`style="background-image:url('${esc(photo)}')"`:""}></div>
-      <div class="villa-vote-main">
-        <div class="villa-vote-name">${esc(v.name||"Villa")}${pos===0&&item.votes>0?`<span class="villa-leader-badge">Terpilih Sementara</span>`:""}</div>
-        <div class="villa-vote-meta">${money(v.price||0)} / night · ${item.votes} vote${item.votes===1?"":"s"}</div>
-        <div class="villa-vote-track"><i style="width:${vp}%"></i></div>
+   return `<div class="dashboard-villa-row ${pos===0&&item.votes>0?"leader":""}">
+      <div class="dashboard-villa-rank">#${pos+1}</div>
+      <div class="dashboard-villa-photo" ${photo?`style="background-image:url('${esc(photo)}')"`:""}></div>
+      <div class="dashboard-villa-main">
+        <div class="dashboard-villa-name">${esc(v.name||"Villa")}${pos===0&&item.votes>0?`<span>Current Leader</span>`:""}</div>
+        <div class="dashboard-villa-meta">${money(v.price||0)} / night · ${item.votes} vote${item.votes===1?"":"s"}</div>
+        <div class="dashboard-villa-track"><i style="width:${vp}%"></i></div>
       </div>
-      <strong class="villa-vote-percent">${vp.toFixed(0)}%</strong>
+      <strong class="dashboard-villa-percent">${vp.toFixed(0)}%</strong>
    </div>`;
- }).join("")||`<div class="villa-empty">No villa available for voting yet.</div>`;
+ }).join("")||`<div class="dashboard-villa-empty">No villa available for voting yet.</div>`;
+
+ const planOptions=t.plans.filter(p=>p.enabled).map(p=>`<option value="${p.id}" ${p.id===t.activePlanId?"selected":""}>${esc(p.name)}</option>`).join("");
 
  $("#content").innerHTML=`<section class="hero" style="background-image:url('${esc(t.cover||"")}')"><span class="pill">TRIP SPACE</span><h2>${esc(t.name)}</h2><p>${date(t.start)} – ${date(t.end)}　·　${esc(t.destination)}</p></section>
  <div class="stats dashboard-stats">
@@ -762,54 +814,43 @@ function dashboard(t){
  <div class="stat"><span class="stat-icon">${hpIcon("chart")}</span><small>Total Spent</small><b>${money(spent)}</b></div>
  <div class="stat"><span class="stat-icon">${hpIcon("calendar")}</span><small>Remaining</small><b>${money(remaining)}</b></div></div>
 
- <div class="dashboard-grid">
-   <section class="section budget-overview-card">
-     <div class="dashboard-card-head">
-       <div><span class="dashboard-card-eyebrow">BUDGET</span><h2>Budget Overview</h2></div>
-       ${dashboardPlan}
-     </div>
-     <div class="budget-overview-layout">
-       <div class="dashboard-donut budget-donut" style="--donut:${budgetGradient}">
-         <div><strong>${pct.toFixed(1)}%</strong><span>Spent</span></div>
-       </div>
-       <div class="budget-overview-details">
-         <div class="budget-total-line"><strong>${money(spent)}</strong><span>/ ${money(plannedBudget)}</span></div>
-         <div class="dashboard-progress"><i style="width:${pct}%"></i></div>
-         <div class="budget-legend"><span><i class="legend-dot spent"></i>Total Spent</span><strong>${money(spent)}</strong></div>
-         <div class="budget-legend"><span><i class="legend-dot remaining"></i>Remaining Budget</span><strong>${money(remaining)}</strong></div>
-       </div>
-     </div>
-   </section>
+ <div class="dashboard-top-grid">
+  <section class="section dashboard-budget-card">
+   <div class="dashboard-card-head"><div><span class="dashboard-eyebrow">BUDGET</span><h2>Budget Overview</h2></div><select id="dashboardPlan">${planOptions}</select></div>
+   <div class="dashboard-budget-layout">
+    <div class="dashboard-donut budget-donut" style="--donut:${`conic-gradient(#f7cf57 ${pct}%, #34485f ${pct}% 100%)`}"><div><strong>${pct.toFixed(1)}%</strong><span>Spent</span></div></div>
+    <div class="dashboard-budget-details">
+     <div class="dashboard-budget-total"><strong>${money(spent)}</strong><span>/ ${money(plannedBudget)}</span></div>
+     <div class="dashboard-progress"><i style="width:${pct}%"></i></div>
+     <div class="dashboard-legend"><span><i class="spent"></i>Total Spent</span><strong>${money(spent)}</strong></div>
+     <div class="dashboard-legend"><span><i class="remaining"></i>Remaining Budget</span><strong>${money(remaining)}</strong></div>
+    </div>
+   </div>
+  </section>
 
-   <section class="section upcoming-card">
-     <div class="dashboard-card-head"><div><span class="dashboard-card-eyebrow">NEXT</span><h2>Upcoming Itinerary</h2></div></div>
-     ${next?`<div class="upcoming-item"><div class="upcoming-date"><b>${new Date(next.date+"T00:00:00").getDate()}</b><span>${new Date(next.date+"T00:00:00").toLocaleDateString("en-US",{month:"short"})}</span></div><div><strong>${esc(next.title||next.activity||"")}</strong><p>${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p></div></div>`:"<div class=\"upcoming-empty\">No itinerary added yet.</div>"}
-   </section>
-
-   <section class="section expense-breakdown-card">
-     <div class="dashboard-card-head">
-       <div><span class="dashboard-card-eyebrow">SPENDING</span><h2>Expense Breakdown</h2></div>
-       <span class="dashboard-plan-badge">${esc(active.name||"Plan A")}</span>
-     </div>
-     <div class="expense-breakdown-layout">
-       <div class="dashboard-donut expense-donut" style="--donut:${expenseGradient}">
-         <div><strong>${money(spent)}</strong><span>Total Spent</span></div>
-       </div>
-       <div class="expense-list">${expenseRows}</div>
-     </div>
-   </section>
-
-   <section class="section villa-vote-card">
-     <div class="dashboard-card-head">
-       <div><span class="dashboard-card-eyebrow">GROUP DECISION</span><h2>Villa Vote</h2><p>Vote for the stay you prefer.</p></div>
-       <span class="dashboard-vote-total">${voteTotal} Votes</span>
-     </div>
-     <div class="villa-vote-list">${villaRows}</div>
-     ${villaList.length?`<button class="villa-vote-button" type="button" onclick="page='Villas & Stay';render()">Vote Now →</button>`:""}
-   </section>
+  <section class="section dashboard-upcoming-card">
+   <div class="dashboard-card-head"><div><span class="dashboard-eyebrow">NEXT</span><h2>Upcoming Itinerary</h2></div></div>
+   ${next?`<div class="dashboard-upcoming"><div class="dashboard-date-box"><b>${new Date(next.date+"T00:00:00").getDate()}</b><span>${new Date(next.date+"T00:00:00").toLocaleDateString("en-US",{month:"short"})}</span></div><div><strong>${esc(next.title||next.activity||"")}</strong><p>${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p></div></div>`:`<div class="dashboard-upcoming-empty">No itinerary added yet.</div>`}
+  </section>
  </div>
 
- <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div><div class="actions">${[["General","pin"],["Participants","users"],["Income Planning","chart"],["Expense Planning","wallet"],["Cash Flow","chart"],["Villas & Stay","bed"],["Destinations","pin"],["Itinerary","calendar"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
+ <div class="dashboard-bottom-grid">
+  <section class="section dashboard-expense-card">
+   <div class="dashboard-card-head"><div><span class="dashboard-eyebrow">SPENDING</span><h2>Expense Breakdown</h2></div><span class="dashboard-plan-badge">${esc(active.name||"Plan A")}</span></div>
+   <div class="dashboard-expense-layout">
+    <div class="dashboard-donut expense-donut" style="--donut:${expenseGradient}"><div><strong>${money(spent)}</strong><span>Total Spent</span></div></div>
+    <div class="dashboard-expense-list">${expenseRows}</div>
+   </div>
+  </section>
+
+  <section class="section dashboard-villa-card">
+   <div class="dashboard-card-head"><div><span class="dashboard-eyebrow">GROUP DECISION</span><h2>Villa Vote</h2><p>Vote for the stay you prefer.</p></div><span class="dashboard-vote-total">${voteTotal} Votes</span></div>
+   <div class="dashboard-villa-list">${villaRows}</div>
+   ${stays.length?`<button class="dashboard-vote-button" type="button" onclick="page='Villas & Stay';render()">Vote Now →</button>`:""}
+  </section>
+ </div>
+
+ <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div><div class="actions">${[["General","grid"],["Participants","users-event"],["Income Planning","chart"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
 }
 function general(t){
  const ro=mode==="member"?"disabled":"";
