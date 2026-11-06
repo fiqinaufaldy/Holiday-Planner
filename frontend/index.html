@@ -1,4 +1,4 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Holiday Planner</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Holiday Planner</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"></head><body>
 <section id="login" class="login">
   <div class="login-top-controls" aria-label="Login preferences">
     <button id="loginThemeToggle" type="button" class="login-control">☀ <span>Light</span></button>
@@ -11,7 +11,7 @@
     </div>
     <p class="eyebrow">YOUR PERSONAL TRAVEL SPACE</p>
     <h1 id="loginTitle">Welcome to your Holiday Planner</h1>
-    <p id="loginDesc">Enter your Access PIN to continue.</p>
+    <p id="loginDesc">Enter your PIN to continue.</p>
     <div class="login-pin-wrap">
       <span class="login-pin-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><title>padlock</title><path fill="currentColor" d="M12 13a1.49 1.49 0 0 0-1 2.61V17a1 1 0 0 0 2 0v-1.39A1.49 1.49 0 0 0 12 13m5-4V7A5 5 0 0 0 7 7v2a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-7a3 3 0 0 0-3-3M9 7a3 3 0 0 1 6 0v2H9Zm9 12a1 1 0 0 1-1-1H7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1Z"/></svg></span>
       <input id="pin" type="password" name="holiday-planner-access-code" inputmode="numeric" maxlength="6" placeholder="Enter Access PIN" autocomplete="new-password" autocapitalize="off" spellcheck="false">
@@ -21,18 +21,7 @@
     <p id="loginError" class="error"></p>
   </div>
 </section>
-<div id="app" class="shell hidden"><aside><a href="#" id="brandHome" class="sidebar-brand" aria-label="FNVERSE Holiday Planner">
-  <img
-    src="assets/logo/FNVERSE-sidebar-dark.webp"
-    class="sidebar-brand-logo"
-    alt="FNVERSE"
-    style="width:34px;height:34px;max-width:34px;max-height:34px;display:block;object-fit:contain;flex:0 0 34px;"
-  >
-  <span class="sidebar-brand-copy">
-    <strong>FNVERSE</strong>
-    <small>Holiday Planner</small>
-  </span>
-</a><small id="access">MASTER ACCESS</small><nav id="nav"></nav>
+<div id="app" class="shell hidden"><aside><a href="#" class="logo" id="brandHome">✈ <b>Holiday<br>Planner</b></a><small id="access">MASTER ACCESS</small><nav id="nav"></nav>
 <div class="sidebar-footer">
   <div class="sidebar-profile">
     <img src="assets/fiqi-profile.jpg" alt="Fiqi Naufaldy profile photo">

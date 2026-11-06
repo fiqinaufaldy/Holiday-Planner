@@ -152,7 +152,7 @@ function togglePlannerLanguage(){plannerLanguage=plannerLanguage==="en"?"id":"en
 function auth(){
  $("#login").classList.remove("hidden");$("#app").classList.add("hidden");
  $("#loginTitle").textContent="Welcome to Holiday Planner";
- $("#loginDesc").textContent="Masukkan PIN untuk melanjutkan.";
+ $("#loginDesc").textContent="Enter your PIN to continue.";
  $("#loginHint").textContent="";$("#loginHint").hidden=true;
  $("#pin").value="";$("#pin").setAttribute("autocomplete","new-password");$("#loginError").textContent="";
  const identity=$("#memberIdentity");if(identity)identity.remove();
