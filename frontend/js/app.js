@@ -802,7 +802,16 @@ function dashboard(t){
      <strong class="villa-vote-percent">${vp.toFixed(0)}%</strong>
    </div>`;
  }).join("")||`<div class="villa-empty">No villa available for voting yet.</div>`;
- const next=(active.itinerary||[]).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];
+ const now=Date.now();
+ const upcoming=(active.itinerary||[]).map((item,index)=>{
+  const rawDate=String(item.date||"").trim();
+  const rawTime=String(item.time||"").trim()||"00:00";
+  const startAt=rawDate?new Date(`${rawDate}T${rawTime.length===5?rawTime+":00":rawTime}`):null;
+  return {item,index,startAt};
+ }).filter(x=>x.startAt&&!Number.isNaN(x.startAt.getTime())&&x.startAt.getTime()>now)
+  .sort((a,b)=>a.startAt.getTime()-b.startAt.getTime())
+  .slice(0,3)
+  .map(x=>x.item);
  const planSelect=`<select id="dashboardPlan" aria-label="Select plan">${t.plans.filter(p=>p.enabled).map(p=>`<option value="${p.id}" ${p.id===t.activePlanId?"selected":""}>${esc(p.name)}</option>`).join("")}</select>`;
 
  $("#content").innerHTML=`
@@ -835,7 +844,7 @@ function dashboard(t){
 
   <section class="section upcoming-card">
    <div class="dashboard-card-head"><div><span class="dashboard-card-eyebrow">NEXT</span><h2>Upcoming Itinerary</h2></div></div>
-   ${next?`<div class="upcoming-item"><div class="upcoming-date"><b>${new Date(next.date+"T00:00:00").getDate()}</b><span>${new Date(next.date+"T00:00:00").toLocaleDateString("en-US",{month:"short"})}</span></div><div><strong>${esc(next.title||next.activity||"")}</strong><p>${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p></div></div>`:"<div class=\"upcoming-empty\">No itinerary added yet.</div>"}
+   ${upcoming.length?upcoming.map(next=>`<div class="upcoming-item"><div class="upcoming-date"><b>${new Date(next.date+"T00:00:00").getDate()}</b><span>${new Date(next.date+"T00:00:00").toLocaleDateString("en-US",{month:"short"})}</span></div><div><strong>${esc(next.title||next.activity||"")}</strong><p>${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p></div></div>`).join(""):"<div class=\"upcoming-empty\">No upcoming itinerary yet.</div>"}
   </section>
 
   <section class="section expense-breakdown-card">
