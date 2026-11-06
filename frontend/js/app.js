@@ -151,8 +151,12 @@ function togglePlannerLanguage(){plannerLanguage=plannerLanguage==="en"?"id":"en
 
 function auth(){
  $("#login").classList.remove("hidden");$("#app").classList.add("hidden");
- $("#loginTitle").textContent="Welcome to Holiday Planner";
- $("#loginDesc").textContent="Masukkan PIN untuk melanjutkan.";
+ // Login screen follows the same default language/theme as the main All Trips / Trip UI.
+ document.documentElement.dataset.theme="light";
+ document.body.dataset.theme="light";
+ const isEnglish=plannerLanguage==="en";
+ $("#loginTitle").textContent=isEnglish?"Welcome to your Holiday Planner":"Selamat Datang di Holiday Planner";
+ $("#loginDesc").textContent=isEnglish?"Enter your Access PIN to continue.":"Masukkan PIN Akses untuk melanjutkan.";
  $("#loginHint").textContent="";$("#loginHint").hidden=true;
  $("#pin").value="";$("#pin").setAttribute("autocomplete","new-password");$("#loginError").textContent="";
  const identity=$("#memberIdentity");if(identity)identity.remove();
