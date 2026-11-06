@@ -886,8 +886,7 @@ function dashboard(t){
   </section>
  </div>
 
- <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div>
- <div class="actions">${[["General","pin"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
+`;
  const planEl=$("#dashboardPlan");
  if(planEl)planEl.onchange=()=>{const current=trip();if(activatePlan(current,planEl.value)){save();render();}};
 }
