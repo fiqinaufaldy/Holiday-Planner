@@ -285,7 +285,50 @@ function updateSidebarProfile(){
  const role=mode==="master"?"Master Access":mode==="admin"?"Admin Access":"Member Access";
  el.innerHTML=`<div class="sidebar-profile-info"><strong>${role}</strong></div>`;
 }
+/* Desktop sidebar lock: keep the left menu visually fixed while browser zoom changes.
+   Mobile/tablet layout is intentionally untouched. */
+function ensureDesktopSidebarCSS(){
+ if(document.getElementById("hp-desktop-sidebar-lock"))return;
+ const style=document.createElement("style");
+ style.id="hp-desktop-sidebar-lock";
+ style.textContent=`@media (min-width:769px){
+.sidebar{position:fixed!important;left:0!important;top:0!important;bottom:0!important;height:100vh!important;max-height:100vh!important;box-sizing:border-box!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+.sidebar #nav{min-height:0!important;overflow:hidden!important;flex:1 1 auto!important}
+.sidebar #nav button{flex:0 0 auto!important}
+}`;
+ document.head.appendChild(style);
+}
+function lockDesktopSidebar(){
+ ensureDesktopSidebarCSS();
+ const apply=()=>{
+  const sidebar=document.querySelector(".sidebar");
+  const appMain=document.querySelector("#app > main");
+  if(!sidebar)return;
+  if(window.innerWidth<769){
+   sidebar.style.removeProperty("transform");
+   sidebar.style.removeProperty("width");
+   sidebar.style.removeProperty("--desktop-menu-scale");
+   if(appMain)appMain.style.removeProperty("margin-left");
+   return;
+  }
+  if(!window.__hpDesktopDpr)window.__hpDesktopDpr=window.devicePixelRatio||1;
+  const current=window.devicePixelRatio||1;
+  const scale=Math.max(.5,Math.min(2,window.__hpDesktopDpr/current));
+  sidebar.style.setProperty("--desktop-menu-scale",String(scale));
+  sidebar.style.width=`${240/scale}px`;
+  sidebar.style.transformOrigin="left top";
+  sidebar.style.transform=`scale(${scale})`;
+  if(appMain)appMain.style.marginLeft=`${240*scale}px`;
+ };
+ apply();
+ if(!window.__hpDesktopSidebarResizeBound){
+  window.__hpDesktopSidebarResizeBound=true;
+  window.addEventListener("resize",apply,{passive:true});
+ }
+}
+
 function showApp(){
+ lockDesktopSidebar();
  $("#login").classList.add("hidden");$("#app").classList.remove("hidden");
  $("#access").textContent=mode==="master"?"MASTER ACCESS":mode==="admin"?"ADMIN ACCESS":"MEMBER ACCESS · "+(trip().name||"");
  applyPlannerTheme();
