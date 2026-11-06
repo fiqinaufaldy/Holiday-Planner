@@ -753,108 +753,116 @@ function hpIcon(name){
 function dashboard(t){
  ensurePlans(t);
  const active=t.plans.find(p=>p.id===t.activePlanId)||t.plans[0]||{};
- const budgetItems=Array.isArray(active.budget)?active.budget:[];
- const tripBudget=Number(active.budgetLimit||t.budgetLimit||0);
- const allocated=budgetItems.reduce((a,x)=>a+Number(x.amount||0),0);
- const budget=tripBudget>0?tripBudget:allocated;
- const spent=allocated;
- const remaining=Math.max(0,budget-spent);
- const pct=budget?Math.min(100,spent/budget*100):0;
- const next=(active.itinerary||t.itinerary||[]).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];
-
- const catColors=["#f7cf57","#4fa8f7","#45d4d0","#b98af6","#ed83c5","#8fa7c4"];
+ const incomeTotal=(active.income||[]).reduce((a,x)=>a+Number(x.amount||0),0);
+ const expenseItems=Array.isArray(active.budget)?active.budget:[];
+ const totalSpent=expenseItems.reduce((a,x)=>a+Number(x.amount||0),0);
+ const plannedBudget=incomeTotal;
+ const remaining=Math.max(0,plannedBudget-totalSpent);
+ const pct=plannedBudget?Math.min(100,totalSpent/plannedBudget*100):0;
  const categories={};
- budgetItems.forEach(x=>{
-   let c=String(x.category||"Others").trim()||"Others";
-   if(/^food$/i.test(c))c="Food & Beverage";
-   if(/^(villa|hotel|accommodation|stay)$/i.test(c))c="Accommodation";
-   if(/^(activity|activities)$/i.test(c))c="Activities";
+ expenseItems.forEach(x=>{
+   const c=String(x.category||"Others").trim()||"Others";
    categories[c]=(categories[c]||0)+Number(x.amount||0);
  });
  const catEntries=Object.entries(categories).sort((a,b)=>b[1]-a[1]);
+ const colors=["#f7cf57","#4fa8f7","#45d4d0","#b98af6","#ed83c5","#8fa7c4"];
  const catTotal=catEntries.reduce((a,[,v])=>a+v,0);
- const expenseGradient=catEntries.length?`conic-gradient(${catEntries.map(([name,value],i)=>{
-   const start=catEntries.slice(0,i).reduce((a,[,v])=>a+(catTotal?v/catTotal*100:0),0);
-   const end=start+(catTotal?value/catTotal*100:0);
-   return `${catColors[i%catColors.length]} ${start}% ${end}%`;
- }).join(", ")})`:"conic-gradient(#34485f 0 100%)";
-
+ const expenseGradient=catEntries.length
+   ?`conic-gradient(${catEntries.map(([name,value],i)=>{
+      const start=catEntries.slice(0,i).reduce((a,[,v])=>a+(catTotal?v/catTotal*100:0),0);
+      const end=start+(catTotal?value/catTotal*100:0);
+      return `${colors[i%colors.length]} ${start}% ${end}%`;
+    }).join(", ")})`
+   :"conic-gradient(#33475f 0 100%)";
+ const budgetGradient=`conic-gradient(#f7cf57 ${pct}%, #33475f ${pct}% 100%)`;
  const expenseRows=catEntries.map(([name,value],i)=>{
    const p=catTotal?value/catTotal*100:0;
-   return `<div class="dashboard-expense-row">
-     <span class="dashboard-expense-dot" style="background:${catColors[i%catColors.length]}"></span>
-     <span class="dashboard-expense-cat">${esc(name)}</span>
+   return `<div class="expense-row">
+     <span class="expense-dot" style="background:${colors[i%colors.length]}"></span>
+     <span class="expense-cat">${esc(name)}</span>
      <strong>${money(value)}</strong>
-     <span class="dashboard-expense-pct">${p.toFixed(1)}%</span>
+     <span class="expense-pct">${p.toFixed(1)}%</span>
    </div>`;
- }).join("")||`<div class="dashboard-expense-empty">No expense data yet.</div>`;
-
- const stays=Array.isArray(active.stays)?active.stays:[];
- const ranked=stays.map((v,i)=>({v,i,votes:Number(v.votes||v.voteCount||0)})).sort((a,b)=>b.votes-a.votes);
+ }).join("")||`<div class="expense-empty">No expenses planned yet.</div>`;
+ const ranked=(active.stays||[]).map((v,i)=>({v,i,votes:Number(v.votes||v.voteCount||0)})).sort((a,b)=>b.votes-a.votes);
  const voteTotal=ranked.reduce((a,x)=>a+x.votes,0);
  const villaRows=ranked.slice(0,3).map((item,pos)=>{
-   const v=item.v;
-   const vp=voteTotal?item.votes/voteTotal*100:0;
+   const v=item.v,votes=item.votes,vp=voteTotal?votes/voteTotal*100:0;
    const photo=v.photos?.[0]||v.photo||"";
-   return `<div class="dashboard-villa-row ${pos===0&&item.votes>0?"leader":""}">
-      <div class="dashboard-villa-rank">#${pos+1}</div>
-      <div class="dashboard-villa-photo" ${photo?`style="background-image:url('${esc(photo)}')"`:""}></div>
-      <div class="dashboard-villa-main">
-        <div class="dashboard-villa-name">${esc(v.name||"Villa")}${pos===0&&item.votes>0?`<span>Current Leader</span>`:""}</div>
-        <div class="dashboard-villa-meta">${money(v.price||0)} / night · ${item.votes} vote${item.votes===1?"":"s"}</div>
-        <div class="dashboard-villa-track"><i style="width:${vp}%"></i></div>
-      </div>
-      <strong class="dashboard-villa-percent">${vp.toFixed(0)}%</strong>
+   return `<div class="villa-vote-row ${pos===0&&votes>0?"leader":""}">
+     <div class="villa-rank">#${pos+1}</div>
+     <div class="villa-vote-photo" ${photo?`style="background-image:url('${esc(photo)}')"`:""}></div>
+     <div class="villa-vote-main">
+       <div class="villa-vote-name">${esc(v.name||"Villa")}${pos===0&&votes>0?`<span class="villa-leader-badge">Terpilih Sementara</span>`:""}</div>
+       <div class="villa-vote-meta">${money(v.price||0)} / night · ${votes} vote${votes===1?"":"s"}</div>
+       <div class="villa-vote-track"><i style="width:${vp}%"></i></div>
+     </div>
+     <strong class="villa-vote-percent">${vp.toFixed(0)}%</strong>
    </div>`;
- }).join("")||`<div class="dashboard-villa-empty">No villa available for voting yet.</div>`;
+ }).join("")||`<div class="villa-empty">No villa available for voting yet.</div>`;
+ const next=(active.itinerary||[]).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];
+ const planSelect=`<select id="dashboardPlan" aria-label="Select plan">${t.plans.filter(p=>p.enabled).map(p=>`<option value="${p.id}" ${p.id===t.activePlanId?"selected":""}>${esc(p.name)}</option>`).join("")}</select>`;
 
- const planOptions=t.plans.filter(p=>p.enabled).map(p=>`<option value="${p.id}" ${p.id===t.activePlanId?"selected":""}>${esc(p.name)}</option>`).join("");
- const budgetDonut=`conic-gradient(#f7cf57 ${pct}%, #34485f ${pct}% 100%)`;
-
- $("#content").innerHTML=`<section class="hero" style="background-image:url('${esc(t.cover||"")}')"><span class="pill">TRIP SPACE</span><h2>${esc(t.name)}</h2><p>${date(t.start)} – ${date(t.end)}　·　${esc(t.destination)}</p></section>
+ $("#content").innerHTML=`
+ <section class="hero" style="background-image:url('${esc(t.cover||"")}')"><span class="pill">TRIP SPACE</span><h2>${esc(t.name)}</h2><p>${date(t.start)} – ${date(t.end)}　·　${esc(t.destination)}</p></section>
  <div class="stats dashboard-stats">
- <div class="stat"><span class="stat-icon">${hpIcon("users")}</span><small>Participants</small><b>${(t.participants||[]).length} People</b></div>
- <div class="stat"><span class="stat-icon">${hpIcon("wallet")}</span><small>Planned Budget</small><b>${money(budget)}</b></div>
- <div class="stat"><span class="stat-icon">${hpIcon("chart")}</span><small>Total Spent</small><b>${money(spent)}</b></div>
- <div class="stat"><span class="stat-icon">${hpIcon("calendar")}</span><small>Remaining</small><b>${money(remaining)}</b></div></div>
+  <div class="stat"><span class="stat-icon">${hpIcon("users")}</span><small>Participants</small><b>${(t.participants||[]).length} People</b></div>
+  <div class="stat"><span class="stat-icon">${hpIcon("wallet")}</span><small>Planned Budget</small><b>${money(plannedBudget)}</b></div>
+  <div class="stat"><span class="stat-icon">${hpIcon("chart")}</span><small>Total Spent</small><b>${money(totalSpent)}</b></div>
+  <div class="stat"><span class="stat-icon">${hpIcon("calendar")}</span><small>Remaining</small><b>${money(remaining)}</b></div>
+ </div>
 
- <div class="dashboard-top-grid">
-  <section class="section dashboard-budget-card">
-   <div class="dashboard-card-head"><div><span class="dashboard-eyebrow">BUDGET</span><h2>Budget Overview</h2></div><select id="dashboardPlan">${planOptions}</select></div>
-   <div class="dashboard-budget-layout">
-    <div class="dashboard-donut budget-donut" style="--donut:${budgetDonut}"><div><strong>${pct.toFixed(1)}%</strong><span>Spent</span></div></div>
-    <div class="dashboard-budget-details">
-     <div class="dashboard-budget-total"><strong>${money(spent)}</strong><span>/ ${money(budget)}</span></div>
+ <div class="dashboard-grid">
+  <section class="section budget-overview-card">
+   <div class="dashboard-card-head">
+    <div><span class="dashboard-card-eyebrow">BUDGET</span><h2>Budget Overview</h2></div>
+    ${planSelect}
+   </div>
+   <div class="budget-overview-layout">
+    <div class="dashboard-donut budget-donut" style="--donut:${budgetGradient}">
+     <div><strong>${pct.toFixed(1)}%</strong><span>Spent</span></div>
+    </div>
+    <div class="budget-overview-details">
+     <div class="budget-total-line"><strong>${money(totalSpent)}</strong><span>/ ${money(plannedBudget)}</span></div>
      <div class="dashboard-progress"><i style="width:${pct}%"></i></div>
-     <div class="dashboard-legend"><span><i class="spent"></i>Total Spent</span><strong>${money(spent)}</strong></div>
-     <div class="dashboard-legend"><span><i class="remaining"></i>Remaining Budget</span><strong>${money(remaining)}</strong></div>
+     <div class="budget-legend"><span><i class="legend-dot spent"></i>Total Spent</span><strong>${money(totalSpent)}</strong></div>
+     <div class="budget-legend"><span><i class="legend-dot remaining"></i>Remaining Budget</span><strong>${money(remaining)}</strong></div>
     </div>
    </div>
   </section>
 
-  <section class="section dashboard-upcoming-card">
-   <div class="dashboard-card-head"><div><span class="dashboard-eyebrow">NEXT</span><h2>Upcoming Itinerary</h2></div></div>
-   ${next?`<div class="dashboard-upcoming"><div class="dashboard-date-box"><b>${new Date(next.date+"T00:00:00").getDate()}</b><span>${new Date(next.date+"T00:00:00").toLocaleDateString("en-US",{month:"short"})}</span></div><div><strong>${esc(next.title||next.activity||"")}</strong><p>${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p></div></div>`:`<div class="dashboard-upcoming-empty">No itinerary added yet.</div>`}
+  <section class="section upcoming-card">
+   <div class="dashboard-card-head"><div><span class="dashboard-card-eyebrow">NEXT</span><h2>Upcoming Itinerary</h2></div></div>
+   ${next?`<div class="upcoming-item"><div class="upcoming-date"><b>${new Date(next.date+"T00:00:00").getDate()}</b><span>${new Date(next.date+"T00:00:00").toLocaleDateString("en-US",{month:"short"})}</span></div><div><strong>${esc(next.title||next.activity||"")}</strong><p>${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p></div></div>`:"<div class=\"upcoming-empty\">No itinerary added yet.</div>"}
   </section>
- </div>
 
- <div class="dashboard-bottom-grid">
-  <section class="section dashboard-expense-card">
-   <div class="dashboard-card-head"><div><span class="dashboard-eyebrow">SPENDING</span><h2>Expense Breakdown</h2></div><span class="dashboard-plan-badge">${esc(active.name||"Plan A")}</span></div>
-   <div class="dashboard-expense-layout">
-    <div class="dashboard-donut expense-donut" style="--donut:${expenseGradient}"><div><strong>${money(spent)}</strong><span>Total Spent</span></div></div>
-    <div class="dashboard-expense-list">${expenseRows}</div>
+  <section class="section expense-breakdown-card">
+   <div class="dashboard-card-head">
+    <div><span class="dashboard-card-eyebrow">SPENDING</span><h2>Expense Breakdown</h2></div>
+    <span class="dashboard-plan-badge">${esc(active.name||"Plan A")}</span>
+   </div>
+   <div class="expense-breakdown-layout">
+    <div class="dashboard-donut expense-donut" style="--donut:${expenseGradient}">
+     <div><strong>${money(totalSpent)}</strong><span>Total Spent</span></div>
+    </div>
+    <div class="expense-list">${expenseRows}</div>
    </div>
   </section>
 
-  <section class="section dashboard-villa-card">
-   <div class="dashboard-card-head"><div><span class="dashboard-eyebrow">GROUP DECISION</span><h2>Villa Vote</h2><p>Vote for the stay you prefer.</p></div><span class="dashboard-vote-total">${voteTotal} Votes</span></div>
-   <div class="dashboard-villa-list">${villaRows}</div>
-   ${stays.length?`<button class="dashboard-vote-button" type="button" onclick="page='Villas & Stay';render()">Vote Now →</button>`:""}
+  <section class="section villa-vote-card">
+   <div class="dashboard-card-head">
+    <div><span class="dashboard-card-eyebrow">GROUP DECISION</span><h2>Villa Vote</h2><p>Vote for the stay you prefer.</p></div>
+    <span class="dashboard-vote-total">${voteTotal} Votes</span>
+   </div>
+   <div class="villa-vote-list">${villaRows}</div>
+   ${ranked.length?`<button class="villa-vote-button" type="button" data-page="Villas & Stay">Vote Now →</button>`:""}
   </section>
  </div>
 
- <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div><div class="actions">${[["General","grid"],["Participants","users-event"],["Income Planning","chart"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
+ <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div>
+ <div class="actions">${[["General","pin"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
+ const planEl=$("#dashboardPlan");
+ if(planEl)planEl.onchange=()=>{const current=trip();if(activatePlan(current,planEl.value)){save();render();}};
 }
 function general(t){
  const ro=mode==="member"?"disabled":"";
