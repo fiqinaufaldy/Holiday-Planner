@@ -924,89 +924,121 @@ html[data-theme="dark"] #login .login-control,body[data-theme="dark"] #login .lo
 
 
 /* =========================================================
-   FNVERSE SIDEBAR + VILLA DETAIL SCROLL FIX
+   FNVERSE SIDEBAR BRAND
+   No divider — logo + FNVERSE + Holiday Planner
    ========================================================= */
-
-/* FNVERSE sidebar logo */
-#brandHome{
-  display:flex;
+.sidebar-brand{
+  display:flex!important;
   align-items:center;
-  justify-content:flex-start;
+  gap:10px;
+  margin:0 0 25px!important;
+  padding:0 10px!important;
   text-decoration:none;
-  padding:8px 12px 20px;
+  color:#fff!important;
+  min-height:46px;
 }
 
-#brandHome .logo-mark{
-  display:flex;
-  align-items:center;
-}
-
-#brandHome .logo-img{
-  display:block;
-  width:150px;
-  height:auto;
-  max-width:100%;
+.sidebar-brand-logo{
+  width:38px;
+  height:38px;
+  flex:0 0 38px;
   object-fit:contain;
-}
-
-#brandHome .logo-img-light{
-  display:none;
-}
-
-/* Light mode uses the light FNVERSE logo */
-html[data-theme="light"] #brandHome .logo-img-dark,
-body[data-theme="light"] #brandHome .logo-img-dark{
-  display:none;
-}
-
-html[data-theme="light"] #brandHome .logo-img-light,
-body[data-theme="light"] #brandHome .logo-img-light{
   display:block;
 }
 
-/* Villa detail: right-side content scrolls independently */
+.sidebar-brand-logo-dark{
+  display:none;
+}
+
+.sidebar-brand-text{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-width:0;
+  line-height:1.05;
+}
+
+.sidebar-brand-text strong{
+  font-family:"Montserrat",sans-serif!important;
+  font-size:17px;
+  font-weight:700;
+  letter-spacing:.02em;
+  color:#f4f1e9;
+}
+
+.sidebar-brand-text small{
+  margin:4px 0 0!important;
+  padding:0!important;
+  font-family:"DM Sans",sans-serif!important;
+  font-size:9px!important;
+  line-height:1.1;
+  letter-spacing:.08em!important;
+  color:#b9c8bb!important;
+  font-weight:500;
+}
+
+/* Dark mode: use the lighter FNVERSE mark */
+html[data-theme="dark"] .sidebar-brand-logo-light,
+body[data-theme="dark"] .sidebar-brand-logo-light{
+  display:none;
+}
+
+html[data-theme="dark"] .sidebar-brand-logo-dark,
+body[data-theme="dark"] .sidebar-brand-logo-dark{
+  display:block;
+}
+
+/* Keep the sidebar's existing theme colors; gold is the accent,
+   so the brand does not introduce pink/purple into the UI. */
+html[data-theme="dark"] .sidebar-brand-text strong,
+body[data-theme="dark"] .sidebar-brand-text strong{
+  color:#f0ece4;
+}
+
+html[data-theme="light"] .sidebar-brand-text strong,
+body[data-theme="light"] .sidebar-brand-text strong{
+  color:#f4f7f2;
+}
+
+/* =========================================================
+   VILLA DETAIL — RIGHT PANEL INTERNAL SCROLL
+   Gallery stays fixed; only Villa content scrolls.
+   ========================================================= */
 .villa-detail-dialog{
   max-height:90vh;
+  overflow:hidden!important;
 }
 
 .villa-detail{
+  height:min(90vh, 820px);
   max-height:90vh;
   overflow:hidden;
 }
 
 .villa-detail-content{
-  max-height:90vh;
+  min-height:0;
+  height:100%;
+  max-height:100%;
   overflow-y:auto;
   overflow-x:hidden;
   scrollbar-width:thin;
+  scrollbar-color:#536984 transparent;
 }
 
-/* Mobile: keep the existing stacked layout and allow full dialog scroll */
 @media(max-width:900px){
   .villa-detail{
+    height:auto;
     max-height:90vh;
-    overflow:hidden;
+    overflow:auto;
   }
 
   .villa-detail-content{
-    max-height:90vh;
-    overflow-y:auto;
+    height:auto;
+    max-height:none;
+    overflow:visible;
   }
-}
 
-@media(max-width:700px){
   .villa-detail-dialog{
-    max-height:90vh;
-    overflow:hidden;
-  }
-
-  .villa-detail{
-    max-height:90vh;
-    overflow:hidden;
-  }
-
-  .villa-detail-content{
-    max-height:calc(90vh - 260px);
-    overflow-y:auto;
+    overflow:auto!important;
   }
 }
