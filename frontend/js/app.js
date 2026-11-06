@@ -754,11 +754,13 @@ function dashboard(t){
  ensurePlans(t);
  const active=t.plans.find(p=>p.id===t.activePlanId)||t.plans[0]||{};
  const budgetItems=Array.isArray(active.budget)?active.budget:[];
- const plannedBudget=Number(active.budgetLimit||0)>0?Number(active.budgetLimit):budgetItems.reduce((a,x)=>a+Number(x.amount||0),0);
- const spent=budgetItems.reduce((a,x)=>a+Number(x.amount||0),0);
- const pct=plannedBudget?Math.min(100,spent/plannedBudget*100):0;
- const remaining=Math.max(0,plannedBudget-spent);
- const next=(active.itinerary||[]).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];
+ const tripBudget=Number(active.budgetLimit||t.budgetLimit||0);
+ const allocated=budgetItems.reduce((a,x)=>a+Number(x.amount||0),0);
+ const budget=tripBudget>0?tripBudget:allocated;
+ const spent=allocated;
+ const remaining=Math.max(0,budget-spent);
+ const pct=budget?Math.min(100,spent/budget*100):0;
+ const next=(active.itinerary||t.itinerary||[]).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];
 
  const catColors=["#f7cf57","#4fa8f7","#45d4d0","#b98af6","#ed83c5","#8fa7c4"];
  const categories={};
@@ -766,6 +768,7 @@ function dashboard(t){
    let c=String(x.category||"Others").trim()||"Others";
    if(/^food$/i.test(c))c="Food & Beverage";
    if(/^(villa|hotel|accommodation|stay)$/i.test(c))c="Accommodation";
+   if(/^(activity|activities)$/i.test(c))c="Activities";
    categories[c]=(categories[c]||0)+Number(x.amount||0);
  });
  const catEntries=Object.entries(categories).sort((a,b)=>b[1]-a[1]);
@@ -774,7 +777,7 @@ function dashboard(t){
    const start=catEntries.slice(0,i).reduce((a,[,v])=>a+(catTotal?v/catTotal*100:0),0);
    const end=start+(catTotal?value/catTotal*100:0);
    return `${catColors[i%catColors.length]} ${start}% ${end}%`;
- }).join(", ")})`:"conic-gradient(#33475f 0 100%)";
+ }).join(", ")})`:"conic-gradient(#34485f 0 100%)";
 
  const expenseRows=catEntries.map(([name,value],i)=>{
    const p=catTotal?value/catTotal*100:0;
@@ -806,11 +809,12 @@ function dashboard(t){
  }).join("")||`<div class="dashboard-villa-empty">No villa available for voting yet.</div>`;
 
  const planOptions=t.plans.filter(p=>p.enabled).map(p=>`<option value="${p.id}" ${p.id===t.activePlanId?"selected":""}>${esc(p.name)}</option>`).join("");
+ const budgetDonut=`conic-gradient(#f7cf57 ${pct}%, #34485f ${pct}% 100%)`;
 
  $("#content").innerHTML=`<section class="hero" style="background-image:url('${esc(t.cover||"")}')"><span class="pill">TRIP SPACE</span><h2>${esc(t.name)}</h2><p>${date(t.start)} – ${date(t.end)}　·　${esc(t.destination)}</p></section>
  <div class="stats dashboard-stats">
  <div class="stat"><span class="stat-icon">${hpIcon("users")}</span><small>Participants</small><b>${(t.participants||[]).length} People</b></div>
- <div class="stat"><span class="stat-icon">${hpIcon("wallet")}</span><small>Planned Budget</small><b>${money(plannedBudget)}</b></div>
+ <div class="stat"><span class="stat-icon">${hpIcon("wallet")}</span><small>Planned Budget</small><b>${money(budget)}</b></div>
  <div class="stat"><span class="stat-icon">${hpIcon("chart")}</span><small>Total Spent</small><b>${money(spent)}</b></div>
  <div class="stat"><span class="stat-icon">${hpIcon("calendar")}</span><small>Remaining</small><b>${money(remaining)}</b></div></div>
 
@@ -818,9 +822,9 @@ function dashboard(t){
   <section class="section dashboard-budget-card">
    <div class="dashboard-card-head"><div><span class="dashboard-eyebrow">BUDGET</span><h2>Budget Overview</h2></div><select id="dashboardPlan">${planOptions}</select></div>
    <div class="dashboard-budget-layout">
-    <div class="dashboard-donut budget-donut" style="--donut:${`conic-gradient(#f7cf57 ${pct}%, #34485f ${pct}% 100%)`}"><div><strong>${pct.toFixed(1)}%</strong><span>Spent</span></div></div>
+    <div class="dashboard-donut budget-donut" style="--donut:${budgetDonut}"><div><strong>${pct.toFixed(1)}%</strong><span>Spent</span></div></div>
     <div class="dashboard-budget-details">
-     <div class="dashboard-budget-total"><strong>${money(spent)}</strong><span>/ ${money(plannedBudget)}</span></div>
+     <div class="dashboard-budget-total"><strong>${money(spent)}</strong><span>/ ${money(budget)}</span></div>
      <div class="dashboard-progress"><i style="width:${pct}%"></i></div>
      <div class="dashboard-legend"><span><i class="spent"></i>Total Spent</span><strong>${money(spent)}</strong></div>
      <div class="dashboard-legend"><span><i class="remaining"></i>Remaining Budget</span><strong>${money(remaining)}</strong></div>
