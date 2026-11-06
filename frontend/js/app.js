@@ -129,7 +129,7 @@ function toast(s){let t=$("#toast");t.textContent=s;t.style.display="block";clea
 
 let plannerLanguage=localStorage.getItem("holidayPlannerLanguage")||"en";
 const languagePairs=[
-["YOUR TRAVEL SPACE","RUANG PERJALANANMU"],["Dashboard","Dasbor"],["General","back-square"],["Participants","Peserta"],
+["YOUR TRAVEL SPACE","RUANG PERJALANANMU"],["Dashboard","Dasbor"],["General","grid"],["Participants","Peserta"],
 ["Income Planning","Rencana Pemasukan"],["Expense Planning","Rencana Pengeluaran"],["Cash Flow","Arus Kas"],
 ["Villas & Stay","Villa & Penginapan"],["Destinations","Destinasi"],["Itinerary","Jadwal Perjalanan"],
 ["Assigned Trips","Trip yang Ditugaskan"],["Log out","Keluar"],["Light mode","Mode terang"],["Dark mode","Mode gelap"],
@@ -275,9 +275,9 @@ function assignedTrips(){
  return[];
 }
 function navItems(){
- if(mode==="master")return tripId?[["Dashboard","dashboard"],["General","back-square"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"],["All Trips","back"]]:[["All Trips","grid"],["Create Trip","plus"],["Access Management","users"],["Settings","settings"]];
- if(mode==="admin")return tripId?[["Dashboard","dashboard"],["General","back-square"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"],["Settings","settings"],["Assigned Trips","back-square"]]:[["Assigned Trips","grid"],["Settings","settings"]];
- if(mode==="member")return [["Dashboard","dashboard"],["General","back-square"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"]];
+ if(mode==="master")return tripId?[["Dashboard","dashboard"],["General","grid"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"],["All Trips","back"]]:[["All Trips","grid"],["Create Trip","plus"],["Access Management","users"],["Settings","settings"]];
+ if(mode==="admin")return tripId?[["Dashboard","dashboard"],["General","grid"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"],["Settings","settings"],["Assigned Trips","back-square"]]:[["Assigned Trips","grid"],["Settings","settings"]];
+ if(mode==="member")return [["Dashboard","dashboard"],["General","grid"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"]];
  return [];
 }
 function updateSidebarProfile(){
@@ -762,7 +762,7 @@ function dashboard(t){
  <div class="stat"><span class="stat-icon">${hpIcon("chart")}</span><small>Total Spent</small><b>${money(spent)}</b></div>
  <div class="stat"><span class="stat-icon">${hpIcon("calendar")}</span><small>Remaining</small><b>${money(budget-spent)}</b></div></div>
  <div class="two"><section class="section"><h2>Budget Overview</h2><div class="bar"><i style="width:${pct}%"></i></div><b>${pct.toFixed(1)}%</b><p>Spent ${money(spent)} · Budget ${money(budget)}</p></section><section class="section"><h2>Upcoming Itinerary</h2>${next?`<b>${esc(next.title||next.activity||"")}</b><p>${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p>`:"No itinerary added yet."}</section></div>
- <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div><div class="actions">${[["General","back-square"],["Participants","users-event"],["Income Planning","chart"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
+ <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div><div class="actions">${[["General","grid"],["Participants","users-event"],["Income Planning","chart"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
 }
 function general(t){
  const ro=mode==="member"?"disabled":"";
