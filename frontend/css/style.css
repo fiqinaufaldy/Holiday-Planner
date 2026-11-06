@@ -901,7 +901,7 @@ html[data-theme="light"] .mobile-trip-menu-icon{background:#f2e7cf;color:#8a6426
 #login .login-pin-wrap input{width:100%;height:58px;margin:0;padding:0 22px 0 57px;text-align:left;letter-spacing:1px;font:500 15px/1 "DM Sans",sans-serif;color:#4d5d58;border:1px solid #bfc5c0;border-radius:13px;background:rgba(255,253,248,.72);outline:none}
 #login .login-pin-wrap input::placeholder{color:#76817c;opacity:1}
 #login .login-pin-wrap input:focus{border-color:#17523f;box-shadow:0 0 0 3px rgba(23,82,63,.1)}
-#login .login-pin-icon{position:absolute;left:20px;top:50%;transform:translateY(-50%);width:22px;height:22px;display:grid;place-items:center;color:#0f4f3d;z-index:103;pointer-events:none}
+#login .login-pin-icon{position:absolute;left:20px;top:50%;transform:translateY(-50%);width:22px;height:22px;display:grid;place-items:center;color:#52615c;z-index:2;pointer-events:none}
 #login .login-pin-icon svg{width:21px;height:21px}
 #login .login-primary{width:100%;height:58px;border-radius:13px;display:flex;align-items:center;justify-content:center;gap:13px;background:#0d533d;color:#fff;font:700 16px/1 "DM Sans",sans-serif;box-shadow:0 13px 28px rgba(13,83,61,.18)}
 #login .continue-icon{display:flex;width:24px;height:24px}
@@ -1071,70 +1071,54 @@ body[data-theme="dark"] #login .login-pin-icon .login-padlock-icon{
 }
 
 
-/* LOGIN PADLOCK — FINAL FIX: input is z-index 102, icon must be above it */
-#login .login-pin-wrap > .login-pin-icon{
-  z-index:103 !important;
-  display:flex !important;
-  visibility:visible !important;
-  opacity:1 !important;
-  pointer-events:none !important;
-}
-
-#login .login-pin-wrap > .login-pin-icon .login-padlock-icon{
-  display:block !important;
-  width:22px !important;
-  height:22px !important;
-  visibility:visible !important;
-  opacity:1 !important;
-  color:#0f4f3d !important;
-  fill:#0f4f3d !important;
-}
-
-#login .login-pin-wrap > .login-pin-icon .login-padlock-icon path{
-  fill:currentColor !important;
-}
-
-html[data-theme="dark"] #login .login-pin-wrap > .login-pin-icon,
-body[data-theme="dark"] #login .login-pin-wrap > .login-pin-icon{
-  color:#ffffff !important;
-}
-
-html[data-theme="dark"] #login .login-pin-wrap > .login-pin-icon .login-padlock-icon,
-body[data-theme="dark"] #login .login-pin-wrap > .login-pin-icon .login-padlock-icon{
-  color:#ffffff !important;
-  fill:#ffffff !important;
-}
-
-html[data-theme="dark"] #login .login-pin-wrap > .login-pin-icon .login-padlock-icon path,
-body[data-theme="dark"] #login .login-pin-wrap > .login-pin-icon .login-padlock-icon path{
-  fill:#ffffff !important;
-}
-
-
-/* Dashboard desktop redesign — Villa Vote + Expense Breakdown */
-.dashboard-hero{min-height:180px}
-.dashboard-main-grid{display:grid;grid-template-columns:1.12fr .88fr;gap:14px;margin-top:14px}
-.dashboard-bottom-grid{align-items:stretch}
-.dashboard-card{margin-top:0;min-width:0}
-.dashboard-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
-.dashboard-card-head h2{margin:3px 0 0}
-.dashboard-eyebrow{font-size:9px;letter-spacing:.16em;font-weight:800;color:#9b8b72}
-.dashboard-link{border:0;background:transparent;color:#e7c77b;font-size:11px;font-weight:700;padding:2px 0}
-.budget-health{padding:7px 10px;border-radius:999px;font-size:11px;font-weight:800;background:#173d2e;color:#bde5cb}
-.budget-health.warning{background:#4a3b20;color:#f0cf86}.budget-health.danger{background:#4b2527;color:#f3b3b3}
-.budget-progress{height:12px;border-radius:999px;background:#e7e4dd;overflow:hidden;margin:8px 0 16px}
-.budget-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#b99a58,#e8c977)}
-.budget-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.budget-meta div{padding:10px 12px;border-radius:12px;background:#f3f0e9}.budget-meta small{display:block;color:#788177;font-size:9px}.budget-meta b{display:block;margin-top:4px;font-size:13px;color:#243329}
-.itinerary-feature{display:grid;grid-template-columns:62px 1fr 24px;align-items:center;gap:13px;min-height:78px;padding:11px 13px;border-radius:13px;background:linear-gradient(135deg,#f3f0e9,#fffdfa);border:1px solid #e8e2d8}
-.itinerary-date{display:grid;place-items:center;min-height:48px;border-radius:10px;background:#173d2e;color:#f3d98d;font-size:10px;font-weight:800;text-align:center}.itinerary-feature b{font-size:12px}.itinerary-feature p{margin:5px 0 0;font-size:10px;color:#788177}.itinerary-arrow{font-size:18px;color:#b18f4f;text-align:right}
-.dashboard-total{font-size:12px;font-weight:800;color:#b89450}.expense-layout{display:grid;grid-template-columns:180px 1fr;align-items:center;gap:20px}.expense-donut{width:168px;height:168px;border-radius:50%;background:conic-gradient(#caa955 0 var(--expense-pct),#e8e4db var(--expense-pct) 100%);display:grid;place-items:center;position:relative}.expense-donut:after{content:"";position:absolute;inset:18px;border-radius:50%;background:#fffdfa}.expense-donut>div{position:relative;z-index:1;text-align:center}.expense-donut b{display:block;font-size:16px}.expense-donut span{display:block;font-size:9px;color:#788177;margin-top:3px}.expense-list{display:grid;gap:10px}.expense-row{display:grid;grid-template-columns:10px 1fr auto auto;align-items:center;gap:8px;font-size:10px}.expense-row strong{font-size:10px}.expense-row small{color:#788177;width:38px;text-align:right}.expense-name{color:#53605a}.expense-dot{width:8px;height:8px;border-radius:50%}.expense-dot.gold{background:#caa955}.expense-dot.blue{background:#6fa6d9}.expense-dot.teal{background:#55b8b0}.expense-dot.purple{background:#9b82d1}.expense-dot.pink{background:#d987b8}
-.villa-vote-card{border-color:#3c536d}.villa-vote-head{display:grid;grid-template-columns:1fr auto auto;align-items:start;gap:12px;margin-bottom:12px}.villa-vote-head h3{font:600 21px "Playfair Display";margin:0}.villa-vote-head p{font-size:10px;color:#788177;margin:5px 0 0}.villa-vote-total{background:#f1eee7;border:1px solid #e7e0d3;border-radius:999px;padding:8px 10px;font-size:9px;color:#788177;white-space:nowrap}.villa-vote-total b{color:#28372e;font-size:12px;margin-left:4px}.villa-vote-action{border:0;background:#173d2e;color:#f2d68a;border-radius:999px;padding:9px 13px;font-size:10px;font-weight:800;white-space:nowrap}.villa-vote-action span{margin-left:5px}.villa-vote-list{display:grid;gap:7px}.villa-vote-row{display:grid;grid-template-columns:31px 50px minmax(90px,1fr) minmax(105px,1.1fr);align-items:center;gap:9px;padding:8px 9px;border:1px solid #e8e2d8;background:#faf8f3;border-radius:12px;position:relative}.villa-vote-row.leader{border-color:#d6b65d;box-shadow:0 0 0 1px #d6b65d1f}.villa-rank{width:27px;height:27px;border-radius:9px;display:grid;place-items:center;background:#e9e6df;color:#6f746e;font-size:10px;font-weight:900}.villa-vote-row.leader .villa-rank{background:#f0d68b;color:#5c4820}.villa-vote-thumb{height:38px;border-radius:8px;background-size:cover;background-position:center}.villa-vote-name{font-size:11px;font-weight:800}.villa-vote-price{font-size:9px;color:#788177;margin-top:3px}.villa-vote-price span{color:#9b9d98}.villa-vote-result b{display:flex;justify-content:space-between;font-size:9px}.villa-vote-result b span{color:#b08d48}.villa-vote-bar{height:6px;background:#dfe1dd;border-radius:99px;overflow:hidden;margin-top:5px}.villa-vote-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#b7954d,#e4c86f)}.villa-leader-badge{position:absolute;right:9px;top:-9px;background:#f0d68b;color:#5b4820;border-radius:999px;padding:4px 7px;font-size:7px;font-weight:900;letter-spacing:.02em}.villa-vote-empty{display:grid;place-items:center;text-align:center;min-height:190px;color:#788177}.villa-vote-empty span{font-size:28px;color:#b9954f}.villa-vote-empty b{font-size:12px;color:#3f4b43}.villa-vote-empty p{font-size:10px;margin:4px 0}
-html[data-theme="dark"] .dashboard-card,body[data-theme="dark"] .dashboard-card{background:#142238!important;border-color:#3a506d!important;color:#f1f5fb}
-html[data-theme="dark"] .dashboard-card-head h2,body[data-theme="dark"] .dashboard-card-head h2,html[data-theme="dark"] .villa-vote-head h3,body[data-theme="dark"] .villa-vote-head h3{color:#f1f5fb!important}
-html[data-theme="dark"] .budget-meta div,body[data-theme="dark"] .budget-meta div{background:#1b2b43;color:#f1f5fb}.html[data-theme="dark"] .budget-meta b,body[data-theme="dark"] .budget-meta b{color:#f1f5fb!important}
-html[data-theme="dark"] .budget-progress,body[data-theme="dark"] .budget-progress{background:#33445b}
-html[data-theme="dark"] .itinerary-feature,body[data-theme="dark"] .itinerary-feature{background:#1b2b43;border-color:#3a506d}.html[data-theme="dark"] .itinerary-feature b,body[data-theme="dark"] .itinerary-feature b{color:#f1f5fb}
-html[data-theme="dark"] .expense-donut:after,body[data-theme="dark"] .expense-donut:after{background:#142238}.html[data-theme="dark"] .expense-name,body[data-theme="dark"] .expense-name{color:#d6deea}.html[data-theme="dark"] .expense-row small,body[data-theme="dark"] .expense-row small{color:#9eafc6}
-html[data-theme="dark"] .villa-vote-total,body[data-theme="dark"] .villa-vote-total{background:#1b2b43;border-color:#405873;color:#bdcadd}.html[data-theme="dark"] .villa-vote-total b,body[data-theme="dark"] .villa-vote-total b{color:#f1f5fb}.html[data-theme="dark"] .villa-vote-row,body[data-theme="dark"] .villa-vote-row{background:#1b2b43;border-color:#344b68}.html[data-theme="dark"] .villa-vote-row.leader,body[data-theme="dark"] .villa-vote-row.leader{border-color:#d0ad5a}.html[data-theme="dark"] .villa-vote-name,body[data-theme="dark"] .villa-vote-name{color:#f1f5fb}.html[data-theme="dark"] .villa-vote-price,body[data-theme="dark"] .villa-vote-price{color:#9eafc6}.html[data-theme="dark"] .villa-vote-bar,body[data-theme="dark"] .villa-vote-bar{background:#34485f}.html[data-theme="dark"] .villa-vote-action,body[data-theme="dark"] .villa-vote-action{background:#d7b65e;color:#17251c}.html[data-theme="dark"] .villa-vote-empty b,body[data-theme="dark"] .villa-vote-empty b{color:#f1f5fb}
-@media(max-width:1000px){.dashboard-main-grid{grid-template-columns:1fr}.expense-layout{grid-template-columns:150px 1fr}.expense-donut{width:145px;height:145px}}
-@media(max-width:700px){.dashboard-main-grid{grid-template-columns:1fr}.expense-layout{grid-template-columns:1fr}.expense-donut{width:150px;height:150px;margin:auto}.villa-vote-head{grid-template-columns:1fr auto}.villa-vote-action{grid-column:1/-1;justify-self:start}.villa-vote-row{grid-template-columns:28px 45px 1fr}.villa-vote-result{grid-column:3}.villa-leader-badge{position:static;grid-column:1/-1;justify-self:start}.budget-meta{grid-template-columns:1fr}.itinerary-feature{grid-template-columns:54px 1fr 20px}}
+/* Dashboard redesign — Budget Overview + Expense Breakdown + Villa Vote */
+.dashboard-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(360px,.85fr);gap:18px;margin-top:18px}
+.dashboard-grid .section{min-width:0}
+.dashboard-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:14px}
+.dashboard-card-head h2{margin:3px 0 0;font-family:"Fraunces",Georgia,serif;font-size:22px}
+.dashboard-card-head p{margin:3px 0 0;font-size:12px;color:var(--muted,#93a3b8)}
+.dashboard-card-eyebrow{font-size:9px;letter-spacing:.18em;font-weight:800;color:#d8b15e}
+#dashboardPlan{min-width:105px;height:38px;border:1px solid #405571;border-radius:999px;background:#1b2b43;color:#f1eee8;padding:0 12px;font-weight:700}
+html[data-theme="light"] #dashboardPlan,body[data-theme="light"] #dashboardPlan{background:#fffdfa;color:#25362b;border-color:#ded8ce}
+.budget-overview-layout,.expense-breakdown-layout{display:grid;grid-template-columns:190px minmax(0,1fr);align-items:center;gap:24px}
+.dashboard-donut{width:150px;height:150px;border-radius:50%;background:var(--donut);display:grid;place-items:center;position:relative;margin:4px auto}
+.dashboard-donut:after{content:"";position:absolute;inset:16px;border-radius:50%;background:#142238}
+.dashboard-donut>div{position:relative;z-index:1;text-align:center;display:flex;flex-direction:column;gap:2px}
+.dashboard-donut strong{font-size:21px;line-height:1.1}
+.dashboard-donut span{font-size:11px;color:#c2c9d2}
+.budget-overview-details{min-width:0}
+.budget-total-line{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.budget-total-line strong{font-size:17px}
+.budget-total-line span{font-size:15px;color:#c5ccd6}
+.dashboard-progress,.villa-vote-track{height:10px;border-radius:999px;background:#dfe2e5;overflow:hidden}
+.dashboard-progress i{display:block;height:100%;border-radius:inherit;background:#f7cf57}
+.budget-legend{display:flex;justify-content:space-between;gap:15px;padding:9px 0;border-bottom:1px solid rgba(145,160,180,.16);font-size:12px}
+.budget-legend span{display:flex;align-items:center;gap:8px}
+.budget-legend strong{font-size:12px}
+.legend-dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+.legend-dot.spent{background:#f7cf57}.legend-dot.remaining{background:#8190a3}
+.upcoming-item{display:flex;align-items:center;gap:15px;min-height:120px}
+.upcoming-date{width:58px;height:66px;border:1px solid #405571;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1b2b43}
+.upcoming-date b{font-size:24px}.upcoming-date span{font-size:10px;color:#d8b15e;text-transform:uppercase}
+.upcoming-item strong{font-size:15px}.upcoming-item p{margin:6px 0 0;color:#aeb9c7;font-size:11px;line-height:1.5}
+.upcoming-empty{padding:35px 0;color:#aeb9c7;font-size:13px}
+.dashboard-plan-badge,.dashboard-vote-total{padding:7px 12px;border-radius:999px;background:#263b5a;color:#f3ce7b;font-size:11px;font-weight:800;white-space:nowrap}
+.expense-breakdown-layout{grid-template-columns:190px minmax(0,1fr)}
+.expense-donut{width:170px;height:170px}
+.expense-donut strong{font-size:16px}
+.expense-list{display:flex;flex-direction:column;gap:5px}
+.expense-row{display:grid;grid-template-columns:12px minmax(110px,1fr) auto 45px;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(145,160,180,.12);font-size:12px}
+.expense-dot{width:10px;height:10px;border-radius:50%}
+.expense-cat{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.expense-row strong{font-size:12px}.expense-pct{text-align:right;color:#c2cad5;font-size:11px}.expense-empty{color:#aeb9c7;padding:20px 0}
+.villa-vote-list{display:flex;flex-direction:column;gap:7px}
+.villa-vote-row{display:grid;grid-template-columns:28px 46px minmax(0,1fr) 40px;align-items:center;gap:9px;padding:7px;border:1px solid #30445e;border-radius:12px;background:rgba(19,35,56,.45)}
+.villa-vote-row.leader{border-color:#c69b3f;box-shadow:inset 0 0 0 1px rgba(247,207,87,.1)}
+.villa-rank{font-size:11px;font-weight:800;color:#d8dce2;text-align:center}
+.villa-vote-photo{width:46px;height:38px;border-radius:8px;background:#263b5a center/cover no-repeat}
+.villa-vote-name{font-size:11px;font-weight:800;display:flex;align-items:center;gap:7px}
+.villa-leader-badge{font-size:8px;color:#f7cf57;border:1px solid rgba(247,207,87,.35);border-radius:999px;padding:3px 5px;white-space:nowrap}
+.villa-vote-meta{font-size:9px;color:#aeb9c7;margin:2px 0 5px}.villa-vote-track{height:5px}.villa-vote-track i{display:block;height:100%;background:#d8b15e;border-radius:inherit}.villa-vote-row:not(.leader) .villa-vote-track i{background:#6f87a5}
+.villa-vote-percent{text-align:right;font-size:11px}.villa-vote-button{width:100%;margin-top:9px;height:36px;border:1px solid #b58a37;border-radius:9px;background:#263b5a;color:#f7cf57;font-weight:800;cursor:pointer}
+.villa-empty{padding:22px 0;color:#aeb9c7;font-size:12px}
+@media(max-width:900px){.dashboard-grid{grid-template-columns:1fr}.budget-overview-layout,.expense-breakdown-layout{grid-template-columns:150px minmax(0,1fr)}}
+@media(max-width:700px){.dashboard-grid{grid-template-columns:1fr;gap:12px}.budget-overview-layout,.expense-breakdown-layout{grid-template-columns:1fr}.dashboard-donut{margin:4px auto}.expense-list{width:100%}.expense-row{grid-template-columns:12px minmax(0,1fr) auto 40px}.villa-vote-row{grid-template-columns:26px 42px minmax(0,1fr) 38px}.dashboard-card-head h2{font-size:19px}}
