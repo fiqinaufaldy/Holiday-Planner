@@ -810,10 +810,10 @@ function dashboard(t){
   return {item,index,startAt};
  }).filter(x=>x.startAt&&!Number.isNaN(x.startAt.getTime())&&x.startAt.getTime()>now)
   .sort((a,b)=>a.startAt.getTime()-b.startAt.getTime())
-  .slice(0,2)
+  .slice(0,4)
   .map(x=>x.item);
  const planSelect=`<select id="dashboardPlan" aria-label="Select plan">${t.plans.filter(p=>p.enabled).map(p=>`<option value="${p.id}" ${p.id===t.activePlanId?"selected":""}>${esc(p.name)}</option>`).join("")}</select>`;
- const upcomingHtml=upcoming.length?upcoming.map(next=>`<div class="upcoming-item" style="display:flex;align-items:center;gap:14px;min-width:0;padding:10px 12px"><div class="upcoming-date" style="flex:0 0 54px;width:54px;height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center"><b>${new Date(next.date+"T00:00:00").getDate()}</b><span>${new Date(next.date+"T00:00:00").toLocaleDateString("en-US",{month:"short"})}</span></div><div style="min-width:0;flex:1"><strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(next.title||next.activity||"")}</strong><p style="margin:4px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p></div></div>`).join(""):"<div class=\"upcoming-empty\">No upcoming itinerary yet.</div>";
+ const upcomingHtml=upcoming.length?upcoming.map(next=>`<div class="upcoming-item" style="display:flex;align-items:center;gap:10px;min-width:0;padding:8px 8px"><div class="upcoming-date" style="flex:0 0 44px;width:44px;height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center"><b>${new Date(next.date+"T00:00:00").getDate()}</b><span>${new Date(next.date+"T00:00:00").toLocaleDateString("en-US",{month:"short"})}</span></div><div style="min-width:0;flex:1"><strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px">${esc(next.title||next.activity||"")}</strong><p style="margin:4px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px">${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p></div></div>`).join(""):"<div class=\"upcoming-empty\">No upcoming itinerary yet.</div>";
 
  $("#content").innerHTML=`
  <section class="hero" style="background-image:url('${esc(t.cover||"")}')"><span class="pill">TRIP SPACE</span><h2>${esc(t.name)}</h2><p>${date(t.start)} – ${date(t.end)}　·　${esc(t.destination)}</p></section>
@@ -844,8 +844,8 @@ function dashboard(t){
   </section>
 
   <section class="section upcoming-card">
-   <div class="dashboard-card-head"><div><span class="dashboard-card-eyebrow">NEXT</span><h2>Upcoming Itinerary</h2></div></div>
-   <div class="upcoming-list" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px">${upcomingHtml}</div>
+   <div class="dashboard-card-head"><div><span class="dashboard-card-eyebrow">NEXT</span><h2>Upcoming Itinerary</h2></div><button data-page="Itinerary" style="border:0;background:none;padding:0;color:var(--accent);font-weight:700;font-size:12px;cursor:pointer">View All <span aria-hidden="true">→</span></button></div>
+   <div class="upcoming-list" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:stretch">${upcomingHtml}</div>
   </section>
 
   <section class="section expense-breakdown-card">
