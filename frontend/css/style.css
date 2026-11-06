@@ -921,3 +921,92 @@ html[data-theme="dark"] #login .login-primary,body[data-theme="dark"] #login .lo
 html[data-theme="dark"] #login .login-control,body[data-theme="dark"] #login .login-control{background:rgba(12,29,43,.88);border-color:#526d80;color:#eef2f4}
 @media(max-width:700px){#login.login{padding:24px 16px 28px}#login .login-top-controls{top:14px;right:14px}#login .login-control{height:33px;min-width:68px;font-size:9px}#login .loginbox{width:min(100%,430px);min-height:auto;padding:31px 24px 34px;border-radius:24px}#login .login-logo{gap:11px;margin-bottom:24px}#login .login-logo .logo-mark{width:44px;height:38px}#login .login-brand{font-size:25px;letter-spacing:-.9px}#login .eyebrow{font-size:8px;letter-spacing:3px;margin-bottom:16px}#login h1#loginTitle{font-size:37px;line-height:1;letter-spacing:-1px}#login h1#loginTitle::after{width:92px;height:10px;margin:12px auto 17px;border-width:4px}#login #loginDesc{font-size:12px;margin-bottom:21px}#login .login-pin-wrap input{height:53px;font-size:14px;padding-left:51px}#login .login-pin-icon{left:17px}#login .login-primary{height:53px;font-size:14px}}
 @media(max-width:380px){#login .loginbox{padding-left:19px;padding-right:19px}#login .login-brand{font-size:23px}#login h1#loginTitle{font-size:33px}}
+
+
+/* =========================================================
+   FNVERSE SIDEBAR + VILLA DETAIL SCROLL FIX
+   ========================================================= */
+
+/* FNVERSE sidebar logo */
+#brandHome{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  text-decoration:none;
+  padding:8px 12px 20px;
+}
+
+#brandHome .logo-mark{
+  display:flex;
+  align-items:center;
+}
+
+#brandHome .logo-img{
+  display:block;
+  width:150px;
+  height:auto;
+  max-width:100%;
+  object-fit:contain;
+}
+
+#brandHome .logo-img-light{
+  display:none;
+}
+
+/* Light mode uses the light FNVERSE logo */
+html[data-theme="light"] #brandHome .logo-img-dark,
+body[data-theme="light"] #brandHome .logo-img-dark{
+  display:none;
+}
+
+html[data-theme="light"] #brandHome .logo-img-light,
+body[data-theme="light"] #brandHome .logo-img-light{
+  display:block;
+}
+
+/* Villa detail: right-side content scrolls independently */
+.villa-detail-dialog{
+  max-height:90vh;
+}
+
+.villa-detail{
+  max-height:90vh;
+  overflow:hidden;
+}
+
+.villa-detail-content{
+  max-height:90vh;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+}
+
+/* Mobile: keep the existing stacked layout and allow full dialog scroll */
+@media(max-width:900px){
+  .villa-detail{
+    max-height:90vh;
+    overflow:hidden;
+  }
+
+  .villa-detail-content{
+    max-height:90vh;
+    overflow-y:auto;
+  }
+}
+
+@media(max-width:700px){
+  .villa-detail-dialog{
+    max-height:90vh;
+    overflow:hidden;
+  }
+
+  .villa-detail{
+    max-height:90vh;
+    overflow:hidden;
+  }
+
+  .villa-detail-content{
+    max-height:calc(90vh - 260px);
+    overflow-y:auto;
+  }
+}
