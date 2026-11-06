@@ -345,7 +345,7 @@ function showApp(){
  
  document.body.classList.toggle("member-view",mode==="member");
  updateSidebarProfile();
- $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("back")}<span>Log out</span></button>`;
+ $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("logout")}<span>Log out</span></button>`;
  const mobileNav=$("#mobileNav");
  if(mobileNav){
    const items=mode==="master"?[]:[["Dashboard","dashboard"],["Expense Planning","expense-report"],["Itinerary","itinerary"],["Participants","users-event"],["More","more"]];
