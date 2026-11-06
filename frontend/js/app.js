@@ -348,9 +348,9 @@ function showApp(){
  $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("logout")}<span>Log out</span></button>`;
  const mobileNav=$("#mobileNav");
  if(mobileNav){
-   mobileNav.innerHTML="";
-   mobileNav.classList.remove("is-visible");
-   mobileNav.style.display="none";
+   const items=mode==="master"?[]:[["Dashboard","dashboard"],["Expense Planning","expense-report"],["Itinerary","itinerary"],["Participants","users-event"],["More","more"]];
+   mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n==="More"?"General":n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n==="More"?(plannerLanguage==="id"?"Lainnya":"More"):n}</span></button>`).join("");
+   mobileNav.classList.toggle("is-visible",items.length>0&&!pendingTripWelcome);
  }
  if(pendingTripWelcome&&tripId){document.body.classList.add("trip-welcome-mode");renderTripWelcome();return;}
  document.body.classList.remove("trip-welcome-mode");
@@ -814,7 +814,7 @@ function dashboard(t){
   .map(x=>x.item);
  const planSelect=`<select id="dashboardPlan" aria-label="Select plan">${t.plans.filter(p=>p.enabled).map(p=>`<option value="${p.id}" ${p.id===t.activePlanId?"selected":""}>${esc(p.name)}</option>`).join("")}</select>`;
  const upcomingItem=next=>`<div class="upcoming-item" style="display:flex;align-items:center;gap:10px;min-width:0;padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.025);border:1px solid rgba(126,153,190,.12);min-height:58px"><div class="upcoming-date" style="flex:0 0 48px;width:48px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:13px;background:rgba(255,255,255,.035)"><b>${new Date(next.date+"T00:00:00").getDate()}</b><span>${new Date(next.date+"T00:00:00").toLocaleDateString("en-US",{month:"short"})}</span></div><div style="min-width:0;flex:1"><strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px">${esc(next.title||next.activity||"")}</strong><p style="margin:4px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px">${date(next.date)} · ${esc(next.time||"")} · ${esc(next.place||next.location||"")}</p></div></div>`;
- const upcomingHtml=upcoming.length?`<div style="display:grid;grid-template-columns:18px minmax(0,1fr);column-gap:10px;align-items:stretch;width:100%"><div style="position:relative;min-height:126px"><span style="position:absolute;left:50%;top:14px;bottom:14px;width:2px;background:var(--accent);transform:translateX(-50%);opacity:.9"></span><span style="position:absolute;left:50%;top:10px;width:13px;height:13px;border-radius:50%;background:var(--accent);transform:translateX(-50%);z-index:2"></span><span style="position:absolute;left:50%;bottom:10px;width:13px;height:13px;border-radius:50%;background:var(--accent);transform:translateX(-50%);z-index:2"></span></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto auto;column-gap:12px;row-gap:12px;align-content:start;min-width:0">${upcoming.slice(0,4).map(upcomingItem).join("")}</div></div>`:"<div class=\"upcoming-empty\">No upcoming itinerary yet.</div>";
+ const upcomingHtml=upcoming.length?`<div style="display:grid;grid-template-columns:8px minmax(0,1fr);column-gap:6px;align-items:stretch;width:100%"><div style="position:relative;min-height:126px"><span style="position:absolute;left:50%;top:14px;bottom:14px;width:2px;background:var(--accent);transform:translateX(-50%);opacity:.9"></span><span style="position:absolute;left:50%;top:10px;width:13px;height:13px;border-radius:50%;background:var(--accent);transform:translateX(-50%);z-index:2"></span><span style="position:absolute;left:50%;bottom:10px;width:13px;height:13px;border-radius:50%;background:var(--accent);transform:translateX(-50%);z-index:2"></span></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto auto;column-gap:12px;row-gap:12px;align-content:start;min-width:0">${upcoming.slice(0,4).map(upcomingItem).join("")}</div></div>`:"<div class=\"upcoming-empty\">No upcoming itinerary yet.</div>";
 
  $("#content").innerHTML=`
  <section class="hero" style="background-image:url('${esc(t.cover||"")}')"><span class="pill">TRIP SPACE</span><h2>${esc(t.name)}</h2><p>${date(t.start)} – ${date(t.end)}　·　${esc(t.destination)}</p></section>
@@ -863,17 +863,19 @@ function dashboard(t){
   </section>
 
   <section class="section villa-vote-card">
-   <div class="dashboard-card-head">
-    <div><span class="dashboard-card-eyebrow">GROUP DECISION</span><h2>Villa Vote</h2><p>Vote for the stay you prefer.</p></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-     <span class="dashboard-vote-total">${voteTotal} Votes</span>
-     ${ranked.length?`<button class="villa-vote-button" type="button" data-page="Villas & Stay" style="margin:0">Vote Now →</button>`:""}
+   <div class="dashboard-card-head" style="align-items:flex-start;gap:20px">
+    <div style="min-width:0"><span class="dashboard-card-eyebrow">GROUP DECISION</span><h2>Villa Vote</h2><p>Vote for the stay you prefer.</p></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:9px;flex:0 0 auto;padding-top:2px">
+     <span class="dashboard-vote-total" style="font-size:12px;font-weight:700;white-space:nowrap">${voteTotal} Votes</span>
+     ${ranked.length?`<button class="villa-vote-button" type="button" data-page="Villas & Stay" style="margin:0;border:1px solid var(--border);border-radius:999px;padding:7px 12px;background:var(--accent);color:#fff;font-size:11px;font-weight:800;letter-spacing:.1px;line-height:1;box-shadow:0 6px 16px rgba(0,0,0,.12);cursor:pointer;white-space:nowrap">Vote Now <span aria-hidden="true">→</span></button>`:""}
     </div>
    </div>
-   <div class="villa-vote-list">${villaRows}</div>
+   <div class="villa-vote-list" style="margin-top:18px">${villaRows}</div>
   </section>
  </div>
-`;
+
+ <section class="section"><div class="toolbar"><h2>Trip Overview</h2>${mode==="master"?'<button id="editTripSettings">Trip Settings</button>':""}</div>
+ <div class="actions">${[["General","pin"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"]].map(([n,ic])=>`<button data-page="${n}">${hpIcon(ic)}<span>${n}</span></button>`).join("")}</div></section>`;
  const planEl=$("#dashboardPlan");
  if(planEl)planEl.onchange=()=>{const current=trip();if(activatePlan(current,planEl.value)){save();render();}};
 }
