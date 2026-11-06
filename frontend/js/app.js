@@ -863,14 +863,14 @@ function dashboard(t){
   </section>
 
   <section class="section villa-vote-card">
-   <div class="dashboard-card-head">
-    <div><span class="dashboard-card-eyebrow">GROUP DECISION</span><h2>Villa Vote</h2><p>Vote for the stay you prefer.</p></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-     <span class="dashboard-vote-total">${voteTotal} Votes</span>
-     ${ranked.length?`<button class="villa-vote-button" type="button" data-page="Villas & Stay" style="margin:0">Vote Now →</button>`:""}
+   <div class="dashboard-card-head" style="align-items:flex-start;gap:20px">
+    <div style="min-width:0"><span class="dashboard-card-eyebrow">GROUP DECISION</span><h2>Villa Vote</h2><p>Vote for the stay you prefer.</p></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:9px;flex:0 0 auto;padding-top:2px">
+     <span class="dashboard-vote-total" style="font-size:12px;font-weight:700;white-space:nowrap">${voteTotal} Votes</span>
+     ${ranked.length?`<button class="villa-vote-button" type="button" data-page="Villas & Stay" style="margin:0;border:1px solid var(--border);border-radius:999px;padding:7px 12px;background:var(--accent);color:#fff;font-size:11px;font-weight:800;letter-spacing:.1px;line-height:1;box-shadow:0 6px 16px rgba(0,0,0,.12);cursor:pointer;white-space:nowrap">Vote Now <span aria-hidden="true">→</span></button>`:""}
     </div>
    </div>
-   <div class="villa-vote-list">${villaRows}</div>
+   <div class="villa-vote-list" style="margin-top:18px">${villaRows}</div>
   </section>
  </div>
 
