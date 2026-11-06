@@ -307,18 +307,24 @@ function lockDesktopSidebar(){
   if(window.innerWidth<769){
    sidebar.style.removeProperty("transform");
    sidebar.style.removeProperty("width");
+   sidebar.style.removeProperty("zoom");
    sidebar.style.removeProperty("--desktop-menu-scale");
    if(appMain)appMain.style.removeProperty("margin-left");
    return;
   }
+  /* Browser zoom changes devicePixelRatio on Chromium desktop. Counter-scale
+     only the sidebar's CONTENT, while keeping the sidebar itself full-height. */
   if(!window.__hpDesktopDpr)window.__hpDesktopDpr=window.devicePixelRatio||1;
   const current=window.devicePixelRatio||1;
-  const scale=Math.max(.5,Math.min(2,window.__hpDesktopDpr/current));
+  const scale=Math.max(.5,Math.min(1,window.__hpDesktopDpr/current));
   sidebar.style.setProperty("--desktop-menu-scale",String(scale));
   sidebar.style.width=`${240/scale}px`;
+  sidebar.style.transform="none";
   sidebar.style.transformOrigin="left top";
-  sidebar.style.transform=`scale(${scale})`;
-  if(appMain)appMain.style.marginLeft=`${240*scale}px`;
+  /* Keep the physical sidebar width constant without scaling its 100vh height. */
+  sidebar.style.zoom=scale;
+  sidebar.style.height=`${100/scale}vh`;
+  if(appMain)appMain.style.marginLeft="240px";
  };
  apply();
  if(!window.__hpDesktopSidebarResizeBound){
