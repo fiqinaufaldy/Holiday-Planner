@@ -1,19 +1,49 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Holiday Planner</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"></head><body>
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Holiday Planner | FNVERSE</title><link rel="icon" type="image/webp" href="assets/logo/A FNVERSE.webp"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"><style id="login-brand-size-adjustment">#login .login-logo .logo-mark{width:150px;height:72px}#login .login-logo .logo-img-dark,#login .login-logo .logo-img-light{transform:scale(1.8);transform-origin:center center}#login .login-brand{font-size:38px;letter-spacing:-1.4px;transform:translate(-30px,-6px)}@media(max-width:700px){#login .login-brand{transform:translateY(-5px)!important}}
+</style><style id="mobile-login-fixed">@media (max-width: 768px){html:has(body:has(#login:not(.hidden))),body:has(#login:not(.hidden)){height:100%;overflow:hidden!important;overscroll-behavior:none!important}#login:not(.hidden){position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important}#login:not(.hidden) .loginbox{max-height:100dvh;overflow:hidden}}</style><style id="mobile-login-aesthetic">@media(max-width:700px){
+  #login.login{padding:58px 16px 24px;align-items:center;justify-items:center;}
+  #login .login-top-controls{top:14px;right:14px;gap:8px;}
+  #login .login-control{height:34px;padding:0 12px;min-width:70px;font-size:9px;}
+  #login .login-control:last-child{min-width:48px;}
+  #login .loginbox{width:100%;max-width:360px;min-height:0;padding:26px 20px 27px;border-radius:24px;}
+  #login .login-logo{gap:9px;margin:0 auto 19px;justify-content:center;width:100%;}
+  #login .login-logo .logo-mark{width:58px;height:34px;flex:0 0 58px;}
+  #login .login-logo .logo-img{width:100%!important;height:100%!important;max-width:100%!important;object-fit:contain!important;}
+  #login .login-brand{font-size:21px;letter-spacing:-.7px;transform:none;white-space:nowrap;}
+  #login .eyebrow{font-size:7px;letter-spacing:2.6px;margin-bottom:14px;}
+  #login h1#loginTitle{max-width:100%;font-size:34px;line-height:1.01;letter-spacing:-.8px;}
+  #login h1#loginTitle::after{width:78px;height:9px;margin:10px auto 14px;border-width:3px;}
+  #login #loginDesc{font-size:11px;margin-bottom:17px;}
+  #login .login-pin-wrap{margin-bottom:14px;}
+  #login .login-pin-wrap input{height:49px;font-size:13px;padding:0 17px 0 47px;border-radius:11px;}
+  #login .login-pin-icon{left:15px;width:20px;height:20px;}
+  #login .login-pin-icon svg{width:19px;height:19px;}
+  #login .login-primary{height:49px;border-radius:11px;font-size:13px;gap:10px;}
+  #login .continue-icon,#login .continue-icon svg{width:21px;height:21px;}
+}
+@media(max-width:360px){
+  #login.login{padding-left:14px;padding-right:14px;}
+  #login .loginbox{padding-left:18px;padding-right:18px;}
+  #login .login-logo{gap:8px;}
+  #login .login-logo .logo-mark{width:52px;flex-basis:52px;}
+  #login .login-brand{font-size:20px;}
+  #login h1#loginTitle{font-size:32px;}
+}
+</style></head><body>
 <section id="login" class="login">
   <div class="login-top-controls" aria-label="Login preferences">
-    <button id="loginThemeToggle" type="button" class="login-control">☀ <span>Light</span></button>
+    <button id="loginThemeToggle" type="button" class="login-control" style="gap:10px">☀ <span style="margin-left:0">Light mode</span></button>
     <button id="loginLanguageToggle" type="button" class="login-control">EN⌄</button>
   </div>
   <div class="loginbox">
     <div class="logo login-logo">
-      <span class="logo-mark"><img class="logo-img logo-img-dark" src="assets/logo/A FNVERSE.webp" alt="FNVERSE"><img class="logo-img logo-img-light" src="assets/logo/B FNVERSE.webp" alt="FNVERSE"></span>
+      <span class="logo-mark"><img class="logo-img logo-img-dark" src="assets/logo/A FNVERSE.webp" alt="FNVERSE" style="width:150px;height:58px;object-fit:contain;"><img class="logo-img logo-img-light" src="assets/logo/B FNVERSE.webp" alt="FNVERSE"></span>
       <span class="login-brand">Holiday Planner</span>
     </div>
     <p class="eyebrow">YOUR PERSONAL TRAVEL SPACE</p>
     <h1 id="loginTitle">Welcome to your Holiday Planner</h1>
     <p id="loginDesc">Enter your Access PIN to continue.</p>
     <div class="login-pin-wrap">
-      <span class="login-pin-icon" aria-hidden="true"><svg class="login-padlock-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" role="img" aria-hidden="true"><path fill="currentColor" d="M12 13a1.49 1.49 0 0 0-1 2.61V17a1 1 0 0 0 2 0v-1.39A1.49 1.49 0 0 0 12 13m5-4V7A5 5 0 0 0 7 7v2a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-7a3 3 0 0 0-3-3M9 7a3 3 0 0 1 6 0v2H9Zm9 12a1 1 0 0 1-1-1H7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1Z"/></svg></span>
+      <span class="login-pin-icon" aria-hidden="true"><svg class="login-padlock-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><title>lock-2-fill</title><path fill="currentColor" d="M18 8h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h2V7a6 6 0 1 1 12 0zm-7 7.732V18h2v-2.268A2 2 0 0 0 12 12a2 2 0 0 0-1 3.732M16 8V7a4 4 0 0 0-8 0v1z"/></svg></span>
       <input id="pin" type="password" name="holiday-planner-access-code" inputmode="numeric" maxlength="6" placeholder="Enter Access PIN" autocomplete="new-password" autocapitalize="off" spellcheck="false">
     </div>
     <button id="loginBtn" class="primary login-primary" type="button" onclick="window.holidayPlannerLogin && window.holidayPlannerLogin()">Continue <span class="continue-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="m16 8l-1.43 1.393L20.15 15H8v2h12.15l-5.58 5.573L16 24l8-8z"/><path fill="currentColor" d="M16 30a14 14 0 1 1 14-14a14.016 14.016 0 0 1-14 14m0-26a12 12 0 1 0 12 12A12.014 12.014 0 0 0 16 4"/></svg></span></button>
@@ -40,4 +70,65 @@
   </div>
   <div class="sidebar-copyright">© 2026 with <span>♥</span> by Fiqi Naufaldy</div>
 </div></aside><main><header><div><small>YOUR TRAVEL SPACE</small><h1 id="title">All Trips</h1><p id="subtitle">All your journeys, in one place.</p></div></header><div id="content"></div></main><nav id="mobileNav" class="mobile-nav" aria-label="Navigasi utama"></nav></div>
-<dialog id="tripModal"><form id="tripForm"><h2>Create New Trip</h2><label>Trip name<input name="name" required placeholder="Bali Getaway"></label><label>Destination<input name="destination" required placeholder="Bali, Indonesia"></label><div class="twocol"><label>Start date<input name="start" type="date" required></label><label>End date<input name="end" type="date" required></label></div><label>Trip PIN (6 digits)<input name="pin" inputmode="numeric" maxlength="6" required></label><label>Cover image URL (optional)<input name="cover" type="url"></label><menu><button type="button" class="light" id="cancelTrip">Cancel</button><button class="primary">Create Trip</button></menu></form></dialog><dialog id="participantModal"><form id="participantForm"><input type="hidden" id="participantIndex"><h2 id="participantModalTitle">Add Participant</h2><label>Full name<input name="name" required maxlength="100" placeholder="Participant name"></label><label>Notes / To-do<textarea name="notes" rows="3" maxlength="500" placeholder="Contoh: bawa SIM, konfirmasi kendaraan, kumpulkan perlengkapan..."></textarea></label><div class="twocol"><label>Role<select name="role"><option>Organizer</option><option>Participant</option><option>Driver</option><option>Guest</option></select></label><label>Status<select name="status"><option>Confirmed</option><option>Pending</option><option>Not Joining</option></select></label></div><menu><button type="button" class="light" id="cancelParticipant">Cancel</button><button class="primary">Save Participant</button></menu></form></dialog><dialog id="incomeModal"><form id="incomeForm"><input type="hidden" id="incomeIndex"><input type="hidden" id="incomeSourcePlan"><h2 id="incomeModalTitle">Add Income</h2><label>Assigned plan<select name="plan" id="incomePlanSelect"><option value="plan_a">Plan A</option><option value="plan_b">Plan B</option></select></label><label>Income source<input name="source" required maxlength="120" placeholder="e.g. Participant contribution"></label><label>Amount (Rp)<input name="amount" type="number" min="0" step="1000" required placeholder="500000"></label><div class="twocol"><label>Date<input name="date" type="date"></label><label>Status<select name="status"><option>Planned</option><option>Received</option></select></label></div><label>Notes<textarea name="notes" rows="3" maxlength="500" placeholder="Optional notes"></textarea></label><menu><button type="button" class="light" id="cancelIncome">Cancel</button><button class="primary">Save Income</button></menu></form></dialog><dialog id="budgetModal"><form id="budgetForm"><input type="hidden" id="budgetIndex"><input type="hidden" id="budgetSourcePlan"><h2 id="budgetModalTitle">Add Budget Item</h2><label>Assigned plan<select name="plan" id="budgetPlanSelect"><option value="plan_a">Plan A</option><option value="plan_b">Plan B</option></select></label><label>Category<select name="category" required><option>Accommodation</option><option>Transport</option><option>Food & Beverage</option><option>Tickets & Activities</option><option>Shopping</option><option>Other</option></select></label><label>Description<input name="description" required maxlength="120" placeholder="e.g. Villa 1 malam"></label><label>Planned amount (Rp)<input name="amount" type="number" min="0" step="1000" required placeholder="500000"></label><label>Notes<textarea name="notes" rows="3" maxlength="500" placeholder="Optional notes"></textarea></label><menu><button type="button" class="light" id="cancelBudget">Cancel</button><button class="primary">Save Budget</button></menu></form></dialog><dialog id="villaModal"><form id="villaForm"><input type="hidden" id="villaIndex"><h2 id="villaModalTitle">Add Villa</h2><label>Villa name<input name="name" required maxlength="120" placeholder="Villa Pine Batu"></label><label>Location<input name="area" maxlength="160" placeholder="Batu, Malang"></label><div class="twocol"><label>Price per night (Rp)<input name="price" type="number" min="0" step="1000" required placeholder="1500000"></label><label>Status<select name="status"><option>Available</option><option>Shortlisted</option><option>Booked</option></select></label></div><div class="twocol"><label>Guest capacity<input name="guests" type="number" min="0" placeholder="6"></label><label>Bedrooms<input name="bedrooms" type="number" min="0" placeholder="3"></label></div><div class="twocol"><label>Bathrooms<input name="bathrooms" type="number" min="0" placeholder="2"></label><label>Reference Link<input name="referenceLink" type="url" placeholder="https://..."></label></div><div class="villa-upload-field"><label>Villa photos (up to 6 images)<input id="villaPhotosInput" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><small>Upload JPG, PNG, or WEBP. Images are optimized automatically before saving.</small><div id="villaPhotoPreview" class="villa-photo-preview"></div></div><label>Description<textarea name="description" rows="3" maxlength="700" placeholder="Describe the property..."></textarea></label><label>Facilities<textarea name="facilities" rows="2" placeholder="Private pool, Wi-Fi, kitchen..."></textarea></label><label>Personal notes<textarea name="notes" rows="2" placeholder="Optional notes..."></textarea></label><menu><button type="button" class="light" id="cancelVilla">Cancel</button><button class="primary">Save Villa</button></menu></form></dialog><dialog id="villaDetailModal" class="villa-detail-dialog"></dialog><input id="backupFile" type="file" accept=".json" hidden><div id="toast"></div><script src="js/supabase-config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/supabase-client.js"></script><script src="js/app.js"></script></body></html>
+<dialog id="tripModal"><form id="tripForm"><h2>Create New Trip</h2><label>Trip name<input name="name" required placeholder="Bali Getaway"></label><label>Destination<input name="destination" required placeholder="Bali, Indonesia"></label><div class="twocol"><label>Start date<input name="start" type="date" required></label><label>End date<input name="end" type="date" required></label></div><label>Trip PIN (6 digits)<input name="pin" inputmode="numeric" maxlength="6" required></label><label>Cover image URL (optional)<input name="cover" type="url"></label><menu><button type="button" class="light" id="cancelTrip">Cancel</button><button class="primary">Create Trip</button></menu></form></dialog><dialog id="participantModal"><form id="participantForm"><input type="hidden" id="participantIndex"><h2 id="participantModalTitle">Add Participant</h2><label>Full name<input name="name" required maxlength="100" placeholder="Participant name"></label><label>Notes / To-do<textarea name="notes" rows="3" maxlength="500" placeholder="Contoh: bawa SIM, konfirmasi kendaraan, kumpulkan perlengkapan..."></textarea></label><div class="twocol"><label>Role<select name="role"><option>Organizer</option><option>Participant</option><option>Driver</option><option>Guest</option></select></label><label>Status<select name="status"><option>Confirmed</option><option>Pending</option><option>Not Joining</option></select></label></div><menu><button type="button" class="light" id="cancelParticipant">Cancel</button><button class="primary">Save Participant</button></menu></form></dialog><dialog id="incomeModal"><form id="incomeForm"><input type="hidden" id="incomeIndex"><input type="hidden" id="incomeSourcePlan"><h2 id="incomeModalTitle">Add Income</h2><label>Assigned plan<select name="plan" id="incomePlanSelect"><option value="plan_a">Plan A</option><option value="plan_b">Plan B</option></select></label><label>Income source<input name="source" required maxlength="120" placeholder="e.g. Participant contribution"></label><label>Amount (Rp)<input name="amount" type="number" min="0" step="1000" required placeholder="500000"></label><div class="twocol"><label>Date<input name="date" type="date"></label><label>Status<select name="status"><option>Planned</option><option>Received</option></select></label></div><label>Notes<textarea name="notes" rows="3" maxlength="500" placeholder="Optional notes"></textarea></label><menu><button type="button" class="light" id="cancelIncome">Cancel</button><button class="primary">Save Income</button></menu></form></dialog><dialog id="budgetModal"><form id="budgetForm"><input type="hidden" id="budgetIndex"><input type="hidden" id="budgetSourcePlan"><h2 id="budgetModalTitle">Add Budget Item</h2><label>Assigned plan<select name="plan" id="budgetPlanSelect"><option value="plan_a">Plan A</option><option value="plan_b">Plan B</option></select></label><label>Category<select name="category" required><option>Accommodation</option><option>Transport</option><option>Food & Beverage</option><option>Tickets & Activities</option><option>Shopping</option><option>Other</option></select></label><label>Description<input name="description" required maxlength="120" placeholder="e.g. Villa 1 malam"></label><label>Planned amount (Rp)<input name="amount" type="number" min="0" step="1000" required placeholder="500000"></label><label>Notes<textarea name="notes" rows="3" maxlength="500" placeholder="Optional notes"></textarea></label><menu><button type="button" class="light" id="cancelBudget">Cancel</button><button class="primary">Save Budget</button></menu></form></dialog><dialog id="villaModal"><form id="villaForm"><input type="hidden" id="villaIndex"><h2 id="villaModalTitle">Add Villa</h2><label>Villa name<input name="name" required maxlength="120" placeholder="Villa Pine Batu"></label><label>Location<input name="area" maxlength="160" placeholder="Batu, Malang"></label><div class="twocol"><label>Price per night (Rp)<input name="price" type="number" min="0" step="1000" required placeholder="1500000"></label><label>Status<select name="status"><option>Available</option><option>Shortlisted</option><option>Booked</option></select></label></div><div class="twocol"><label>Guest capacity<input name="guests" type="number" min="0" placeholder="6"></label><label>Bedrooms<input name="bedrooms" type="number" min="0" placeholder="3"></label></div><div class="twocol"><label>Bathrooms<input name="bathrooms" type="number" min="0" placeholder="2"></label><label>Reference Link<input name="referenceLink" type="url" placeholder="https://..."></label></div><div class="villa-upload-field"><label>Villa photos (up to 6 images)<input id="villaPhotosInput" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><small>Upload JPG, PNG, or WEBP. Images are optimized automatically before saving.</small><div id="villaPhotoPreview" class="villa-photo-preview"></div></div><label>Description<textarea name="description" rows="3" maxlength="700" placeholder="Describe the property..."></textarea></label><label>Facilities<textarea name="facilities" rows="2" placeholder="Private pool, Wi-Fi, kitchen..."></textarea></label><label>Personal notes<textarea name="notes" rows="2" placeholder="Optional notes..."></textarea></label><menu><button type="button" class="light" id="cancelVilla">Cancel</button><button class="primary">Save Villa</button></menu></form></dialog><dialog id="villaDetailModal" class="villa-detail-dialog"></dialog><input id="backupFile" type="file" accept=".json" hidden><div id="toast"></div><script src="js/supabase-config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/supabase-client.js"></script><script src="js/app.js"></script>
+<script id="login-language-branding">
+(function () {
+  const toggle = document.getElementById('loginLanguageToggle');
+
+  function applyLoginLanguage() {
+    if (!toggle) return;
+
+    const lang = (toggle.textContent || '').trim().toUpperCase();
+    const isIndonesian = lang.includes('ID');
+
+    const title = document.getElementById('loginTitle');
+    const desc = document.getElementById('loginDesc');
+    const pin = document.getElementById('pin');
+    const btn = document.getElementById('loginBtn');
+    const eyebrow = document.querySelector('#login .eyebrow');
+    const themeToggle = document.getElementById('loginThemeToggle');
+
+    // Product/brand name stays "Holiday Planner" in both languages.
+    if (title) title.textContent = isIndonesian
+      ? 'Selamat datang di Holiday Planner'
+      : 'Welcome to your Holiday Planner';
+
+    if (desc) desc.textContent = isIndonesian
+      ? 'Masukkan PIN Akses Anda untuk melanjutkan.'
+      : 'Enter your Access PIN to continue.';
+
+    if (pin) pin.placeholder = isIndonesian
+      ? 'Masukkan PIN Akses'
+      : 'Enter Access PIN';
+
+    if (eyebrow) eyebrow.textContent = isIndonesian
+      ? 'RUANG PERJALANAN PRIBADI'
+      : 'YOUR PERSONAL TRAVEL SPACE';
+
+    if (btn) {
+      const icon = btn.querySelector('.continue-icon');
+      if (icon) {
+        btn.childNodes.forEach(function (node) {
+          if (node.nodeType === Node.TEXT_NODE) node.textContent = isIndonesian ? 'Lanjutkan ' : 'Continue ';
+        });
+      }
+    }
+
+    if (themeToggle) {
+      const span = themeToggle.querySelector('span');
+      if (span) span.textContent = isIndonesian ? 'Mode gelap' : 'Dark mode';
+    }
+  }
+
+  if (toggle) {
+    toggle.addEventListener('click', function () {
+      setTimeout(applyLoginLanguage, 0);
+    });
+  }
+
+  // Initial state.
+  applyLoginLanguage();
+})();
+</script>
+
+</body></html>
