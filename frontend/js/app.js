@@ -129,9 +129,9 @@ function toast(s){let t=$("#toast");t.textContent=s;t.style.display="block";clea
 
 let plannerLanguage=localStorage.getItem("holidayPlannerLanguage")||"en";
 const languagePairs=[
-["YOUR TRAVEL SPACE","RUANG PERJALANANMU"],["Dashboard","Beranda"],["General","Umum"],["Participants","Peserta"],
-["Income Planning","Rencana Pendapatan"],["Expense Planning","Rencana Pengeluaran"],["Cash Flow","Arus Kas"],
-["Villas & Stay","Villa & Penginapan"],["Destinations","Destinasi"],["Itinerary","Rencana Perjalanan"],
+["YOUR TRAVEL SPACE","RUANG PERJALANANMU"],["Dashboard","Dasbor"],["General","grid"],["Participants","Peserta"],
+["Income Planning","Rencana Pemasukan"],["Expense Planning","Rencana Pengeluaran"],["Cash Flow","Arus Kas"],
+["Villas & Stay","Villa & Penginapan"],["Destinations","Destinasi"],["Itinerary","Jadwal Perjalanan"],
 ["Assigned Trips","Trip yang Ditugaskan"],["Log out","Keluar"],["Light mode","Mode terang"],["Dark mode","Mode gelap"],
 ["Continue →","Lanjutkan →"],["Budget Overview","Ringkasan Anggaran"],["Upcoming Itinerary","Jadwal Berikutnya"],
 ["Trip Information","Informasi Trip"],["Save changes","Simpan perubahan"],["Trip Participants","Peserta Trip"],
@@ -153,7 +153,6 @@ languagePairs.push(...[
  ["Remaining Budget","Sisa Anggaran"],["Total Spent","Total Pengeluaran"],["Remaining Until Trip","Sisa Waktu Trip"]
 ]);
 const plannerOriginalAttributes = new WeakMap();
-function plannerText(s){const pair=languagePairs.find(x=>x[0]===s);return plannerLanguage==="id"?(pair?pair[1]:s):s;}
 function applyPlannerLanguage(){
  const pairs=[...languagePairs].sort((a,b)=>Math.max(b[0].length,b[1].length)-Math.max(a[0].length,a[1].length));
  const replaceText=s=>{let out=s;for(const [en,id] of pairs){const from=plannerLanguage==="id"?en:id,to=plannerLanguage==="id"?id:en;if(!from)continue;const escaped=from.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");out=out.replace(new RegExp(`(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`,"gu"),`$1${to}`);}return out;};
@@ -293,6 +292,11 @@ function updateSidebarProfile(){
  const role=mode==="master"?"Master Access":mode==="admin"?"Admin Access":"Member Access";
  el.innerHTML=`<div class="sidebar-profile-info"><strong>${role}</strong></div>`;
 }
+function sidebarLabel(label){
+ if(plannerLanguage!=="id")return label;
+ const labels={"Dashboard":"Beranda","General":"Umum","Participants":"Peserta","Income Planning":"Rencana Pendapatan","Expense Planning":"Rencana Pengeluaran","Cash Flow":"Arus Kas","Villas & Stay":"Villa & Penginapan","Destinations":"Destinasi","Itinerary":"Rencana Perjalanan","Settings":"Pengaturan","Assigned Trips":"Trip Ditugaskan","All Trips":"Semua Trip","Create Trip":"Buat Trip","Access Management":"Manajemen Akses","Log out":"Keluar"};
+ return labels[label]||label;
+}
 /* Desktop sidebar lock: keep the left menu visually fixed while browser zoom changes.
    Mobile/tablet layout is intentionally untouched. */
 function ensureDesktopSidebarCSS(){
@@ -353,7 +357,7 @@ function showApp(){
  
  document.body.classList.toggle("member-view",mode==="member");
  updateSidebarProfile();
- $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${plannerText(n)}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("logout")}<span>${plannerText("Log out")}</span></button>`;
+ $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${sidebarLabel(n)}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("logout")}<span>${sidebarLabel("Log out")}</span></button>`;
  const mobileNav=$("#mobileNav");
  if(mobileNav){
    /* Mobile navigation intentionally disabled. Desktop sidebar remains unchanged. */
