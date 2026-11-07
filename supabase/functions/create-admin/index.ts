@@ -1,77 +1,97 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import bcrypt from "npm:bcryptjs@2.4.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const json = (data, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  const json = (body, status = 200) =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) return json({ success:false, error:"Unauthorized." },401);
+    if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+
+    const { pin } = await req.json();
+    if (typeof pin !== "string" || !/^\d{6}$/.test(pin)) {
+      return json({ error: "PIN harus terdiri dari 6 digit" }, 400);
+    }
 
     const url = Deno.env.get("SUPABASE_URL");
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    if (!url || !serviceKey) return json({ success:false, error:"Supabase server configuration tidak lengkap." },500);
-
-    const admin = createClient(url, serviceKey, { auth:{ persistSession:false } });
-    const token = authHeader.replace("Bearer ","").trim();
-    const { data: callerData, error: callerError } = await admin.auth.getUser(token);
-    if (callerError || !callerData?.user) return json({ success:false, error:"Session tidak valid." },401);
-
-    const { data: callerProfile, error: profileError } = await admin
-      .from("profiles").select("role,is_active").eq("id",callerData.user.id).single();
-    if (profileError || callerProfile?.role !== "master" || !callerProfile?.is_active) {
-      return json({ success:false, error:"Hanya Master yang dapat membuat Admin." },403);
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    if (!url || !serviceKey || !anonKey) {
+      return json({ error: "Konfigurasi Supabase belum lengkap" }, 500);
     }
 
-    const { display_name, pin, trip_ids=[] } = await req.json();
-    if (!display_name || !/^[0-9]{6}$/.test(String(pin))) {
-      return json({ success:false, error:"Nama dan PIN 6 digit wajib diisi." },400);
-    }
-    if (!Array.isArray(trip_ids) || !trip_ids.length) {
-      return json({ success:false, error:"Pilih minimal satu trip." },400);
+    const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
+
+    const { data: pinResult, error: pinError } = await admin.rpc("verify_pin", { p_pin: pin });
+    if (pinError) {
+      console.error("verify_pin error:", pinError);
+      return json({ error: "PIN tidak dapat diverifikasi" }, 500);
     }
 
-    const internalEmail = `admin-${crypto.randomUUID()}@holidayplanner.local`;
-    const { data:userData, error:userError } = await admin.auth.admin.createUser({
-      email: internalEmail,
-      email_confirm: true,
-      user_metadata: { display_name, app_role:"admin" },
+    if (!pinResult || pinResult.length === 0) {
+      return json({ error: "PIN salah atau akses sementara dibatasi" }, 401);
+    }
+
+    const userId = pinResult[0].user_id;
+    const appRole = pinResult[0].app_role;
+    const tripId = pinResult[0].trip_id || null;
+
+    const { data: userData, error: userError } = await admin.auth.admin.getUserById(userId);
+    if (userError || !userData.user) {
+      console.error("getUserById error:", userError);
+      return json({ error: "Akun pengguna tidak ditemukan" }, 500);
+    }
+
+    const email = userData.user.email;
+    if (!email) return json({ error: "Akun belum memiliki email Auth" }, 500);
+
+    const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email,
     });
-    if (userError || !userData?.user) return json({ success:false, error:userError?.message||"Gagal membuat user." },400);
+    if (linkError) {
+      console.error("generateLink error:", linkError);
+      return json({ error: "Gagal membuat sesi login" }, 500);
+    }
 
-    const userId=userData.user.id;
-    const pinHash=await bcrypt.hash(String(pin),10);
+    const tokenHash = linkData.properties?.hashed_token;
+    if (!tokenHash) return json({ error: "Token sesi tidak tersedia" }, 500);
 
-    const { error:profileCreateError } = await admin.rpc("create_admin_profile", {
-      p_user_id:userId, p_display_name:String(display_name).trim(), p_pin_hash:pinHash
+    const authClient = createClient(url, anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
     });
-    if (profileCreateError) {
-      await admin.auth.admin.deleteUser(userId);
-      return json({ success:false, error:profileCreateError.message },400);
+
+    const { data: authData, error: authError } = await authClient.auth.verifyOtp({
+      type: "magiclink",
+      token_hash: tokenHash,
+    });
+    if (authError || !authData.session) {
+      console.error("verifyOtp error:", authError);
+      return json({ error: "Gagal menerbitkan sesi login" }, 500);
     }
 
-    const accessRows=trip_ids.map(trip_id=>({ user_id:userId, trip_id, access_role:"admin" }));
-    const { error:accessError } = await admin.from("trip_access").insert(accessRows);
-    if (accessError) {
-      await admin.auth.admin.deleteUser(userId);
-      return json({ success:false, error:accessError.message },400);
-    }
-
-    return json({ success:true, user_id:userId, display_name:String(display_name).trim(), role:"admin", trip_count:trip_ids.length });
+    return json({
+      success: true,
+      role: appRole,
+      trip_id: tripId,
+      session: authData.session,
+      user: authData.user,
+    });
   } catch (error) {
-    console.error("create-admin error:",error);
-    return json({ success:false, error:error?.message||"Terjadi kesalahan." },500);
+    console.error("pin-login error:", error);
+    return json({ error: "Permintaan login tidak dapat diproses" }, 400);
   }
 });

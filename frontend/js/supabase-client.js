@@ -44,25 +44,31 @@
   },
   async loadTripWorkspace(tripId){await requireSession();const {data,error}=await client.from("trip_workspaces").select("payload,updated_at").eq("trip_id",tripId).maybeSingle();fail(error);return data?.payload||null;},
   async saveTripWorkspace(tripId,payload){await requireSession();const {data,error}=await client.from("trip_workspaces").upsert({trip_id:tripId,payload,updated_at:new Date().toISOString()},{onConflict:"trip_id"}).select("trip_id,updated_at").single();fail(error);return data;},
-  async createTrip(t){await requireSession();const payload={name:String(t.name||"").trim(),destination:t.destination||null,start_date:t.start||t.start_date||null,end_date:t.end||t.end_date||null,description:t.description||null,cover_image_url:t.cover||t.cover_image_url||null,status:t.status||"planning"};if(!payload.name)throw new Error("Nama trip wajib diisi.");const {data,error}=await client.from("trips").insert(payload).select().single();fail(error);return data;},
-  async updateTrip(id,t){await requireSession();const payload={name:String(t.name||"").trim(),destination:t.destination||null,start_date:t.start||t.start_date||null,end_date:t.end||t.end_date||null,description:t.description||null,cover_image_url:t.cover||t.cover_image_url||null,status:t.status||"planning"};const {data,error}=await client.from("trips").update(payload).eq("id",id).select().single();fail(error);return data;},
-  async deleteTrip(id){await requireSession();const {error}=await client.from("trips").delete().eq("id",id);fail(error);return{ok:true};},
-  async listTripAccess(id){await requireSession();const {data,error}=await client.from("trip_access").select("id,trip_id,user_id,access_role,created_at,profiles(display_name,role,is_active)").eq("trip_id",id).order("created_at");fail(error);return data||[];},
-  async listTripMembers(tripId){
+  async createTrip(t){
    await requireSession();
-   const {data,error}=await client.rpc("get_trip_members",{p_trip_id:tripId});
-   fail(error);
-   return data||[];
-  },
-  async updateMemberPin(tripId,userId,pin){
-   await requireSession();
-   if(typeof tripId!=="string"||!tripId)throw new Error("Trip tidak valid.");
-   if(typeof userId!=="string"||!userId)throw new Error("Member tidak valid.");
-   if(typeof pin!=="string"||!/^\d{6}$/.test(pin))throw new Error("PIN Member harus 6 digit.");
-   const {data,error}=await client.rpc("set_member_pin",{p_trip_id:tripId,p_user_id:userId,p_pin:pin});
-   fail(error);
+   const payload={name:String(t.name||"").trim(),destination:t.destination||null,start_date:t.start||t.start_date||null,end_date:t.end||t.end_date||null,description:t.description||null,cover_image_url:t.cover||t.cover_image_url||null,status:t.status||"planning"};
+   if(!payload.name)throw new Error("Nama trip wajib diisi.");
+   const {data,error}=await client.from("trips").insert(payload).select().single();fail(error);
+   if(t.pin!==null&&t.pin!==undefined&&t.pin!==""){
+    if(typeof t.pin!=="string"||!/\d{6}/.test(t.pin))throw new Error("Trip PIN harus 6 digit.");
+    const {error:pinError}=await client.rpc("set_trip_pin",{p_trip_id:data.id,p_pin:t.pin});
+    fail(pinError);
+   }
    return data;
   },
+  async updateTrip(id,t){
+   await requireSession();
+   const payload={name:String(t.name||"").trim(),destination:t.destination||null,start_date:t.start||t.start_date||null,end_date:t.end||t.end_date||null,description:t.description||null,cover_image_url:t.cover||t.cover_image_url||null,status:t.status||"planning"};
+   const {data,error}=await client.from("trips").update(payload).eq("id",id).select().single();fail(error);
+   if(t.pin!==null&&t.pin!==undefined&&t.pin!==""){
+    if(typeof t.pin!=="string"||!/\d{6}/.test(t.pin))throw new Error("Trip PIN harus 6 digit.");
+    const {error:pinError}=await client.rpc("set_trip_pin",{p_trip_id:id,p_pin:t.pin});
+    fail(pinError);
+   }
+   return data;
+  },
+  async deleteTrip(id){await requireSession();const {error}=await client.from("trips").delete().eq("id",id);fail(error);return{ok:true};},
+  async listTripAccess(id){await requireSession();const {data,error}=await client.from("trip_access").select("id,trip_id,user_id,access_role,created_at,profiles(display_name,role,is_active)").eq("trip_id",id).order("created_at");fail(error);return data||[];},
   async listProfiles(){await requireSession();const {data,error}=await client.from("profiles").select("id,display_name,role,is_active,created_at").order("display_name");fail(error);return data||[];},
   async createAdmin(displayName,pin,tripIds){
    await requireSession();
