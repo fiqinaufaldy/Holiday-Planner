@@ -115,7 +115,7 @@ function queueCloudWorkspaceSave(t){
   finally{cloudSaveTimers.delete(t.id);}
  },450));
 }
-function save(){localStorage.setItem(store,JSON.stringify(db));if(cloudSyncReady&&Array.isArray(db.trips))db.trips.forEach(queueCloudWorkspaceSave)}
+function save(){localStorage.setItem(store,JSON.stringify(db));if(cloudSyncReady&&mode!=="member"&&Array.isArray(db.trips))db.trips.forEach(queueCloudWorkspaceSave)}
 async function persistTripCloudNow(t){
  if(!cloudSyncReady||!t?.id||!window.HolidayPlannerCloud?.saveTripWorkspace)return;
  const snapshot=JSON.parse(JSON.stringify(t));
@@ -193,7 +193,7 @@ function auth(){
 async function hydrateTripsFromCloud(){
  if(!window.HolidayPlannerCloud?.listTrips) throw new Error("Supabase Trips API belum tersedia.");
  // Keep an immutable snapshot until cloud sync has definitely succeeded.
- const localSnapshot=Array.isArray(db.trips)?db.trips.map(t=>({...t})):[];
+ const localSnapshot=mode==="member"?[]:(Array.isArray(db.trips)?db.trips.map(t=>({...t})):[]);
  const map={...(db.cloudTripMap||{})};
  const remote=await window.HolidayPlannerCloud.listTrips();
  let cloudRows=remote.slice();
@@ -264,6 +264,16 @@ async function enter(pin){
    if(role==="admin"){
     mode="admin";activeAdmin=result.user.id;tripId=null;page="Assigned Trips";await hydrateTripsFromCloud();showApp();return;
    }
+   if(role==="member"){
+    mode="member";tripId=null;page="Dashboard";memberName=result?.profile?.display_name||"";
+    await hydrateTripsFromCloud();
+    const memberTrips=assignedTrips();
+    if(!memberTrips.length)throw new Error("Akun Member belum memiliki trip.");
+    tripId=memberTrips[0].id;
+    page="Dashboard";
+    showApp();
+    return;
+   }
    throw new Error("Akun tidak memiliki akses.");
   }catch(error){err(error.message||"PIN tidak sesuai. Coba lagi.");return;}
   finally{if(loginBtn){loginBtn.disabled=false;loginBtn.textContent="Continue →";}}
@@ -282,7 +292,7 @@ function assignedTrips(){
  return[];
 }
 function navItems(){
- if(mode==="master")return tripId?[["Dashboard","dashboard"],["General","grid"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"],["Settings","settings"],["Assigned Trips","back-square"]]:[["All Trips","grid"],["Create Trip","plus"],["Access Management","users"],["Settings","settings"]];
+ if(mode==="master")return tripId?[["Dashboard","dashboard"],["General","grid"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"],["All Trips","back"]]:[["All Trips","grid"],["Create Trip","plus"],["Access Management","users"],["Settings","settings"]];
  if(mode==="admin")return tripId?[["Dashboard","dashboard"],["General","grid"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"],["Settings","settings"],["Assigned Trips","back-square"]]:[["Assigned Trips","grid"],["Settings","settings"]];
  if(mode==="member")return [["Dashboard","dashboard"],["General","grid"],["Participants","users-event"],["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"],["Villas & Stay","holiday-village"],["Destinations","maps-location-02"],["Itinerary","itinerary"]];
  return [];
@@ -345,7 +355,14 @@ function lockDesktopSidebar(){
  }
 }
 
+function ensureMemberPinCSS(){
+ if(document.getElementById("hp-member-pin-css"))return;
+ const style=document.createElement("style");style.id="hp-member-pin-css";
+ style.textContent=`.member-pin-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 0;border-bottom:1px solid var(--border)}.member-pin-row:last-child{border-bottom:0}.member-pin-identity{display:flex;flex-direction:column;gap:5px;min-width:0}.member-pin-identity strong{font-size:14px}.member-pin-identity small{font-size:11px;color:var(--muted)}.member-pin-controls{display:flex;gap:8px;align-items:center}.member-pin-controls input{width:150px;min-height:38px;padding:0 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text)}.member-pin-controls button{min-height:38px}@media(max-width:700px){.member-pin-row{align-items:stretch;flex-direction:column}.member-pin-controls{width:100%}.member-pin-controls input{flex:1;width:auto}}`;
+ document.head.appendChild(style);
+}
 function showApp(){
+ ensureMemberPinCSS();
  lockDesktopSidebar();
  $("#login").classList.add("hidden");$("#app").classList.remove("hidden");
  $("#access").textContent=mode==="master"?"MASTER ACCESS":mode==="admin"?"ADMIN ACCESS":"MEMBER ACCESS · "+(trip().name||"");
@@ -508,7 +525,39 @@ function applyApprovedChange(r){
  save();
 }
 function allTrips(){page="All Trips";pageHead("All Trips","Plan, organize, and keep track of all your journeys.");$("#nav").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.page==="All Trips"));let cards=db.trips.map(t=>{let budget=t.budget.reduce((a,x)=>a+ +x.amount,0),spent=t.cashflow.filter(x=>x.type==="Expense").reduce((a,x)=>a+ +x.amount,0),pct=budget?Math.min(100,spent/budget*100):0;return `<article class="trip"><div class="cover" style="background-image:url('${esc(t.cover||"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1000&q=80")}')"></div><div class="tripbody"><h3>${esc(t.name)}</h3><p>▦ ${date(t.start)} – ${date(t.end)}</p><p>◎ ${esc(t.destination)}</p><div class="tripfoot"><span>${money(spent)} spent</span><b>${pct.toFixed(0)}%</b></div><div class="bar"><i style="width:${pct}%"></i></div><div class="actions"><button class="primary" data-open="${t.id}">Open trip</button><button data-edittrip="${t.id}">Trip Settings / PIN</button><button data-deltrip="${t.id}">Delete</button></div></div></article>`}).join("");$("#content").innerHTML=`<section class="hero" style="background-image:url('https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1600&q=85')"><span class="pill">MASTER ACCESS</span><h2>Every trip, one place.</h2><p>Keep your journeys organized and ready for the next adventure.</p></section><div class="toolbar"><div><h2 style="font:600 23px 'Playfair Display'">My Trips (${db.trips.length})</h2><p>Choose a trip to open its private workspace.</p></div><button class="primary" id="newTrip">＋ Create New Trip</button></div><div class="grid">${cards||'<div class="empty">Belum ada perjalanan. Buat trip pertamamu.</div>'}</div>`}
-function settings(){page="Settings";pageHead("Settings","Manage your profile and backup data.");const isAdmin=mode==="admin",scopeTrips=isAdmin?assignedTrips():db.trips;const profile=isAdmin?"":`<section class="section"><h2>Profile Settings</h2><div class="profile-setting">${db.admin.photo?`<img id="profilePreview" src="${db.admin.photo}" alt="Profile photo">`:`<div class="profile-placeholder" id="profilePreview">${esc((db.admin.name||"AD").split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase())}</div>`}<div><strong>${esc(db.admin.name||"Fiqi Naufaldy")}</strong><p style="font-size:11px;color:#788177;margin:5px 0 9px">Account profile</p><label class="profile-upload" for="profilePhoto">↑ Upload profile photo</label><input id="profilePhoto" type="file" accept="image/png,image/jpeg,image/webp" hidden></div></div><div class="formgrid"><label>Display name<input id="adminName" value="${esc(db.admin.name)}"></label><label>New Master PIN (optional)<input id="adminPin" inputmode="numeric" maxlength="6" placeholder="Leave blank to keep current"></label></div><p><button class="primary" id="saveAdmin">Save Settings</button></p><p style="font-size:11px;color:#788177">Foto dan nama ini ditampilkan di footer sidebar sebagai identitas pemilik akun.</p></section>`;const scopeText=isAdmin?`Backup hanya mencakup ${scopeTrips.length} trip yang ditugaskan ke akun Admin ini. Data trip lain dan pengaturan akses Master tidak akan berubah saat restore.`:"Backup mencakup seluruh trip, akun Admin, dan profil Master.";$("#content").innerHTML=`${profile}<section class="section"><h2>Backup & Restore</h2><p>${scopeText}</p><div class="actions backup-actions"><button class="primary" id="export">${hpIcon("download")}<span>${isAdmin?"Export Assigned Trips":"Export All Data"}</span></button><button id="import">${hpIcon("upload")}<span>Import Backup</span></button></div><p style="font-size:11px;color:#788177">Simpan file backup di tempat aman. Saat import, data pada cakupan backup akan menggantikan data yang sekarang.</p></section>`}
+async function renderTripMemberSettings(tripIdForSettings){
+ const host=$("#tripMemberAccess");
+ if(!host||!window.HolidayPlannerCloud?.listTripMembers)return;
+ try{
+  const members=await window.HolidayPlannerCloud.listTripMembers(tripIdForSettings);
+  if(!members.length){
+   host.innerHTML=`<div class="empty">Belum ada Member yang ditugaskan ke trip ini.</div>`;
+   return;
+  }
+  host.innerHTML=members.map(m=>`<div class="member-pin-row">
+    <div class="member-pin-identity"><strong>${esc(m.display_name||"Member")}</strong><small>${m.pin_configured?"PIN sudah diatur":"PIN belum diatur"}${m.is_active?"":" · Nonaktif"}</small></div>
+    <div class="member-pin-controls">
+      <input data-member-pin="${esc(m.user_id)}" inputmode="numeric" maxlength="6" placeholder="6 digit PIN" autocomplete="new-password">
+      <button class="primary" type="button" data-save-member-pin="${esc(m.user_id)}">Simpan PIN</button>
+    </div>
+  </div>`).join("");
+ }catch(error){
+  host.innerHTML=`<div class="empty">Gagal memuat Member: ${esc(error?.message||"periksa koneksi Supabase")}</div>`;
+ }
+}
+
+function settings(){
+ page="Settings";
+ pageHead("Settings","Manage your profile and backup data.");
+ const isAdmin=mode==="admin",scopeTrips=isAdmin?assignedTrips():db.trips;
+ const inTrip=!!tripId&&(mode==="master"||mode==="admin");
+ const currentTrip=inTrip?trip():null;
+ const profile=isAdmin?"":`<section class="section"><h2>Profile Settings</h2><div class="profile-setting">${db.admin.photo?`<img id="profilePreview" src="${db.admin.photo}" alt="Profile photo">`:`<div class="profile-placeholder" id="profilePreview">${esc((db.admin.name||"AD").split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase())}</div>`}<div><strong>${esc(db.admin.name||"Fiqi Naufaldy")}</strong><p style="font-size:11px;color:#788177;margin:5px 0 9px">Account profile</p><label class="profile-upload" for="profilePhoto">↑ Upload profile photo</label><input id="profilePhoto" type="file" accept="image/png,image/jpeg,image/webp" hidden></div></div><div class="formgrid"><label>Display name<input id="adminName" value="${esc(db.admin.name)}"></label><label>New Master PIN (optional)<input id="adminPin" inputmode="numeric" maxlength="6" placeholder="Leave blank to keep current"></label></div><p><button class="primary" id="saveAdmin">Save Settings</button></p><p style="font-size:11px;color:#788177">Foto dan nama ini ditampilkan di footer sidebar sebagai identitas pemilik akun.</p></section>`;
+ const tripSettings=inTrip?`<section class="section"><div class="toolbar"><div><span class="eyebrow">TRIP ACCESS</span><h2>Member PIN</h2><p>Atur atau ubah PIN Member untuk <strong>${esc(currentTrip?.name||"trip ini")}</strong>. PIN lama langsung tidak berlaku setelah PIN baru disimpan.</p></div></div><div id="tripMemberAccess"><div class="empty">Memuat Member...</div></div></section>`:"";
+ const scopeText=isAdmin?`Backup hanya mencakup ${scopeTrips.length} trip yang ditugaskan ke akun Admin ini. Data trip lain dan pengaturan akses Master tidak akan berubah saat restore.`:"Backup mencakup seluruh trip, akun Admin, dan profil Master.";
+ $("#content").innerHTML=`${profile}${tripSettings}<section class="section"><h2>Backup & Restore</h2><p>${scopeText}</p><div class="actions backup-actions"><button class="primary" id="export">${hpIcon("download")}<span>${isAdmin?"Export Assigned Trips":"Export All Data"}</span></button><button id="import">${hpIcon("upload")}<span>Import Backup</span></button></div><p style="font-size:11px;color:#788177">Simpan file backup di tempat aman. Saat import, data pada cakupan backup akan menggantikan data yang sekarang.</p></section>`;
+ if(inTrip)renderTripMemberSettings(tripId);
+}
 const labels={General:"Trip information",Participants:"People joining this trip",Budgeting:"Plan trip expenses", "Cash Flow":"Track income and expenses","Villas & Stay":"Accommodation options",Destinations:"Places to explore",Itinerary:"Schedule your trip"};
 function tripPage(){let t=trip();pageHead(page==="Dashboard"?t.name:page,labels[page]||"Your trip workspace");$("#nav").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));if(page==="Destinations")return planningCollectionPage(t,"destinations");if(page==="Itinerary")return planningCollectionPage(t,"itinerary");if(page==="Cash Flow")return cashFlowPage(t);if(page==="Dashboard")return dashboard(t);if(page==="General")return general(t);if(page==="Participants")return participantsPage(t);if(page==="Expense Planning")return budgetPage(t);if(page==="Income Planning")return incomePage(t);if(page==="Villas & Stay")return villasPage(t);let key={"Participants":"participants","Expense Planning":"budget","Income Planning":"income","Cash Flow":"cashflow","Villas & Stay":"stays","Destinations":"destinations","Itinerary":"itinerary"}[page];let arr=t[key]||[];let fields={participants:["Name","Contact","Role","Status"],budget:["Category","Description","Amount"],cashflow:["Date","Type","Description","Amount"],stays:["Name","Area","Check-in","Check-out","Price"],destinations:["Name","Area","Est. ticket"],itinerary:["Date","Time","Activity","Location","Notes"]}[key];let rows=arr.map((x,i)=>`<tr>${Object.values(x).map(v=>`<td>${esc(typeof v==="number"&&["amount","price","cost"].includes("")?money(v):v)}</td>`).join("")}<td><button data-delitem="${key}:${i}">Delete</button></td></tr>`).join("");$("#content").innerHTML=`<section class="section"><div class="toolbar"><div><h2>${page}</h2><p>${arr.length} item(s) recorded.</p></div><button class="primary" id="addItem" data-key="${key}">＋ Add ${page}</button></div><div style="overflow:auto"><table><thead><tr>${fields.map(x=>`<th>${x}</th>`).join("")}<th>Action</th></tr></thead><tbody>${rows||`<tr><td colspan="${fields.length+1}" class="empty">No data yet.</td></tr>`}</tbody></table></div></section>`}
 
@@ -957,7 +1006,24 @@ if(b.dataset.removeadmin){if(mode!=="master")return;db.admins=db.admins.filter(a
 
 
 if(isMemberViewOnly() && (b.id==="newTrip" || b.id==="addParticipant" || b.id==="addBudget" || b.id==="addCashflow" || b.id==="addVilla" || b.id==="addDestination" || b.id==="addItinerary"))return toast("Member Access hanya untuk melihat data.");
-if(b.id==="newTrip")openTrip();if(b.dataset.open){tripId=b.dataset.open;if(mode==="master"||assignedTrips().some(t=>t.id===tripId)){page="Dashboard";pendingTripWelcome=true;showApp()}else toast("Trip access denied.")}if(b.dataset.edittrip){let t=db.trips.find(x=>x.id===b.dataset.edittrip);if(t){editingTripId=t.id;let f=$("#tripForm");f.elements.name.value=t.name;f.elements.destination.value=t.destination;f.elements.start.value=t.start;f.elements.end.value=t.end;f.elements.pin.value=t.pin||"";f.elements.cover.value=t.cover||"";$("#tripModal").showModal();}}if(b.dataset.deltrip){if(confirm("Delete this trip and all its data?")){const id=b.dataset.deltrip;try{await window.HolidayPlannerCloud.deleteTrip(id);db.trips=db.trips.filter(t=>t.id!==id);if(db.cloudTripMap)for(const k of Object.keys(db.cloudTripMap))if(db.cloudTripMap[k]===id)delete db.cloudTripMap[k];save();render();toast("Trip deleted from Supabase")}catch(error){toast(error.message||"Gagal menghapus trip.")}}}if(b.id==="saveAdmin"){let p=$("#adminPin").value;if(p&&!/^\d{6}$/.test(p))return toast("Master PIN harus 6 digit.");db.admin.name=$("#adminName").value||"Fiqi Naufaldy";if(p)db.admin.pin=p;save();updateSidebarProfile();settings();toast("Settings saved")}if(b.id==="export"){let payload,filename;if(mode==="admin"){const a=db.admins.find(x=>x.id===activeAdmin);if(!a)return toast("Admin account not found.");payload={app:"Holiday Planner",format:"holiday-planner-backup",version:2,scope:"admin-assigned",adminId:activeAdmin,createdAt:new Date().toISOString(),trips:assignedTrips()};filename="holiday-planner-admin-backup.json";}else{payload={app:"Holiday Planner",format:"holiday-planner-backup",version:2,scope:"master-full",createdAt:new Date().toISOString(),...db};filename="holiday-planner-master-backup.json";}const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}if(b.id==="import")$("#backupFile").click();if(b.id==="saveGeneral"){
+if(b.id==="newTrip")openTrip();if(b.dataset.open){tripId=b.dataset.open;if(mode==="master"||assignedTrips().some(t=>t.id===tripId)){page="Dashboard";pendingTripWelcome=true;showApp()}else toast("Trip access denied.")}if(b.dataset.edittrip){let t=db.trips.find(x=>x.id===b.dataset.edittrip);if(t){editingTripId=t.id;let f=$("#tripForm");f.elements.name.value=t.name;f.elements.destination.value=t.destination;f.elements.start.value=t.start;f.elements.end.value=t.end;f.elements.pin.value=t.pin||"";f.elements.cover.value=t.cover||"";$("#tripModal").showModal();}}if(b.dataset.deltrip){if(confirm("Delete this trip and all its data?")){const id=b.dataset.deltrip;try{await window.HolidayPlannerCloud.deleteTrip(id);db.trips=db.trips.filter(t=>t.id!==id);if(db.cloudTripMap)for(const k of Object.keys(db.cloudTripMap))if(db.cloudTripMap[k]===id)delete db.cloudTripMap[k];save();render();toast("Trip deleted from Supabase")}catch(error){toast(error.message||"Gagal menghapus trip.")}}}if(b.dataset.saveMemberPin){
+ const userId=b.dataset.saveMemberPin;
+ const input=document.querySelector(`[data-member-pin="${userId}"]`);
+ const pin=input?.value.trim()||"";
+ if(mode!=="master"&&mode!=="admin")return toast("Akses tidak diizinkan.");
+ if(!/^\d{6}$/.test(pin))return toast("PIN Member harus 6 digit.");
+ b.disabled=true;
+ try{
+  await window.HolidayPlannerCloud.updateMemberPin(tripId,userId,pin);
+  if(input)input.value="";
+  await renderTripMemberSettings(tripId);
+  toast("PIN Member berhasil diperbarui di Supabase.");
+ }catch(error){
+  toast(error?.message||"Gagal memperbarui PIN Member.");
+ }finally{b.disabled=false;}
+ return;
+}
+if(b.id==="saveAdmin"){let p=$("#adminPin").value;if(p&&!/^\d{6}$/.test(p))return toast("Master PIN harus 6 digit.");db.admin.name=$("#adminName").value||"Fiqi Naufaldy";if(p)db.admin.pin=p;save();updateSidebarProfile();settings();toast("Settings saved")}if(b.id==="export"){let payload,filename;if(mode==="admin"){const a=db.admins.find(x=>x.id===activeAdmin);if(!a)return toast("Admin account not found.");payload={app:"Holiday Planner",format:"holiday-planner-backup",version:2,scope:"admin-assigned",adminId:activeAdmin,createdAt:new Date().toISOString(),trips:assignedTrips()};filename="holiday-planner-admin-backup.json";}else{payload={app:"Holiday Planner",format:"holiday-planner-backup",version:2,scope:"master-full",createdAt:new Date().toISOString(),...db};filename="holiday-planner-master-backup.json";}const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}if(b.id==="import")$("#backupFile").click();if(b.id==="saveGeneral"){
  const t=trip();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");
  t.name=$("#gName").value.trim()||t.name;
  t.destination=$("#gDestination").value.trim();t.start=$("#gStart").value;t.end=$("#gEnd").value;
