@@ -21,7 +21,7 @@
    const {data:profile,error:profileError}=await client.from("profiles").select("id,display_name,role,is_active").eq("id",data.user.id).single();
    fail(profileError);
    if(!profile?.is_active)throw new Error("Akun tidak aktif.");
-   return {session:sessionData.session,user:data.user,profile};
+   return {session:sessionData.session,user:data.user,profile,trip_id:data.trip_id||null};
   },
   async signOut(){const {error}=await client.auth.signOut();fail(error);return{ok:true};},
   async getSession(){const {data,error}=await client.auth.getSession();fail(error);return data.session;},
@@ -48,23 +48,28 @@
    await requireSession();
    const payload={name:String(t.name||"").trim(),destination:t.destination||null,start_date:t.start||t.start_date||null,end_date:t.end||t.end_date||null,description:t.description||null,cover_image_url:t.cover||t.cover_image_url||null,status:t.status||"planning"};
    if(!payload.name)throw new Error("Nama trip wajib diisi.");
-   const {data,error}=await client.from("trips").insert(payload).select().single();fail(error);
-   if(t.pin!==null&&t.pin!==undefined&&t.pin!==""){
-    if(typeof t.pin!=="string"||!/\d{6}/.test(t.pin))throw new Error("Trip PIN harus 6 digit.");
-    const {error:pinError}=await client.rpc("set_trip_pin",{p_trip_id:data.id,p_pin:t.pin});
+   if(typeof t.pin!=="string"||!/^[0-9]{6}$/.test(t.pin))throw new Error("Trip PIN harus 6 digit.");
+   const {data,error}=await client.from("trips").insert(payload).select().single();
+   fail(error);
+   try{
+    const {data:pinResult,error:pinError}=await client.rpc("set_trip_pin",{p_trip_id:data.id,p_pin:t.pin});
     fail(pinError);
+    if(pinResult!==true)throw new Error("Trip PIN gagal disimpan.");
+   }catch(error){
+    await client.from("trips").delete().eq("id",data.id);
+    throw error;
    }
    return data;
   },
   async updateTrip(id,t){
    await requireSession();
    const payload={name:String(t.name||"").trim(),destination:t.destination||null,start_date:t.start||t.start_date||null,end_date:t.end||t.end_date||null,description:t.description||null,cover_image_url:t.cover||t.cover_image_url||null,status:t.status||"planning"};
-   const {data,error}=await client.from("trips").update(payload).eq("id",id).select().single();fail(error);
-   if(t.pin!==null&&t.pin!==undefined&&t.pin!==""){
-    if(typeof t.pin!=="string"||!/\d{6}/.test(t.pin))throw new Error("Trip PIN harus 6 digit.");
-    const {error:pinError}=await client.rpc("set_trip_pin",{p_trip_id:id,p_pin:t.pin});
-    fail(pinError);
-   }
+   if(typeof t.pin!=="string"||!/^[0-9]{6}$/.test(t.pin))throw new Error("Trip PIN harus 6 digit.");
+   const {data,error}=await client.from("trips").update(payload).eq("id",id).select().single();
+   fail(error);
+   const {data:pinResult,error:pinError}=await client.rpc("set_trip_pin",{p_trip_id:id,p_pin:t.pin});
+   fail(pinError);
+   if(pinResult!==true)throw new Error("Trip PIN gagal disimpan.");
    return data;
   },
   async deleteTrip(id){await requireSession();const {error}=await client.from("trips").delete().eq("id",id);fail(error);return{ok:true};},
@@ -81,5 +86,5 @@
   async revokeTripAccess(id){await requireSession();const {error}=await client.from("trip_access").delete().eq("id",id);fail(error);return{ok:true};}
  };
  window.HolidayPlannerCloud=api;
- console.info("Holiday Planner: Supabase PIN login bridge initialized.");
+ console.info("Holiday Planner: Supabase PIN login bridge initialized (Master only).");
 })();
