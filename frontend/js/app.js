@@ -355,9 +355,17 @@ function showApp(){
  $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${n}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("logout")}<span>Log out</span></button>`;
  const mobileNav=$("#mobileNav");
  if(mobileNav){
-   const items=mode==="master"?[]:[["Dashboard","dashboard"],["Expense Planning","expense-report"],["Itinerary","itinerary"],["Participants","users-event"],["More","more"]];
-   mobileNav.innerHTML=items.map(([n,ic])=>`<button type="button" data-page="${n==="More"?"General":n}" class="${page===n?"active":""}">${hpIcon(ic)}<span>${n==="More"?(plannerLanguage==="id"?"Lainnya":"More"):n}</span></button>`).join("");
-   mobileNav.classList.toggle("is-visible",items.length>0&&!pendingTripWelcome);
+   /* Mobile navigation intentionally disabled. Desktop sidebar remains unchanged. */
+   mobileNav.innerHTML="";
+   mobileNav.classList.remove("is-visible");
+   mobileNav.setAttribute("hidden","hidden");
+ }
+ const mobileMenuStyleId="planner-mobile-menu-disabled";
+ if(!document.getElementById(mobileMenuStyleId)){
+   const style=document.createElement("style");
+   style.id=mobileMenuStyleId;
+   style.textContent=`@media(max-width:700px){#mobileNav,.mobile-nav,.mobile-trip-menu,.mobile-more-sheet{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;pointer-events:none!important}}`;
+   document.head.appendChild(style);
  }
  if(pendingTripWelcome&&tripId){document.body.classList.add("trip-welcome-mode");renderTripWelcome();return;}
  document.body.classList.remove("trip-welcome-mode");
