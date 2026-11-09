@@ -107,11 +107,17 @@ function queueCloudWorkspaceSave(t){
  const timer=cloudSaveTimers.get(t.id);if(timer)clearTimeout(timer);
  cloudSaveTimers.set(t.id,setTimeout(async()=>{
   try{const snapshot=JSON.parse(JSON.stringify(t));delete snapshot.pin;
-   // Keep public.trips card metadata in sync with edits saved in the workspace.
-   if(window.HolidayPlannerCloud.updateTrip){
-    await window.HolidayPlannerCloud.updateTrip(t.id,{name:t.name,destination:t.destination,start:t.start,end:t.end,cover:t.cover,description:t.description,status:t.status});
-   }
+   // Workspace is the source of truth for planner edits. Save it first.
+   // Syncing public.trips metadata is best-effort so an RLS/permission issue there
+   // does not make a successful workspace save look like a failed cloud save.
    await window.HolidayPlannerCloud.saveTripWorkspace(t.id,snapshot);
+   if(window.HolidayPlannerCloud.updateTrip){
+    try{
+     await window.HolidayPlannerCloud.updateTrip(t.id,{name:t.name,destination:t.destination,start:t.start,end:t.end,cover:t.cover,description:t.description,status:t.status});
+    }catch(metadataError){
+     console.warn("Trip card metadata sync skipped:",metadataError);
+    }
+   }
    window.dispatchEvent(new CustomEvent("holidayplanner:cloud-saved",{detail:{tripId:t.id}}));
   }catch(error){console.error("Holiday Planner cloud save failed:",error);toast("Gagal menyimpan ke cloud: "+(error.message||"periksa koneksi"));}
   finally{cloudSaveTimers.delete(t.id);}
@@ -414,9 +420,16 @@ function planningCollectionPage(t,key){
  const dest=key==="destinations",title=dest?"Destinations":"Itinerary";
  if(!Array.isArray(t[key]))t[key]=[];
  if(t[key].length===0){const legacy=(t.plans||[]).flatMap(p=>p[key]||[]);const seen=new Set();t[key]=legacy.filter(x=>{const k=JSON.stringify(x);if(seen.has(k))return false;seen.add(k);return true;});}
- const fields=dest?[["name","Name"],["area","Area"],["ticket","Est. ticket (Rp)"],["notes","Notes"]]:[["date","Date"],["time","Time"],["title","Activity"],["place","Location"],["note","Notes"]];
+ const fields=dest?[["name","Name"],["area","Area"],["ticket","Est. ticket (Rp)"],["notes","Notes"]]:[["date","Date"],["time","Time"],["activity","Activity"],["location","Location"],["notes","Notes"]];
  const items=t[key];
- const rows=items.map((x,i)=>`<tr>${fields.map(([k])=>`<td>${k==="ticket"?money(x[k]||0):esc(x[k]||"—")}</td>`).join("")}<td><button data-plan-edit="${key}:${i}">Edit</button> <button data-plan-delete="${key}:${i}">Delete</button></td></tr>`).join("");
+ const valueFor=(x,k)=>{
+   if(dest)return x[k];
+   if(k==="activity")return x.activity??x.title;
+   if(k==="location")return x.location??x.place;
+   if(k==="notes")return x.notes??x.note;
+   return x[k];
+ };
+ const rows=items.map((x,i)=>`<tr>${fields.map(([k])=>`<td>${k==="ticket"?money(valueFor(x,k)||0):esc(valueFor(x,k)||"—")}</td>`).join("")}<td><button data-plan-edit="${key}:${i}">Edit</button> <button data-plan-delete="${key}:${i}">Delete</button></td></tr>`).join("");
  $("#content").innerHTML=`<section class="section"><div class="toolbar"><div><h2>${title}</h2><p>${dest?"Manage places to explore for this trip.":"Manage your trip schedule in one place."}</p></div><button class="primary" id="planningAdd" data-kind="${key}">＋ Add ${dest?"Destination":"Itinerary"}</button></div><div class="table-wrap"><table><thead><tr>${fields.map(([,label])=>`<th>${label}</th>`).join("")}<th>Actions</th></tr></thead><tbody>${rows||`<tr><td colspan="${fields.length+1}" class="empty">No ${title.toLowerCase()} added yet.</td></tr>`}</tbody></table></div></section>`;
 }
 function cashFlowPage(t){
@@ -441,6 +454,7 @@ function cashFlowPage(t){
 function openPlanningForm(key,index=null){
  const t=trip();if(!Array.isArray(t[key]))t[key]=[];const p=t;const isDest=key==="destinations",fields=isDest?[["name","Name","text"],["area","Area","text"],["ticket","Estimated ticket (Rp)","number"],["notes","Notes","textarea"]]:[["date","Date","date"],["time","Time","time"],["activity","Activity","text"],["location","Location","text"],["notes","Notes","textarea"]];
  const old=index===null?{}:(p[key]||[])[index]||{};
+ if(!isDest){old={...old,activity:old.activity??old.title,location:old.location??old.place,notes:old.notes??old.note};}
  const dialog=document.createElement("dialog");dialog.className="planner-dialog";dialog.id="dynamicPlannerDialog";
  dialog.innerHTML=`<form id="dynamicPlannerForm"><h2>${index===null?"Add":"Edit"} ${isDest?"Destination":"Itinerary"}</h2><input type="hidden" name="key" value="${key}"><input type="hidden" name="index" value="${index===null?"":index}">${fields.map(([k,label,type])=>`<label>${label}${type==="textarea"?`<textarea name="${k}">${esc(old[k]||"")}</textarea>`:`<input name="${k}" type="${type}" value="${esc(old[k]??"")}">`}</label>`).join("")}<div class="dialog-actions"><button type="button" class="secondary" id="dynamicCancel">Cancel</button><button class="primary" type="submit">Save</button></div></form></dialog>`;
  document.body.appendChild(dialog);dialog.showModal();dialog.querySelector("#dynamicCancel").onclick=()=>dialog.remove();
