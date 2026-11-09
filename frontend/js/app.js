@@ -421,9 +421,12 @@ function planningCollectionPage(t,key){
 }
 function cashFlowPage(t){
  ensurePlans(t);
- const entries=(t.plans||[]).flatMap(p=>(p.cashflow||[]).map((x,i)=>({x,planId:p.id,index:i})));
- const legacy=(t.cashflow||[]).filter(x=>!entries.some(e=>e.x.id&&e.x.id===x.id)).map((x,i)=>({x,planId:"legacy",index:i}));
- const all=[...entries,...legacy],items=all.map(e=>e.x);
+ // Cash Flow is plan-scoped. trip() mirrors the active plan into t.cashflow,
+ // so reading both t.plans[].cashflow and t.cashflow would render the same
+ // transaction twice. Use the active plan as the single source of truth.
+ const active=t.plans.find(p=>p.id===t.activePlanId)||t.plans.find(p=>p.enabled)||t.plans[0];
+ const all=(active?.cashflow||[]).map((x,i)=>({x,planId:active?.id||"plan_a",index:i}));
+ const items=all.map(e=>e.x);
  const incoming=items.filter(x=>x.type==="Income").reduce((n,x)=>n+Number(x.amount||0),0);
  const outgoing=items.filter(x=>x.type==="Expense").reduce((n,x)=>n+Number(x.amount||0),0);
  const rows=all.map(({x,index,planId})=>`<tr><td>${esc(x.date||"—")}</td><td>${esc(x.type==="Income"?"Pemasukan":"Pengeluaran")}</td><td>${esc(x.description||"—")}</td><td>${money(x.amount)}</td><td>${esc(x.source==="Income Planning"?"Perencanaan Pemasukan":x.notes||"Input manual")}</td><td>${x.source==="Income Planning"?"Otomatis":`<button data-cf-edit="${planId}:${index}">Ubah</button> <button data-cf-delete="${planId}:${index}">Hapus</button>`}</td></tr>`).join("");
