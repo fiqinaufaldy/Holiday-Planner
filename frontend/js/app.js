@@ -419,8 +419,17 @@ function planningCollectionPage(t,key){
 }
 function cashFlowPage(t){
  ensurePlans(t);
+ // A legacy transaction can be the exact same object as the active plan transaction
+ // (older data is migrated into Plan A by reference). Older records may also have
+ // no id at all, so comparing only ids makes one manual transaction render twice.
  const entries=(t.plans||[]).flatMap(p=>(p.cashflow||[]).map((x,i)=>({x,planId:p.id,index:i})));
- const legacy=(t.cashflow||[]).filter(x=>!entries.some(e=>e.x.id&&e.x.id===x.id)).map((x,i)=>({x,planId:"legacy",index:i}));
+ const transactionKey=x=>x?.id||[x?.date||"",x?.type||"",x?.description||"",Number(x?.amount||0),x?.notes||"",x?.source||""].join("\u001f");
+ const entryKeys=new Set(entries.map(e=>transactionKey(e.x)));
+ const legacy=(t.cashflow||[]).filter(x=>{
+   // Same reference = same record. Otherwise use id/content as a safe fallback
+   // for legacy records copied from the same transaction.
+   return !entries.some(e=>e.x===x) && !entryKeys.has(transactionKey(x));
+ }).map((x,i)=>({x,planId:"legacy",index:i}));
  const all=[...entries,...legacy],items=all.map(e=>e.x);
  const incoming=items.filter(x=>x.type==="Income").reduce((n,x)=>n+Number(x.amount||0),0);
  const outgoing=items.filter(x=>x.type==="Expense").reduce((n,x)=>n+Number(x.amount||0),0);
@@ -438,7 +447,7 @@ function openPlanningForm(key,index=null){
 function openCashFlowForm(index=null){
  const t=trip();ensurePlans(t);const p=t.plans.find(x=>x.id===t.activePlanId);const old=index===null?{}:p.cashflow[index]||{};
  const d=document.createElement("dialog");d.className="planner-dialog";d.innerHTML=`<form id="cashFlowForm"><h2>${index===null?"Add":"Edit"} transaction</h2><label>Date<input type="date" name="date" value="${esc(old.date||"")}"></label><label>Type<select name="type"><option ${old.type==="Income"?"selected":""}>Income</option><option ${old.type==="Expense"?"selected":""}>Expense</option></select></label><label>Description<input name="description" required value="${esc(old.description||"")}"></label><label>Amount (Rp)<input type="number" min="0" name="amount" required value="${Number(old.amount||0)}"></label><label>Notes<textarea name="notes">${esc(old.notes||"")}</textarea></label><div class="dialog-actions"><button type="button" class="secondary" id="cfCancel">Cancel</button><button class="primary">Save transaction</button></div></form></dialog>`;
- document.body.appendChild(d);d.showModal();d.querySelector("#cfCancel").onclick=()=>d.remove();d.querySelector("form").onsubmit=e=>{e.preventDefault();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");const x=Object.fromEntries(new FormData(e.target));x.amount=Number(x.amount);x.source="Manual";if(index===null)p.cashflow.push(x);else p.cashflow[index]=x;t.cashflow=p.cashflow;save();d.close();d.remove();cashFlowPage(t);};
+ document.body.appendChild(d);d.showModal();d.querySelector("#cfCancel").onclick=()=>d.remove();d.querySelector("form").onsubmit=e=>{e.preventDefault();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");const x=Object.fromEntries(new FormData(e.target));x.amount=Number(x.amount);x.source="Manual";if(index===null){x.id="manual_"+Date.now()+"_"+Math.random().toString(36).slice(2,8);p.cashflow.push(x);}else{if(!x.id&&p.cashflow[index]?.id)x.id=p.cashflow[index].id;p.cashflow[index]=x;}t.cashflow=p.cashflow;save();d.close();d.remove();cashFlowPage(t);};
 }
 function renderCore(){
  if(mode==="master"){if(page==="All Trips"||!tripId){if(page==="Settings")return settings();if(page==="Access Management")return accessManagement();if(page==="Create Trip"){openTrip();page="All Trips";return;}return allTrips();}return tripPage();}
