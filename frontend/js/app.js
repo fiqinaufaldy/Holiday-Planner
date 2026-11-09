@@ -32,6 +32,8 @@ function ensurePlans(t){
  t.plans=t.plans.filter(p=>p.id==="plan_a"||p.id==="plan_b");
  t.plans.forEach(p=>{if(!p.tripInfo)p.tripInfo={destination:t.destination||"",start:t.start||"",end:t.end||""};});
  t.plans.forEach(p=>{if(!Array.isArray(p.income))p.income=[];if(!Array.isArray(p.budget))p.budget=[];});
+ t.plans.forEach(p=>{p.budget.forEach(x=>{x.category=normalizeExpenseCategory(x.category);});});
+ if(Array.isArray(t.budget))t.budget.forEach(x=>{x.category=normalizeExpenseCategory(x.category);});
  if(!t.plans.some(p=>p.enabled))t.plans[0].enabled=true;
  if(!t.activePlanId||!t.plans.some(p=>p.id===t.activePlanId&&p.enabled))t.activePlanId=t.plans.find(p=>p.enabled).id;
 }
@@ -556,7 +558,7 @@ function budgetPage(t){
  const pct=budgetLimit?Math.min(100,allocated/budgetLimit*100):0;
  const safePct=budgetLimit?Math.min(100,paid/budgetLimit*100):0;
  const [activeTab,setTab]=["Expenses",null];
- const grouped={};items.forEach(x=>grouped[x.category||"Other"]=(grouped[x.category||"Other"]||0)+Number(x.amount||0));
+ const grouped={};items.forEach(x=>grouped[normalizeExpenseCategory(x.category)]=(grouped[normalizeExpenseCategory(x.category)]||0)+Number(x.amount||0));
  const rows=items.map((x,i)=>`<article class="budget-item"><div class="budget-item-icon">${budgetIcon(x.category)}</div><div class="budget-item-main"><strong>${esc(x.description||x.category||"Expense")}</strong><small>${esc(x.category||"Other")}${x.notes?` · ${esc(x.notes)}`:""}</small><div class="budget-item-track"><i style="width:${allocated?Math.min(100,Number(x.amount||0)/allocated*100):0}%"></i></div></div><div class="budget-item-amount"><strong>${money(x.amount)}</strong><small>Planned</small></div><div class="budget-item-actions"><button data-editbudget="${i}" aria-label="Edit budget">Edit</button><button data-delbudget="${i}" aria-label="Delete budget">×</button></div></article>`).join("");
  const paymentRows=payments.map(x=>`<article class="budget-item"><div class="budget-item-icon paid-icon">✓</div><div class="budget-item-main"><strong>${esc(x.description||"Payment")}</strong><small>${esc(x.date||"Payment")}</small></div><div class="budget-item-amount"><strong>${money(x.amount)}</strong><small>Paid</small></div></article>`).join("");
  const breakdown=Object.entries(grouped).sort((a,b)=>b[1]-a[1]).map(([name,value])=>`<div class="budget-category-row"><div class="budget-category-head"><span>${esc(name)}</span><strong>${money(value)}</strong></div><div class="budget-category-track"><i style="width:${allocated?Math.min(100,value/allocated*100):0}%"></i></div><small>${allocated?(value/allocated*100).toFixed(1):"0"}% of allocated budget</small></div>`).join("");
@@ -617,14 +619,31 @@ function incomePage(t){
  </div>`;
 }
 
+function normalizeExpenseCategory(category){
+ const c=String(category||"").trim().toLowerCase();
+ if(c.includes("accom")||c.includes("villa")||c.includes("hotel")||c.includes("penginapan"))return "Accomodation";
+ if(c.includes("transport")||c.includes("bbm")||c.includes("tol"))return "Transportation";
+ if(c.includes("food")||c.includes("beverage")||c.includes("makan")||c.includes("minum"))return "Food & Beverage";
+ if(c.includes("ticket")||c.includes("activ")||c.includes("entertain")||c.includes("wisata"))return "Activities & Entertainment";
+ if(c.includes("shop")||c.includes("belanja"))return "Shopping";
+ if(c.includes("emergency")||c.includes("darurat"))return "Emergency Fund / Dana Darurat";
+ return "Others";
+}
+function budgetCategoryOptions(selected=""){
+ const categories=["Accomodation","Transportation","Food & Beverage","Activities & Entertainment","Shopping","Emergency Fund / Dana Darurat","Others"];
+ const value=normalizeExpenseCategory(selected);
+ return categories.map(c=>`<option value="${esc(c)}" ${c===value?"selected":""}>${esc(c)}</option>`).join("");
+}
 function budgetIcon(category){
- const c=String(category||"").toLowerCase();
- if(c.includes("accom")||c.includes("villa")||c.includes("hotel"))return "⌂";
- if(c.includes("transport"))return "↗";
- if(c.includes("food"))return "♨";
- if(c.includes("ticket")||c.includes("activ"))return "✦";
- if(c.includes("shop"))return "◇";
- return "＋";
+ const c=normalizeExpenseCategory(category);
+ const svg=(body,title)=>`<svg class="budget-category-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><title>${title}</title>${body}</svg>`;
+ if(c==="Accomodation")return svg(`<path fill="currentColor" d="M12 3.5L3 10v10h18V10z"/><path fill="#443014" d="M9 13h6v7H9z"/><path fill="currentColor" d="M7 11h2v2H7zm8 0h2v2h-2z"/>`,`house-2-line`);
+ if(c==="Transportation")return svg(`<path fill="currentColor" d="M19 16q-1.8 0-3.175-1.125T14.1 12h-2.975l-1.2-2H14.1q.125-.55.338-1.05T15 8H8.7L7.5 6h8.55l-1.1-3H11V1h3.95q.65 0 1.15.363t.725.962L18.175 6H19q2.075 0 3.538 1.463T24 11t-1.463 3.538T19 16m0-2q1.25 0 2.125-.875T22 11t-.875-2.125T19 8h-.075l.975 2.675l-1.9.675l-.95-2.625q-.5.425-.775 1.025T16 11q0 1.25.875 2.125T19 14M7 23q-1.25 0-2.125-.875T4 20H0v-6h2v-3H0V9h7l3 5h2q.825 0 1.413.588T14 16v2q0 .825-.587 1.413T12 20h-2q0 1.25-.875 2.125T7 23m-3-9h3.675l-1.8-3H4zm3 7q.425 0 .713-.288T8 20t-.288-.712T7 19t-.712.288T6 20t.288.713T7 21"/>`,`transportation`);
+ if(c==="Food & Beverage")return svg(`<path fill="currentColor" d="M1 22c0 .54.45 1 1 1h13c.56 0 1-.46 1-1v-1H1zM8.5 9C4.75 9 1 11 1 15h15c0-4-3.75-6-7.5-6m-4.88 4c1.11-1.55 3.47-2 4.88-2s3.77.45 4.88 2zM1 17h15v2H1zM18 5V1h-2v4h-5l.23 2h9.56l-1.4 14H18v2h1.72c.84 0 1.53-.65 1.63-1.47L23 5z"/>`,`food-outline`);
+ if(c==="Activities & Entertainment")return svg(`<path fill="currentColor" d="M21 8h-2V3a1 1 0 0 0-1.37-.93l-15 6c-.09.04-.16.1-.24.16c-.03.02-.06.03-.09.06c-.04.04-.05.08-.08.12c-.05.06-.1.12-.13.19c-.01.02 0 .05-.02.08c-.03.1-.06.2-.06.31v3.55c0 .48.33.89.8.98a1.499 1.499 0 0 1 0 2.94c-.47.09-.8.5-.8.98v3.55c0 .55.45 1 1 1h18c.55 0 1-.45 1-1v-3.55c0-.48-.33-.89-.8-.98a1.499 1.499 0 0 1 0-2.94c.47-.09.8-.5.8-.98V8.99c0-.55-.45-1-1-1Zm-4 0H8.19L17 4.48zm3 3.84c-1.2.57-2 1.79-2 3.16s.8 2.59 2 3.16V20h-4v-2h-1v2H4v-1.84c1.2-.57-1.79-2-3.16s-.8-2.59-2-3.16V10h11v1h1v-1h4z"/><path fill="currentColor" d="M15 12h1v2h-1zm0 3h1v2h-1z"/>`,`tickets`);
+ if(c==="Shopping")return svg(`<path fill="currentColor" d="M12 13a5 5 0 0 1-5-5h2a3 3 0 0 0 3 3a3 3 0 0 0 3-3h2a5 5 0 0 1-5 5m0-10a3 3 0 0 1 3 3H9a3 3 0 0 1 3-3m7 3h-2a5 5 0 0 0-5-5a5 5 0 0 0-5 5H5c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2"/>`,`shopping`);
+ if(c==="Emergency Fund / Dana Darurat")return svg(`<path d="M7 18v-6a5 5 0 1 1 10 0v6"/><path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z"/><path d="M21 12h1"/><path d="M18.5 4.5 18 5"/><path d="M2 12h1"/><path d="M12 2v1"/><path d="m4.929 4.929.707.707"/><path d="M12 12v6"/>`,`siren`);
+ return svg(`<path fill="currentColor" d="M6 10.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3m4.5 1.5a1.5 1.5 0 1 1 3 0a1.5 1.5 0 0 1-3 0m6 0a1.5 1.5 0 1 1 3 0a1.5 1.5 0 0 1-3 0"/>`,`other-1-solid`);
 }
 function openBudget(index=null){
   const t=trip();ensurePlans(t);syncPlan(t);
@@ -636,7 +655,7 @@ function openBudget(index=null){
   $("#budgetModalTitle").textContent=index===null?"Add Budget Item":"Edit Budget Item";
   if(index!==null){
    const x=active.budget[index]||{};
-   f.elements.category.value=x.category||"Other";f.elements.description.value=x.description||"";
+   f.elements.category.innerHTML=budgetCategoryOptions(x.category);f.elements.description.value=x.description||"";
    f.elements.amount.value=x.amount||0;f.elements.notes.value=x.notes||"";
    $("#budgetPlanSelect").value=active.id;
   }
@@ -647,7 +666,7 @@ $("#budgetForm").onsubmit=e=>{
  const t=trip();ensurePlans(t);syncPlan(t);
  const f=e.target,index=$("#budgetIndex").value,sourceId=$("#budgetSourcePlan").value,targetId=$("#budgetPlanSelect").value;
  const source=t.plans.find(p=>p.id===sourceId),target=t.plans.find(p=>p.id===targetId);
- const item={category:f.elements.category.value,description:f.elements.description.value.trim(),amount:Number(f.elements.amount.value),notes:f.elements.notes.value.trim()};
+ const item={category:normalizeExpenseCategory(f.elements.category.value),description:f.elements.description.value.trim(),amount:Number(f.elements.amount.value),notes:f.elements.notes.value.trim()};
  if(!target||!target.enabled)return toast("Pilih plan yang aktif.");
  if(!item.description||!Number.isFinite(item.amount)||item.amount<0)return toast("Periksa deskripsi dan nominal budget.");
  if(index!==""){
