@@ -107,17 +107,11 @@ function queueCloudWorkspaceSave(t){
  const timer=cloudSaveTimers.get(t.id);if(timer)clearTimeout(timer);
  cloudSaveTimers.set(t.id,setTimeout(async()=>{
   try{const snapshot=JSON.parse(JSON.stringify(t));delete snapshot.pin;
-   // Workspace is the source of truth for planner edits. Keep the public trip card
-   // update best-effort so a permission/RLS issue on public.trips does not make
-   // an otherwise valid workspace save look like a failed cloud save.
-   await window.HolidayPlannerCloud.saveTripWorkspace(t.id,snapshot);
+   // Keep public.trips card metadata in sync with edits saved in the workspace.
    if(window.HolidayPlannerCloud.updateTrip){
-    try{
-     await window.HolidayPlannerCloud.updateTrip(t.id,{name:t.name,destination:t.destination,start:t.start,end:t.end,cover:t.cover,description:t.description,status:t.status});
-    }catch(metadataError){
-     console.warn("Trip card metadata sync skipped:",metadataError);
-    }
+    await window.HolidayPlannerCloud.updateTrip(t.id,{name:t.name,destination:t.destination,start:t.start,end:t.end,cover:t.cover,description:t.description,status:t.status});
    }
+   await window.HolidayPlannerCloud.saveTripWorkspace(t.id,snapshot);
    window.dispatchEvent(new CustomEvent("holidayplanner:cloud-saved",{detail:{tripId:t.id}}));
   }catch(error){console.error("Holiday Planner cloud save failed:",error);toast("Gagal menyimpan ke cloud: "+(error.message||"periksa koneksi"));}
   finally{cloudSaveTimers.delete(t.id);}
@@ -428,7 +422,16 @@ function planningCollectionPage(t,key){
 function cashFlowPage(t){
  ensurePlans(t);
  const entries=(t.plans||[]).flatMap(p=>(p.cashflow||[]).map((x,i)=>({x,planId:p.id,index:i})));
- const legacy=(t.cashflow||[]).filter(x=>!entries.some(e=>e.x.id&&e.x.id===x.id)).map((x,i)=>({x,planId:"legacy",index:i}));
+ // t.cashflow is an alias of the active plan cashflow. Do not add it again as legacy.
+ // Only treat it as legacy when it is a separate array from the plan cashflows.
+ const activePlan=(t.plans||[]).find(p=>p.id===t.activePlanId)||t.plans?.[0];
+ const legacySource=t.cashflow;
+ const isActivePlanAlias=!!activePlan&&legacySource===activePlan.cashflow;
+ const legacy=isActivePlanAlias?[]:(legacySource||[]).filter(x=>!entries.some(e=>{
+   if(e.x===x)return true;
+   if(e.x?.id&&x?.id&&e.x.id===x.id)return true;
+   return e.x?.date===x?.date&&e.x?.type===x?.type&&e.x?.description===x?.description&&Number(e.x?.amount||0)===Number(x?.amount||0)&&e.x?.source===x?.source;
+ })).map((x,i)=>({x,planId:"legacy",index:i}));
  const all=[...entries,...legacy],items=all.map(e=>e.x);
  const incoming=items.filter(x=>x.type==="Income").reduce((n,x)=>n+Number(x.amount||0),0);
  const outgoing=items.filter(x=>x.type==="Expense").reduce((n,x)=>n+Number(x.amount||0),0);
