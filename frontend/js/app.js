@@ -419,17 +419,8 @@ function planningCollectionPage(t,key){
 }
 function cashFlowPage(t){
  ensurePlans(t);
- // A legacy transaction can be the exact same object as the active plan transaction
- // (older data is migrated into Plan A by reference). Older records may also have
- // no id at all, so comparing only ids makes one manual transaction render twice.
  const entries=(t.plans||[]).flatMap(p=>(p.cashflow||[]).map((x,i)=>({x,planId:p.id,index:i})));
- const transactionKey=x=>x?.id||[x?.date||"",x?.type||"",x?.description||"",Number(x?.amount||0),x?.notes||"",x?.source||""].join("\u001f");
- const entryKeys=new Set(entries.map(e=>transactionKey(e.x)));
- const legacy=(t.cashflow||[]).filter(x=>{
-   // Same reference = same record. Otherwise use id/content as a safe fallback
-   // for legacy records copied from the same transaction.
-   return !entries.some(e=>e.x===x) && !entryKeys.has(transactionKey(x));
- }).map((x,i)=>({x,planId:"legacy",index:i}));
+ const legacy=(t.cashflow||[]).filter(x=>!entries.some(e=>e.x.id&&e.x.id===x.id)).map((x,i)=>({x,planId:"legacy",index:i}));
  const all=[...entries,...legacy],items=all.map(e=>e.x);
  const incoming=items.filter(x=>x.type==="Income").reduce((n,x)=>n+Number(x.amount||0),0);
  const outgoing=items.filter(x=>x.type==="Expense").reduce((n,x)=>n+Number(x.amount||0),0);
@@ -447,7 +438,7 @@ function openPlanningForm(key,index=null){
 function openCashFlowForm(index=null){
  const t=trip();ensurePlans(t);const p=t.plans.find(x=>x.id===t.activePlanId);const old=index===null?{}:p.cashflow[index]||{};
  const d=document.createElement("dialog");d.className="planner-dialog";d.innerHTML=`<form id="cashFlowForm"><h2>${index===null?"Add":"Edit"} transaction</h2><label>Date<input type="date" name="date" value="${esc(old.date||"")}"></label><label>Type<select name="type"><option ${old.type==="Income"?"selected":""}>Income</option><option ${old.type==="Expense"?"selected":""}>Expense</option></select></label><label>Description<input name="description" required value="${esc(old.description||"")}"></label><label>Amount (Rp)<input type="number" min="0" name="amount" required value="${Number(old.amount||0)}"></label><label>Notes<textarea name="notes">${esc(old.notes||"")}</textarea></label><div class="dialog-actions"><button type="button" class="secondary" id="cfCancel">Cancel</button><button class="primary">Save transaction</button></div></form></dialog>`;
- document.body.appendChild(d);d.showModal();d.querySelector("#cfCancel").onclick=()=>d.remove();d.querySelector("form").onsubmit=e=>{e.preventDefault();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");const x=Object.fromEntries(new FormData(e.target));x.amount=Number(x.amount);x.source="Manual";if(index===null){x.id="manual_"+Date.now()+"_"+Math.random().toString(36).slice(2,8);p.cashflow.push(x);}else{if(!x.id&&p.cashflow[index]?.id)x.id=p.cashflow[index].id;p.cashflow[index]=x;}t.cashflow=p.cashflow;save();d.close();d.remove();cashFlowPage(t);};
+ document.body.appendChild(d);d.showModal();d.querySelector("#cfCancel").onclick=()=>d.remove();d.querySelector("form").onsubmit=e=>{e.preventDefault();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");const x=Object.fromEntries(new FormData(e.target));x.amount=Number(x.amount);x.source="Manual";if(index===null)p.cashflow.push(x);else p.cashflow[index]=x;t.cashflow=p.cashflow;save();d.close();d.remove();cashFlowPage(t);};
 }
 function renderCore(){
  if(mode==="master"){if(page==="All Trips"||!tripId){if(page==="Settings")return settings();if(page==="Access Management")return accessManagement();if(page==="Create Trip"){openTrip();page="All Trips";return;}return allTrips();}return tripPage();}
@@ -619,12 +610,14 @@ function incomePage(t){
 
 function budgetIcon(category){
  const c=String(category||"").toLowerCase();
- if(c.includes("accom")||c.includes("villa")||c.includes("hotel"))return "⌂";
- if(c.includes("transport"))return "↗";
- if(c.includes("food"))return "♨";
- if(c.includes("ticket")||c.includes("activ"))return "✦";
- if(c.includes("shop"))return "◇";
- return "＋";
+ const svg=(body)=>`<svg class="budget-category-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
+ if(c.includes("accom")||c.includes("villa")||c.includes("hotel"))return svg(`<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 20H5a1 1 0 0 1-1-1v-7m10 8h5a1 1 0 0 0 1-1V7m-6 13V9m0-4v4m0 0L3 12m6 4v4m4-16l8 3m-4.5 4h1m-1 4h1"/>`);
+ if(c.includes("transport"))return svg(`<path fill="currentColor" d="M19 16q-1.8 0-3.175-1.125T14.1 12h-2.975l-1.2-2H14.1q.125-.55.338-1.05T15 8H8.7L7.5 6h8.55l-1.1-3H11V1h3.95q.65 0 1.15.363t.725.962L18.175 6H19q2.075 0 3.538 1.463T24 11t-1.463 3.538T19 16m0-2q1.25 0 2.125-.875T22 11t-.875-2.125T19 8h-.075l.975 2.675l-1.9.675l-.95-2.625q-.5.425-.775 1.025T16 11q0 1.25.875 2.125T19 14M7 23q-1.25 0-2.125-.875T4 20H0v-6h2v-3H0V9h7l3 5h2q.825 0 1.413.588T14 16v2q0 .825-.587 1.413T12 20h-2q0 1.25-.875 2.125T7 23m-3-9h3.675l-1.8-3H4zm3 7q.425 0 .713-.288T8 20t-.288-.712T7 19t-.712.288T6 20t.288.713T7 21"/>`);
+ if(c.includes("food")||c.includes("beverage"))return svg(`<path fill="currentColor" d="M1 22c0 .54.45 1 1 1h13c.56 0 1-.46 1-1v-1H1zM8.5 9C4.75 9 1 11 1 15h15c0-4-3.75-6-7.5-6m-4.88 4c1.11-1.55 3.47-2 4.88-2s3.77.45 4.88 2zM1 17h15v2H1zM18 5V1h-2v4h-5l.23 2h9.56l-1.4 14H18v2h1.72c.84 0 1.53-.65 1.63-1.47L23 5z"/>`);
+ if(c.includes("activ")||c.includes("ticket")||c.includes("entertainment"))return svg(`<path fill="currentColor" d="M21 8h-2V3a1 1 0 0 0-1.37-.93l-15 6c-.09.04-.16.1-.24.16c-.03.02-.06.03-.09.06c-.04.04-.05.08-.08.12c-.05.06-.1.12-.13.19c-.01.02 0 .05-.02.08c-.03.1-.06.2-.06.31v3.55c0 .48.33.89.8.98a1.499 1.499 0 0 1 0 2.94c-.47.09-.8.5-.8.98v3.55c0 .55.45 1 1 1h18c.55 0 1-.45 1-1v-3.55c0-.48-.33-.89-.8-.98a1.499 1.499 0 0 1 0-2.94c.47-.09.8-.5.8-.98V8.99c0-.55-.45-1-1-1Zm-4 0H8.19L17 4.48zm3 3.84c-1.2.57-2 1.79-2 3.16s.8 2.59 2 3.16V20h-4v-2h-1v2H4v-1.84c1.2-.57 2-1.79 2-3.16s-.8-2.59-2-3.16V10h11v1h1v-1h4z"/><path fill="currentColor" d="M15 12h1v2h-1zm0 3h1v2h-1z"/>`);
+ if(c.includes("shop"))return svg(`<path fill="currentColor" d="M12 13a5 5 0 0 1-5-5h2a3 3 0 0 0 3 3a3 3 0 0 0 3-3h2a5 5 0 0 1-5 5m0-10a3 3 0 0 1 3 3H9a3 3 0 0 1 3-3m7 3h-2a5 5 0 0 0-5-5a5 5 0 0 0-5 5H5c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2"/>`);
+ if(c.includes("emergency")||c.includes("darurat"))return svg(`<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M7 18v-6a5 5 0 1 1 10 0v6M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2zM21 12h1M18.5 4.5 18 5M2 12h1M12 2v1M4.929 4.929l.707.707M12 12v6"/>`);
+ return svg(`<path fill="currentColor" d="M6 10.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3m4.5 1.5a1.5 1.5 0 1 1 3 0a1.5 1.5 0 0 1-3 0m6 0a1.5 1.5 0 1 1 3 0a1.5 1.5 0 0 1-3 0"/>`);
 }
 function openBudget(index=null){
   const t=trip();ensurePlans(t);syncPlan(t);

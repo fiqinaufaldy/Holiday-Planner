@@ -177,7 +177,7 @@ body.trip-welcome-mode .trip-welcome-content{padding:clamp(32px,7vw,100px)}
 .budget-list-heading>strong{font-size:15px;color:#e7c06c}
 .budget-items{display:grid;gap:10px}
 .budget-item{display:flex;align-items:center;gap:14px;padding:15px 14px;border:1px solid #3b332c;border-radius:15px;background:#1a2a40}
-.budget-item-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#443014;color:#efc36e;font-size:18px;flex:0 0 auto}
+.budget-item-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#443014;color:#efc36e;font-size:18px;flex:0 0 auto}.budget-category-icon{width:20px;height:20px;display:block}
 .budget-item-icon.paid-icon{background:#193b2a;color:#8fd0a7}
 .budget-item-main{flex:1;min-width:0;display:grid;gap:5px}
 .budget-item-main>strong{font-size:13px;color:#eee9e1;font-weight:600}
