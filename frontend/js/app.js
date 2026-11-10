@@ -341,6 +341,10 @@ function ensureDesktopSidebarCSS(){
 .sidebar{position:fixed!important;left:0!important;top:0!important;bottom:0!important;height:100vh!important;max-height:100vh!important;box-sizing:border-box!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
 .sidebar #nav{min-height:0!important;overflow:hidden!important;flex:1 1 auto!important}
 .sidebar #nav button{flex:0 0 auto!important}
+}
+/* Member is read-only: hide all edit/delete/add controls and action columns. */
+.member-view #content table th:last-child,.member-view #content table td:last-child{display:none!important}
+.member-view #content [data-editbudget],.member-view #content [data-delbudget],.member-view #content [data-editincome],.member-view #content [data-delincome],.member-view #content [data-editperson],.member-view #content [data-delperson],.member-view #content [data-editvilla],.member-view #content [data-delvilla],.member-view #content [data-plan-edit],.member-view #content [data-plan-delete],.member-view #content [data-cf-edit],.member-view #content [data-cf-delete],.member-view #content [data-delitem],.member-view #content #planningAdd,.member-view #content #cashflowAdd,.member-view #content #addParticipant,.member-view #content #addBudget,.member-view #content #addIncome,.member-view #content #addVilla,.member-view #content #addVillaEmpty,.member-view #content #addItem{display:none!important}
 }`;
  document.head.appendChild(style);
 }
