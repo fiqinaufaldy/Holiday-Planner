@@ -327,8 +327,7 @@ function updateSidebarProfile(){
  el.innerHTML=`<div class="sidebar-profile-info"><strong>${role}</strong></div>`;
 }
 function sidebarLabel(label){
- if(plannerLanguage!=="id")return label;
- const labels={"Dashboard":"Beranda","General":"Umum","Participants":"Peserta","Income Planning":"Rencana Pendapatan","Expense Planning":"Rencana Pengeluaran","Cash Flow":"Arus Kas","Villas & Stay":"Villa & Penginapan","Destinations":"Destinasi","Itinerary":"Rencana Perjalanan","Settings":"Pengaturan","Assigned Trips":"Trip Ditugaskan","All Trips":"Semua Trip","Create Trip":"Buat Trip","Access Management":"Manajemen Akses","Log out":"Keluar"};
+ const labels={"Dashboard":plannerLanguage==="id"?"Beranda":"Dashboard","General":plannerLanguage==="id"?"Umum":"General","Participants":plannerLanguage==="id"?"Peserta":"Participants","Income Planning":plannerLanguage==="id"?"Rencana Pendapatan":"Income Planning","Expense Planning":plannerLanguage==="id"?"Rencana Pengeluaran":"Expense Planning","Cash Flow":plannerLanguage==="id"?"Arus Kas":"Cash Flow","Villas & Stay":plannerLanguage==="id"?"Penginapan":"Accommodation","Destinations":plannerLanguage==="id"?"Destinasi":"Destinations","Itinerary":plannerLanguage==="id"?"Rencana Perjalanan":"Itinerary","Settings":plannerLanguage==="id"?"Pengaturan":"Settings","Assigned Trips":plannerLanguage==="id"?"Trip Ditugaskan":"Assigned Trips","All Trips":plannerLanguage==="id"?"Semua Trip":"All Trips","Create Trip":plannerLanguage==="id"?"Buat Trip":"Create Trip","Access Management":plannerLanguage==="id"?"Manajemen Akses":"Access Management","Log out":plannerLanguage==="id"?"Keluar":"Log out"};
  return labels[label]||label;
 }
 /* Desktop sidebar lock: keep the left menu visually fixed while browser zoom changes.
@@ -407,7 +406,7 @@ function showApp(){
    ["Dashboard","dashboard","Beranda"],
    ["Participants","users-event","Peserta"],
    ["Cash Flow","finance","Keuangan"],
-   ["Villas & Stay","holiday-village","Villa & Stay"],
+   ["Villas & Stay","holiday-village",plannerLanguage==="id"?"Penginapan":"Accommodation"],
  ];
  const mobileExtra=navItems().filter(([n])=>!["Dashboard","Participants","Cash Flow","Villas & Stay","Settings"].includes(n));
  mobileNav.innerHTML=mobileItems.map(([n,i,l])=>`<button type="button" data-page="${n}" class="mobile-nav-item ${page===n?"active":""}">${hpIcon(i)}<span>${l}</span></button>`).join("")+`<button type="button" data-action="mobile-more" class="mobile-nav-item"><span class="mobile-more-icon">···</span><span>Lainnya</span></button>`;
@@ -1091,7 +1090,7 @@ $("#cancelTrip").onclick=()=>$("#tripModal").close();
 document.addEventListener("click",async e=>{let b=e.target.closest("button");if(!b)return;
 if(b.hasAttribute("data-villa-prev")){setVillaGallery(villaGalleryIndex-1);return;}
 if(b.hasAttribute("data-villa-next")){setVillaGallery(villaGalleryIndex+1);return;}
-if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.dataset.action==="mobile-more"){document.getElementById("mobileMoreSheet")?.classList.add("open");return;}if(b.dataset.action==="mobile-more-close"){document.getElementById("mobileMoreSheet")?.classList.remove("open");return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){page=b.dataset.page;document.querySelectorAll("#nav [data-page], #mobileNav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
+if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.dataset.action==="mobile-more"){document.getElementById("mobileMoreSheet")?.classList.add("open");return;}if(b.dataset.action==="mobile-more-close"){document.getElementById("mobileMoreSheet")?.classList.remove("open");return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
 if(b.id==="createAdmin"){
  if(mode!=="master")return toast("Master Access required.");
  const name=$("#newAdminName").value.trim(),pin=$("#newAdminPin").value.trim(),trips=[...document.querySelectorAll('input[name="adminTrip"]:checked')].map(o=>o.value);
