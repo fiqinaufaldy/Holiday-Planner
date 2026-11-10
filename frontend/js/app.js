@@ -285,7 +285,15 @@ async function enter(pin){
     return;
    }
    throw new Error("Akun tidak memiliki akses.");
-  }catch(error){err(error.message||"PIN tidak sesuai. Coba lagi.");return;}
+  }catch(error){
+   const invalidPin=error?.code==="PIN_INVALID"||error?.message==="PIN_INVALID";
+   if(invalidPin){
+    err(plannerLanguage==="id"?"PIN salah. Silakan periksa kembali PIN Anda.":"Incorrect PIN. Please check your PIN and try again.");
+   }else{
+    err(error?.message||"Terjadi kesalahan saat login. Silakan coba lagi.");
+   }
+   return;
+  }
   finally{if(loginBtn){loginBtn.disabled=false;loginBtn.textContent="Continue →";}}
  }
  err("Layanan login Supabase belum siap. Muat ulang halaman dan coba lagi.");

@@ -14,7 +14,19 @@
   async loginWithPin(pin){
    if(typeof pin!=="string"||!/^\d{6}$/.test(pin))throw new Error("PIN harus 6 digit.");
    const {data,error}=await client.functions.invoke("pin-login",{body:{pin}});
-   fail(error);
+   if(error){
+    const status=Number(error?.context?.status||error?.status||0);
+    let bodyText="";
+    try{
+     const body=error?.context?.body;
+     bodyText=typeof body==="string"?body:JSON.stringify(body||"");
+    }catch{}
+    const detail=(error?.message||"")+" "+bodyText;
+    if([400,401,403].includes(status)||/invalid pin|incorrect pin|pin salah|pin tidak|wrong pin/i.test(detail)){
+     const e=new Error("PIN_INVALID");e.code="PIN_INVALID";throw e;
+    }
+    fail(error);
+   }
    if(!data?.success||!data?.session?.access_token||!data?.session?.refresh_token)throw new Error(data?.error||"Login PIN gagal.");
    const {data:sessionData,error:sessionError}=await client.auth.setSession({access_token:data.session.access_token,refresh_token:data.session.refresh_token});
    fail(sessionError);
@@ -64,16 +76,12 @@
   async updateTrip(id,t){
    await requireSession();
    const payload={name:String(t.name||"").trim(),destination:t.destination||null,start_date:t.start||t.start_date||null,end_date:t.end||t.end_date||null,description:t.description||null,cover_image_url:t.cover||t.cover_image_url||null,status:t.status||"planning"};
+   if(typeof t.pin!=="string"||!/^[0-9]{6}$/.test(t.pin))throw new Error("Trip PIN harus 6 digit.");
    const {data,error}=await client.from("trips").update(payload).eq("id",id).select().single();
    fail(error);
-   // Only update the PIN when a new PIN is explicitly supplied. Normal trip/workspace edits must not require it.
-   if(t.pin!==undefined&&t.pin!==null&&String(t.pin)!==""){
-    const pin=String(t.pin);
-    if(!/^[0-9]{6}$/.test(pin))throw new Error("Trip PIN harus 6 digit.");
-    const {data:pinResult,error:pinError}=await client.rpc("set_trip_pin",{p_trip_id:id,p_pin:pin});
-    fail(pinError);
-    if(pinResult!==true)throw new Error("Trip PIN gagal disimpan.");
-   }
+   const {data:pinResult,error:pinError}=await client.rpc("set_trip_pin",{p_trip_id:id,p_pin:t.pin});
+   fail(pinError);
+   if(pinResult!==true)throw new Error("Trip PIN gagal disimpan.");
    return data;
   },
   async deleteTrip(id){await requireSession();const {error}=await client.from("trips").delete().eq("id",id);fail(error);return{ok:true};},
