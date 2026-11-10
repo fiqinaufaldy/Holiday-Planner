@@ -423,6 +423,15 @@ function planningCollectionPage(t,key){
  if(t[key].length===0){const legacy=(t.plans||[]).flatMap(p=>p[key]||[]);const seen=new Set();t[key]=legacy.filter(x=>{const k=JSON.stringify(x);if(seen.has(k))return false;seen.add(k);return true;});}
  const fields=dest?[["name","Name"],["area","Area"],["ticket","Est. ticket (Rp)"],["notes","Notes"]]:[["date","Date"],["time","Time"],["activity","Activity"],["location","Location"],["notes","Notes"]];
  const items=t[key];
+ const sortedItems=items.map((x,i)=>({x,i})).sort((a,b)=>{
+   if(dest)return 0;
+   const da=String(a.x?.date||""), db=String(b.x?.date||"");
+   const ta=da?Date.parse(da):NaN, tb=db?Date.parse(db):NaN;
+   if(!Number.isNaN(ta)&&!Number.isNaN(tb)&&ta!==tb)return ta-tb;
+   if(!Number.isNaN(ta)!==!Number.isNaN(tb))return Number.isNaN(ta)?1:-1;
+   if(da!==db)return da.localeCompare(db);
+   return String(a.x?.time||"").localeCompare(String(b.x?.time||""));
+ });
  const valueFor=(x,k)=>{
    if(dest)return x[k];
    if(k==="activity")return x.activity??x.title;
@@ -430,11 +439,12 @@ function planningCollectionPage(t,key){
    if(k==="notes")return x.notes??x.note;
    return x[k];
  };
- const rows=items.map((x,i)=>`<tr>${fields.map(([k])=>`<td>${k==="ticket"?money(valueFor(x,k)||0):esc(valueFor(x,k)||"—")}</td>`).join("")}<td><button data-plan-edit="${key}:${i}">Edit</button> <button data-plan-delete="${key}:${i}">Delete</button></td></tr>`).join("");
+ const rows=sortedItems.map(({x,i})=>`<tr>${fields.map(([k])=>`<td>${k==="ticket"?money(valueFor(x,k)||0):esc(valueFor(x,k)||"—")}</td>`).join("")}<td><button data-plan-edit="${key}:${i}">Edit</button> <button data-plan-delete="${key}:${i}">Delete</button></td></tr>`).join("");
  $("#content").innerHTML=`<section class="section"><div class="toolbar"><div><h2>${title}</h2><p>${dest?"Manage places to explore for this trip.":"Manage your trip schedule in one place."}</p></div><button class="primary" id="planningAdd" data-kind="${key}">＋ Add ${dest?"Destination":"Itinerary"}</button></div><div class="table-wrap"><table><thead><tr>${fields.map(([,label])=>`<th>${label}</th>`).join("")}<th>Actions</th></tr></thead><tbody>${rows||`<tr><td colspan="${fields.length+1}" class="empty">No ${title.toLowerCase()} added yet.</td></tr>`}</tbody></table></div></section>`;
 }
 function cashFlowPage(t){
  ensurePlans(t);
+ reconcileIncomeCashflow(t);
  const entries=(t.plans||[]).flatMap(p=>(p.cashflow||[]).map((x,i)=>({x,planId:p.id,index:i})));
  // t.cashflow is an alias of the active plan cashflow. Do not add it again as legacy.
  // Only treat it as legacy when it is a separate array from the plan cashflows.
@@ -616,6 +626,7 @@ function budgetPage(t){
 
 function incomePage(t){
  if(!Array.isArray(t.income))t.income=[];
+ reconcileIncomeCashflow(t);
  const items=t.income;
  const total=items.reduce((n,x)=>n+Number(x.amount||0),0);
  const received=items.filter(x=>x.status==="Received").reduce((n,x)=>n+Number(x.amount||0),0);
@@ -707,6 +718,14 @@ function syncIncomeCashflow(t,plan,item){
   if(existing>=0)plan.cashflow[existing]=entry;else plan.cashflow.push(entry);
  }else if(existing>=0)plan.cashflow.splice(existing,1);
  if(t.activePlanId===plan.id)t.cashflow=plan.cashflow;
+}
+function reconcileIncomeCashflow(t){
+ ensurePlans(t);
+ const active=t.plans.find(p=>p.id===t.activePlanId)||t.plans[0];
+ if(!active)return;
+ if(!Array.isArray(active.income))active.income=[];
+ active.income.forEach(item=>syncIncomeCashflow(t,active,item));
+ if(t.activePlanId===active.id)t.cashflow=active.cashflow;
 }
 function openIncome(index=null){
  const t=trip();ensurePlans(t);syncPlan(t);
