@@ -406,10 +406,13 @@ function showApp(){
  const mobileItems=[
    ["Dashboard","dashboard","Beranda"],
    ["Participants","users-event","Peserta"],
-   ["Expense Planning","finance","Pengeluaran"],
+   ["Expense Planning","expense-report","Pengeluaran"],
    ["Villas & Stay","holiday-village","Villa & Stay"],
  ];
- const mobileExtra=navItems().filter(([n])=>!["Dashboard","Participants","Expense Planning","Villas & Stay","Settings"].includes(n));
+ const mobileExtraBase=navItems().filter(([n])=>!["Dashboard","Participants","Expense Planning","Cash Flow","Villas & Stay"].includes(n));
+ const mobileExtra=[...mobileExtraBase];
+ if((mode==="master"||mode==="admin")&&!mobileExtra.some(([n])=>n==="Settings"))mobileExtra.push(["Settings","settings"]);
+ mobileExtra.push(["__logout","logout"]);
  mobileNav.innerHTML=mobileItems.map(([n,i,l])=>`<button type="button" data-page="${n}" class="mobile-nav-item ${page===n?"active":""}">${hpIcon(i)}<span>${l}</span></button>`).join("")+`<button type="button" data-action="mobile-more" class="mobile-nav-item"><span class="mobile-more-icon">···</span><span>Lainnya</span></button>`;
  let moreSheet=document.getElementById("mobileMoreSheet");
  if(!moreSheet){
@@ -418,7 +421,7 @@ function showApp(){
    moreSheet.className="mobile-more-sheet";
    document.body.appendChild(moreSheet);
  }
- moreSheet.innerHTML=`<div class="mobile-more-panel"><div class="mobile-more-head"><strong>Lainnya</strong><button type="button" data-action="mobile-more-close">×</button></div><div class="mobile-more-list">${mobileExtra.map(([n,i])=>`<button type="button" data-page="${n}">${hpIcon(i)}<span>${sidebarLabel(n)}</span></button>`).join("")}</div></div>`;
+ moreSheet.innerHTML=`<div class="mobile-more-panel"><div class="mobile-more-head"><strong>Lainnya</strong><button type="button" data-action="mobile-more-close">×</button></div><div class="mobile-more-list">${mobileExtra.map(([n,i])=>{const isLogout=n==="__logout";return `<button type="button" ${isLogout?'data-action="exit-trip"':'data-page="'+n+'"'}>${hpIcon(i)}<span>${isLogout?sidebarLabel("Log out"):sidebarLabel(n)}</span></button>`;}).join("")}</div></div>`;
  moreSheet.classList.remove("open");
  const mobileMenuStyleId="planner-mobile-menu";
  if(!document.getElementById(mobileMenuStyleId)){
@@ -440,8 +443,9 @@ function showApp(){
   #mobileMoreSheet .mobile-more-head{display:flex!important;align-items:center!important;justify-content:space-between!important;margin-bottom:10px!important;color:var(--text,#fff)!important;}
   #mobileMoreSheet .mobile-more-head button{border:0!important;background:transparent!important;color:var(--text,#fff)!important;font-size:24px!important;cursor:pointer!important;}
   #mobileMoreSheet .mobile-more-list{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;}
-  #mobileMoreSheet .mobile-more-list button{display:flex!important;align-items:center!important;gap:10px!important;padding:12px!important;border:1px solid var(--border,#334967)!important;border-radius:10px!important;background:rgba(255,255,255,.03)!important;color:var(--text,#fff)!important;}
-  #mobileMoreSheet .mobile-more-list svg{width:18px!important;height:18px!important;}
+  #mobileMoreSheet .mobile-more-list button{display:grid!important;grid-template-columns:24px minmax(0,1fr)!important;align-items:center!important;gap:8px!important;min-height:58px!important;padding:9px 12px!important;border:1px solid var(--border,#334967)!important;border-radius:10px!important;background:rgba(255,255,255,.03)!important;color:var(--text,#fff)!important;text-align:center!important;line-height:1.15!important;}
+  #mobileMoreSheet .mobile-more-list button span{display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;min-height:34px!important;line-height:1.15!important;}
+  #mobileMoreSheet .mobile-more-list svg{width:18px!important;height:18px!important;justify-self:center!important;}
 }
 @media(min-width:769px){#mobileNav,#mobileMoreSheet{display:none!important;}}
 `;
