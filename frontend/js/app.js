@@ -416,8 +416,8 @@ function showApp(){
     <button type="button" data-mobile-section="finance" class="${["Income Planning","Expense Planning","Cash Flow"].includes(page)?"active":""}">
       ${hpIcon("finance")}<span>Keuangan</span>
     </button>
-    <button type="button" data-mobile-section="destinations" class="${page==="Destinations"?"active":""}">
-      ${hpIcon("maps-location-02")}<span>Destinasi</span>
+    <button type="button" data-mobile-section="villas" class="${page==="Villas & Stay"?"active":""}">
+      ${hpIcon("holiday-village")}<span>Villa & Stay</span>
     </button>
     <button type="button" data-mobile-section="more" class="${["General","Villas & Stay","Itinerary","Settings"].includes(page)?"active":""}">
       ${hpIcon("more")}<span>Lainnya</span>
@@ -463,7 +463,7 @@ function showApp(){
  .sidebar{display:none!important}
  .hp-mobile-bottom-nav{
    position:fixed!important;left:0!important;right:0!important;bottom:0!important;
-   z-index:9999!important;display:grid!important;grid-template-columns:repeat(5,1fr);
+   z-index:9999!important;display:grid!important;display:flex!important;flex-direction:row!important;grid-template-columns:none!important;width:100vw!important;max-width:100vw!important;
    height:72px;padding:7px 8px calc(7px + env(safe-area-inset-bottom));
    box-sizing:border-box;background:rgba(10,22,39,.96);
    border-top:1px solid var(--border);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
@@ -471,7 +471,7 @@ function showApp(){
  }
  .hp-mobile-bottom-nav button{
    appearance:none;border:0;background:transparent;color:var(--muted);
-   display:flex;flex-direction:column;align-items:center;justify-content:center;
+   display:flex!important;flex:1 1 20%!important;flex-direction:column;align-items:center;justify-content:center;
    gap:5px;min-width:0;padding:5px 3px;border-radius:14px;cursor:pointer;
    font:inherit;touch-action:manipulation;
  }
@@ -1153,7 +1153,7 @@ if(b.dataset.mobileSection){
  const section=b.dataset.mobileSection;
  if(section==="dashboard"){page="Dashboard";$("#mobileMoreSheet")?.classList.remove("is-open");render();return;}
  if(section==="participants"){page="Participants";$("#mobileMoreSheet")?.classList.remove("is-open");render();return;}
- if(section==="destinations"){page="Destinations";$("#mobileMoreSheet")?.classList.remove("is-open");render();return;}
+ if(section==="villas"){page="Villas & Stay";$("#mobileMoreSheet")?.classList.remove("is-open");render();return;}
  const sheet=$("#mobileMoreSheet"),title=$("#mobileSheetTitle"),items=$("#mobileSheetItems");
  if(sheet&&items){
    const list=section==="finance"
