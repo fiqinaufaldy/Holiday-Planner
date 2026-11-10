@@ -576,7 +576,7 @@ function settings(){
  const inTrip=!!tripId&&(mode==="master"||mode==="admin");
  const currentTrip=inTrip?trip():null;
  const profile=isAdmin?"":`<section class="section"><h2>Profile Settings</h2><div class="profile-setting">${db.admin.photo?`<img id="profilePreview" src="${db.admin.photo}" alt="Profile photo">`:`<div class="profile-placeholder" id="profilePreview">${esc((db.admin.name||"AD").split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase())}</div>`}<div><strong>${esc(db.admin.name||"Fiqi Naufaldy")}</strong><p style="font-size:11px;color:#788177;margin:5px 0 9px">Account profile</p><label class="profile-upload" for="profilePhoto">↑ Upload profile photo</label><input id="profilePhoto" type="file" accept="image/png,image/jpeg,image/webp" hidden></div></div><div class="formgrid"><label>Display name<input id="adminName" value="${esc(db.admin.name)}"></label><label>New Master PIN (optional)<input id="adminPin" inputmode="numeric" maxlength="6" placeholder="Leave blank to keep current"></label></div><p><button class="primary" id="saveAdmin">Save Settings</button></p><p style="font-size:11px;color:#788177">Foto dan nama ini ditampilkan di footer sidebar sebagai identitas pemilik akun.</p></section>`;
- const tripSettings=inTrip?`<section class="section"><div class="toolbar"><div><span class="eyebrow">TRIP ACCESS</span><h2>Member PIN</h2><p>PIN ini khusus digunakan Member untuk masuk ke trip <strong>${esc(currentTrip?.name||"trip ini")}</strong>. PIN Member terpisah dari PIN Master/Admin.</p></div></div><div class="formgrid"><label>Member PIN<input id="memberTripPin" inputmode="numeric" maxlength="6" value="${esc(currentTrip?.pin||"")}" placeholder="Enter 6-digit PIN" autocomplete="off"></label></div><p><button class="primary" id="saveMemberTripPin">Save Member PIN</button></p><p style="font-size:11px;color:#788177">Gunakan 6 digit. Mengubah Member PIN tidak mengubah PIN Master atau PIN Admin.</p></section>`:"";
+ const tripSettings=inTrip?`<section class="section"><div class="toolbar"><div><span class="eyebrow">TRIP ACCESS</span><h2>Member PIN</h2><p>PIN ini khusus digunakan Member untuk masuk ke trip <strong>${esc(currentTrip?.name||"trip ini")}</strong>. PIN Member terpisah dari PIN Master/Admin.</p></div></div><div class="formgrid"><label>Member PIN<input id="memberTripPin" inputmode="numeric" maxlength="6" value="" placeholder="Enter new 6-digit PIN" autocomplete="new-password"></label></div><p><button class="primary" id="saveMemberTripPin">Save Member PIN</button></p><p style="font-size:11px;color:#788177">Gunakan 6 digit. Mengubah Member PIN tidak mengubah PIN Master atau PIN Admin.</p></section>`:"";
  const scopeText=isAdmin?`Backup hanya mencakup ${scopeTrips.length} trip yang ditugaskan ke akun Admin ini. Data trip lain dan pengaturan akses Master tidak akan berubah saat restore.`:"Backup mencakup seluruh trip, akun Admin, dan profil Master.";
  $("#content").innerHTML=`${profile}${tripSettings}<section class="section"><h2>Backup & Restore</h2><p>${scopeText}</p><div class="actions backup-actions"><button class="primary" id="export">${hpIcon("download")}<span>${isAdmin?"Export Assigned Trips":"Export All Data"}</span></button><button id="import">${hpIcon("upload")}<span>Import Backup</span></button></div><p style="font-size:11px;color:#788177">Simpan file backup di tempat aman. Saat import, data pada cakupan backup akan menggantikan data yang sekarang.</p></section>`;
 
@@ -1063,22 +1063,11 @@ if(b.id==="newTrip")openTrip();if(b.dataset.open){tripId=b.dataset.open;if(mode=
  if(!currentTrip)return toast(plannerLanguage==="id"?"Trip tidak ditemukan.":"Trip not found.");
  b.disabled=true;
  try{
-  const updated=await window.HolidayPlannerCloud.updateTrip(currentTrip.id,{
-   name:currentTrip.name,
-   destination:currentTrip.destination||"",
-   start:currentTrip.start||"",
-   end:currentTrip.end||"",
-   cover:currentTrip.cover||"",
-   pin
-  });
-  currentTrip.pin=pin;
-  if(updated){
-   currentTrip.name=updated.name||currentTrip.name;
-   currentTrip.destination=updated.destination||currentTrip.destination||"";
-   currentTrip.start=updated.start_date||currentTrip.start||"";
-   currentTrip.end=updated.end_date||currentTrip.end||"";
-   currentTrip.cover=updated.cover_image_url||currentTrip.cover||"";
-  }
+  const client=window.HolidayPlannerCloud?.client;
+  if(!client)throw new Error(plannerLanguage==="id"?"Koneksi Supabase tidak tersedia.":"Supabase connection is unavailable.");
+  const {data,error}=await client.rpc("set_member_pin",{p_trip_id:currentTrip.id,p_pin:pin});
+  if(error)throw error;
+  if(data!==true && data?.success!==true)throw new Error(plannerLanguage==="id"?"Gagal menyimpan PIN Member.":"Failed to save Member PIN.");
   save();
   settings();
   toast(plannerLanguage==="id"?"PIN Member berhasil disimpan.":"Member PIN saved successfully.");
