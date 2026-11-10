@@ -274,12 +274,18 @@ async function enter(pin){
     mode="admin";activeAdmin=result.user.id;tripId=null;page="Assigned Trips";await hydrateTripsFromCloud();showApp();return;
    }
    if(role==="member"){
-    mode="member";tripId=null;page="Dashboard";memberName=result?.profile?.display_name||"";
+    mode="member";
+    tripId=result?.trip_id||null;
+    page="Dashboard";
+    memberName=result?.profile?.display_name||"";
+
+    if(!tripId)throw new Error("Akun Member belum memiliki trip.");
+
     await hydrateTripsFromCloud();
-    const memberTrips=assignedTrips();
-    if(!memberTrips.length)throw new Error("Akun Member belum memiliki trip.");
-    tripId=result?.trip_id||memberTrips[0].id;
-    if(!memberTrips.some(t=>t.id===tripId))tripId=memberTrips[0].id;
+
+    const memberTrips=db.trips.filter(t=>t.id===tripId);
+    if(!memberTrips.length)throw new Error("Trip Member tidak ditemukan.");
+
     page="Dashboard";
     showApp();
     return;
