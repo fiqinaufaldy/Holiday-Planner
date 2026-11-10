@@ -396,123 +396,56 @@ function showApp(){
  document.body.classList.toggle("member-view",mode==="member");
  updateSidebarProfile();
  $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${sidebarLabel(n)}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("logout")}<span>${sidebarLabel("Log out")}</span></button>`;
- const mobileNav=$("#mobileNav");
- const mobileMore=$("#mobileMoreSheet");
+ let mobileNav=document.getElementById("mobileNav");
  if(!mobileNav){
-   const nav=document.createElement("nav");
-   nav.id="mobileNav";
-   nav.className="hp-mobile-bottom-nav";
-   document.body.appendChild(nav);
+   mobileNav=document.createElement("nav");
+   mobileNav.id="mobileNav";
+   mobileNav.className="mobile-nav";
+   document.body.appendChild(mobileNav);
  }
- const bottomNav=$("#mobileNav");
- if(bottomNav){
-   bottomNav.innerHTML=`
-    <button type="button" data-mobile-section="dashboard" class="${page==="Dashboard"?"active":""}">
-      ${hpIcon("dashboard")}<span>Beranda</span>
-    </button>
-    <button type="button" data-mobile-section="participants" class="${page==="Participants"?"active":""}">
-      ${hpIcon("users-event")}<span>Peserta</span>
-    </button>
-    <button type="button" data-mobile-section="finance" class="${["Income Planning","Expense Planning","Cash Flow"].includes(page)?"active":""}">
-      ${hpIcon("finance")}<span>Keuangan</span>
-    </button>
-    <button type="button" data-mobile-section="villas" class="${page==="Villas & Stay"?"active":""}">
-      ${hpIcon("holiday-village")}<span>Villa & Stay</span>
-    </button>
-    <button type="button" data-mobile-section="more" class="${["General","Villas & Stay","Itinerary","Settings"].includes(page)?"active":""}">
-      ${hpIcon("more")}<span>Lainnya</span>
-    </button>`;
-   bottomNav.removeAttribute("hidden");
- }
- let sheet=$("#mobileMoreSheet");
- if(!sheet){
-   sheet=document.createElement("div");
-   sheet.id="mobileMoreSheet";
-   sheet.className="hp-mobile-sheet";
-   document.body.appendChild(sheet);
- }
- const financeItems=[
-   ["Income Planning","finance-manager"],
-   ["Expense Planning","expense-report"],
-   ["Cash Flow","finance"]
+ const mobileItems=[
+   ["Dashboard","dashboard","Beranda"],
+   ["Participants","users-event","Peserta"],
+   ["Cash Flow","finance","Keuangan"],
+   ["Villas & Stay","holiday-village","Villa & Stay"],
  ];
- const moreItems=[
-   ["General","grid"],
-   ["Villas & Stay","holiday-village"],
-   ["Itinerary","itinerary"]
- ];
- if(mode==="master"||mode==="admin")moreItems.push(["Settings","settings"]);
- sheet.innerHTML=`
-   <div class="hp-mobile-sheet-backdrop" data-mobile-close></div>
-   <div class="hp-mobile-sheet-panel">
-     <div class="hp-mobile-sheet-handle"></div>
-     <div class="hp-mobile-sheet-title" id="mobileSheetTitle">Menu</div>
-     <div class="hp-mobile-sheet-items" id="mobileSheetItems"></div>
-   </div>`;
+ const mobileExtra=navItems().filter(([n])=>!["Dashboard","Participants","Cash Flow","Villas & Stay","Settings"].includes(n));
+ mobileNav.innerHTML=mobileItems.map(([n,i,l])=>`<button type="button" data-page="${n}" class="mobile-nav-item ${page===n?"active":""}">${hpIcon(i)}<span>${l}</span></button>`).join("")+`<button type="button" data-action="mobile-more" class="mobile-nav-item"><span class="mobile-more-icon">···</span><span>Lainnya</span></button>`;
+ let moreSheet=document.getElementById("mobileMoreSheet");
+ if(!moreSheet){
+   moreSheet=document.createElement("div");
+   moreSheet.id="mobileMoreSheet";
+   moreSheet.className="mobile-more-sheet";
+   document.body.appendChild(moreSheet);
+ }
+ moreSheet.innerHTML=`<div class="mobile-more-panel"><div class="mobile-more-head"><strong>Lainnya</strong><button type="button" data-action="mobile-more-close">×</button></div><div class="mobile-more-list">${mobileExtra.map(([n,i])=>`<button type="button" data-page="${n}">${hpIcon(i)}<span>${sidebarLabel(n)}</span></button>`).join("")}</div></div>`;
+ moreSheet.classList.remove("open");
  const mobileMenuStyleId="planner-mobile-menu";
  if(!document.getElementById(mobileMenuStyleId)){
    const style=document.createElement("style");
    style.id=mobileMenuStyleId;
    style.textContent=`
-@media(min-width:701px){
- #mobileNav,#mobileMoreSheet{display:none!important}
+@media(max-width:768px){
+  .sidebar{display:none!important;}
+  #app>main{margin-left:0!important;width:100%!important;max-width:100%!important;padding-bottom:82px!important;}
+  #mobileNav{display:flex!important;position:fixed!important;left:8px!important;right:8px!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;width:auto!important;height:64px!important;min-height:64px!important;z-index:99999!important;box-sizing:border-box!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:stretch!important;justify-content:space-between!important;padding:4px!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:12px!important;background:rgba(10,20,35,.96)!important;box-shadow:0 10px 30px rgba(0,0,0,.3)!important;}
+  #mobileNav .mobile-nav-item{display:flex!important;flex:1 1 20%!important;width:20%!important;min-width:0!important;height:56px!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;border:0!important;border-radius:8px!important;background:transparent!important;color:rgba(255,255,255,.72)!important;padding:4px 2px!important;margin:0!important;line-height:1!important;white-space:nowrap!important;cursor:pointer!important;}
+  #mobileNav .mobile-nav-item.active{background:rgba(83,121,169,.45)!important;color:#fff!important;}
+  #mobileNav .mobile-nav-item svg{width:15px!important;height:15px!important;display:block!important;flex:0 0 15px!important;}
+  #mobileNav .mobile-nav-item span:last-child{display:block!important;font-size:8px!important;line-height:1!important;}
+  #mobileNav .mobile-more-icon{font-size:15px!important;line-height:12px!important;height:15px!important;letter-spacing:1px!important;}
+  #mobileMoreSheet{display:none!important;position:fixed!important;inset:0!important;z-index:100000!important;background:rgba(0,0,0,.45)!important;align-items:flex-end!important;}
+  #mobileMoreSheet.open{display:flex!important;}
+  #mobileMoreSheet .mobile-more-panel{width:100%!important;box-sizing:border-box!important;padding:16px 16px calc(88px + env(safe-area-inset-bottom))!important;border-radius:18px 18px 0 0!important;background:var(--panel,#101d32)!important;border:1px solid var(--border,#334967)!important;}
+  #mobileMoreSheet .mobile-more-head{display:flex!important;align-items:center!important;justify-content:space-between!important;margin-bottom:10px!important;color:var(--text,#fff)!important;}
+  #mobileMoreSheet .mobile-more-head button{border:0!important;background:transparent!important;color:var(--text,#fff)!important;font-size:24px!important;cursor:pointer!important;}
+  #mobileMoreSheet .mobile-more-list{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;}
+  #mobileMoreSheet .mobile-more-list button{display:flex!important;align-items:center!important;gap:10px!important;padding:12px!important;border:1px solid var(--border,#334967)!important;border-radius:10px!important;background:rgba(255,255,255,.03)!important;color:var(--text,#fff)!important;}
+  #mobileMoreSheet .mobile-more-list svg{width:18px!important;height:18px!important;}
 }
-@media(max-width:700px){
- body{padding-bottom:78px!important}
- #app>main{padding-bottom:82px!important}
- .sidebar{display:none!important}
- .hp-mobile-bottom-nav{
-   position:fixed!important;left:0!important;right:0!important;bottom:0!important;
-   z-index:9999!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:stretch!important;justify-content:space-between!important;
-   width:100vw!important;max-width:100vw!important;min-width:100vw!important;
-   height:72px!important;min-height:72px!important;
-   padding:7px 8px calc(7px + env(safe-area-inset-bottom));
-   box-sizing:border-box;background:rgba(10,22,39,.96);
-   border-top:1px solid var(--border);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-   box-shadow:0 -10px 30px rgba(0,0,0,.18);
- }
- .hp-mobile-bottom-nav button{
-   appearance:none;border:0;background:transparent;color:var(--muted);
-   display:flex!important;flex:0 0 20%!important;width:20%!important;max-width:20%!important;min-width:20%!important;
-   flex-direction:column!important;align-items:center!important;justify-content:center!important;
-   gap:5px;min-height:58px;padding:5px 3px;border-radius:14px;cursor:pointer;
-   font:inherit;touch-action:manipulation;
- }
- .hp-mobile-bottom-nav > button{
-   box-sizing:border-box!important;
-   writing-mode:horizontal-tb!important;
-   float:none!important;
-   position:static!important;
- }
- .hp-mobile-bottom-nav button .hp-icon{width:20px;height:20px;flex:0 0 auto}
- .hp-mobile-bottom-nav button span{font-size:10px;font-weight:700;line-height:1;white-space:nowrap}
- .hp-mobile-bottom-nav button.active{color:var(--accent);background:rgba(247,207,87,.09)}
- .hp-mobile-sheet{position:fixed;inset:0;z-index:10000;display:none}
- .hp-mobile-sheet.is-open{display:block}
- .hp-mobile-sheet-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.46)}
- .hp-mobile-sheet-panel{
-   position:absolute;left:0;right:0;bottom:0;max-height:78vh;overflow:auto;
-   background:var(--panel);border:1px solid var(--border);border-bottom:0;
-   border-radius:22px 22px 0 0;padding:10px 16px calc(20px + env(safe-area-inset-bottom));
-   box-shadow:0 -18px 50px rgba(0,0,0,.3)
- }
- .hp-mobile-sheet-handle{width:42px;height:4px;border-radius:999px;background:var(--muted);opacity:.45;margin:2px auto 16px}
- .hp-mobile-sheet-title{font-family:inherit;font-size:19px;font-weight:800;color:var(--text);margin:0 2px 12px}
- .hp-mobile-sheet-items{display:grid;gap:8px}
- .hp-mobile-sheet-items button{
-   width:100%;border:1px solid var(--border);background:rgba(255,255,255,.025);color:var(--text);
-   border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:11px;
-   font:inherit;font-size:12px;font-weight:700;text-align:left;cursor:pointer
- }
- .hp-mobile-sheet-items button .hp-icon{width:20px;height:20px;color:var(--accent)}
-}
+@media(min-width:769px){#mobileNav,#mobileMoreSheet{display:none!important;}}
 `;
    document.head.appendChild(style);
- }
- function populateMobileSheet(title,items){
-   const titleEl=$("#mobileSheetTitle"),itemsEl=$("#mobileSheetItems");
-   if(titleEl)titleEl.textContent=title;
-   if(itemsEl)itemsEl.innerHTML=items.map(([name,icon])=>`<button type="button" data-page="${name}">${hpIcon(icon)}<span>${sidebarLabel(name)}</span></button>`).join("");
  }
  if(pendingTripWelcome&&tripId){document.body.classList.add("trip-welcome-mode");renderTripWelcome();return;}
  document.body.classList.remove("trip-welcome-mode");
@@ -1155,28 +1088,10 @@ $("#tripForm").onsubmit=async e=>{
  finally{if(submit){submit.disabled=false;submit.textContent="Create Trip";}}
 };
 $("#cancelTrip").onclick=()=>$("#tripModal").close();
-document.addEventListener("click",async e=>{
-if(e.target.closest("[data-mobile-close]")){$("#mobileMoreSheet")?.classList.remove("is-open");return;}
-let b=e.target.closest("button");if(!b)return;
-if(b.dataset.mobileSection){
- const section=b.dataset.mobileSection;
- if(section==="dashboard"){page="Dashboard";$("#mobileMoreSheet")?.classList.remove("is-open");render();return;}
- if(section==="participants"){page="Participants";$("#mobileMoreSheet")?.classList.remove("is-open");render();return;}
- if(section==="villas"){page="Villas & Stay";$("#mobileMoreSheet")?.classList.remove("is-open");render();return;}
- const sheet=$("#mobileMoreSheet"),title=$("#mobileSheetTitle"),items=$("#mobileSheetItems");
- if(sheet&&items){
-   const list=section==="finance"
-     ? [["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"]]
-     : [["General","grid"],["Villas & Stay","holiday-village"],["Itinerary","itinerary"],...(mode==="master"||mode==="admin"?[[ "Settings","settings" ]]:[])];
-   if(title)title.textContent=section==="finance"?"Keuangan":"Lainnya";
-   items.innerHTML=list.map(([name,icon])=>`<button type="button" data-page="${name}">${hpIcon(icon)}<span>${sidebarLabel(name)}</span></button>`).join("");
-   sheet.classList.add("is-open");
- }
- return;
-}
+document.addEventListener("click",async e=>{let b=e.target.closest("button");if(!b)return;
 if(b.hasAttribute("data-villa-prev")){setVillaGallery(villaGalleryIndex-1);return;}
 if(b.hasAttribute("data-villa-next")){setVillaGallery(villaGalleryIndex+1);return;}
-if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){$("#mobileMoreSheet")?.classList.remove("is-open");page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
+if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.dataset.action==="mobile-more"){document.getElementById("mobileMoreSheet")?.classList.add("open");return;}if(b.dataset.action==="mobile-more-close"){document.getElementById("mobileMoreSheet")?.classList.remove("open");return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
 if(b.id==="createAdmin"){
  if(mode!=="master")return toast("Master Access required.");
  const name=$("#newAdminName").value.trim(),pin=$("#newAdminPin").value.trim(),trips=[...document.querySelectorAll('input[name="adminTrip"]:checked')].map(o=>o.value);
