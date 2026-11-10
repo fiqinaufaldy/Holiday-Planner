@@ -463,19 +463,28 @@ function showApp(){
  .sidebar{display:none!important}
  .hp-mobile-bottom-nav{
    position:fixed!important;left:0!important;right:0!important;bottom:0!important;
-   z-index:9999!important;display:grid!important;display:flex!important;flex-direction:row!important;grid-template-columns:none!important;width:100vw!important;max-width:100vw!important;
-   height:72px;padding:7px 8px calc(7px + env(safe-area-inset-bottom));
+   z-index:9999!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:stretch!important;justify-content:space-between!important;
+   width:100vw!important;max-width:100vw!important;min-width:100vw!important;
+   height:72px!important;min-height:72px!important;
+   padding:7px 8px calc(7px + env(safe-area-inset-bottom));
    box-sizing:border-box;background:rgba(10,22,39,.96);
    border-top:1px solid var(--border);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
    box-shadow:0 -10px 30px rgba(0,0,0,.18);
  }
  .hp-mobile-bottom-nav button{
    appearance:none;border:0;background:transparent;color:var(--muted);
-   display:flex!important;flex:1 1 20%!important;flex-direction:column;align-items:center;justify-content:center;
-   gap:5px;min-width:0;padding:5px 3px;border-radius:14px;cursor:pointer;
+   display:flex!important;flex:0 0 20%!important;width:20%!important;max-width:20%!important;min-width:20%!important;
+   flex-direction:column!important;align-items:center!important;justify-content:center!important;
+   gap:5px;min-height:58px;padding:5px 3px;border-radius:14px;cursor:pointer;
    font:inherit;touch-action:manipulation;
  }
- .hp-mobile-bottom-nav button .hp-icon{width:20px;height:20px}
+ .hp-mobile-bottom-nav > button{
+   box-sizing:border-box!important;
+   writing-mode:horizontal-tb!important;
+   float:none!important;
+   position:static!important;
+ }
+ .hp-mobile-bottom-nav button .hp-icon{width:20px;height:20px;flex:0 0 auto}
  .hp-mobile-bottom-nav button span{font-size:10px;font-weight:700;line-height:1;white-space:nowrap}
  .hp-mobile-bottom-nav button.active{color:var(--accent);background:rgba(247,207,87,.09)}
  .hp-mobile-sheet{position:fixed;inset:0;z-index:10000;display:none}
