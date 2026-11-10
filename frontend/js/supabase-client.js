@@ -64,12 +64,16 @@
   async updateTrip(id,t){
    await requireSession();
    const payload={name:String(t.name||"").trim(),destination:t.destination||null,start_date:t.start||t.start_date||null,end_date:t.end||t.end_date||null,description:t.description||null,cover_image_url:t.cover||t.cover_image_url||null,status:t.status||"planning"};
-   if(typeof t.pin!=="string"||!/^[0-9]{6}$/.test(t.pin))throw new Error("Trip PIN harus 6 digit.");
    const {data,error}=await client.from("trips").update(payload).eq("id",id).select().single();
    fail(error);
-   const {data:pinResult,error:pinError}=await client.rpc("set_trip_pin",{p_trip_id:id,p_pin:t.pin});
-   fail(pinError);
-   if(pinResult!==true)throw new Error("Trip PIN gagal disimpan.");
+   // Only update the PIN when a new PIN is explicitly supplied. Normal trip/workspace edits must not require it.
+   if(t.pin!==undefined&&t.pin!==null&&String(t.pin)!==""){
+    const pin=String(t.pin);
+    if(!/^[0-9]{6}$/.test(pin))throw new Error("Trip PIN harus 6 digit.");
+    const {data:pinResult,error:pinError}=await client.rpc("set_trip_pin",{p_trip_id:id,p_pin:pin});
+    fail(pinError);
+    if(pinResult!==true)throw new Error("Trip PIN gagal disimpan.");
+   }
    return data;
   },
   async deleteTrip(id){await requireSession();const {error}=await client.from("trips").delete().eq("id",id);fail(error);return{ok:true};},

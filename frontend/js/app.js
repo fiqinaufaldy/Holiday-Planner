@@ -106,7 +106,9 @@ function queueCloudWorkspaceSave(t){
  if(!cloudSyncReady||!t?.id||!window.HolidayPlannerCloud?.saveTripWorkspace)return;
  const timer=cloudSaveTimers.get(t.id);if(timer)clearTimeout(timer);
  cloudSaveTimers.set(t.id,setTimeout(async()=>{
-  try{const snapshot=JSON.parse(JSON.stringify(t));delete snapshot.pin;
+  try{const snapshot=JSON.parse(JSON.stringify(t));
+   // Workspace sync also validates the trip PIN, so keep it in the workspace payload.
+   // Do not strip snapshot.pin here.
    // Workspace is the source of truth for planner edits. Save it first.
    // Syncing public.trips metadata is best-effort so an RLS/permission issue there
    // does not make a successful workspace save look like a failed cloud save.
@@ -127,7 +129,6 @@ function save(){localStorage.setItem(store,JSON.stringify(db));if(cloudSyncReady
 async function persistTripCloudNow(t){
  if(!cloudSyncReady||!t?.id||!window.HolidayPlannerCloud?.saveTripWorkspace)return;
  const snapshot=JSON.parse(JSON.stringify(t));
- delete snapshot.pin;
  await window.HolidayPlannerCloud.saveTripWorkspace(t.id,snapshot);
 }
 function money(n){return "Rp "+Number(n||0).toLocaleString("id-ID")}
