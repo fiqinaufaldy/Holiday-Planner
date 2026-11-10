@@ -397,18 +397,113 @@ function showApp(){
  updateSidebarProfile();
  $("#nav").innerHTML=navItems().map(([n,i])=>`<button type="button" data-page="${n}" class="${page===n?"active":""}">${hpIcon(i)}<span>${sidebarLabel(n)}</span></button>`).join("")+` <button type="button" data-action="exit-trip" class="sidebar-logout">${hpIcon("logout")}<span>${sidebarLabel("Log out")}</span></button>`;
  const mobileNav=$("#mobileNav");
- if(mobileNav){
-   /* Mobile navigation intentionally disabled. Desktop sidebar remains unchanged. */
-   mobileNav.innerHTML="";
-   mobileNav.classList.remove("is-visible");
-   mobileNav.setAttribute("hidden","hidden");
+ const mobileMore=$("#mobileMoreSheet");
+ if(!mobileNav){
+   const nav=document.createElement("nav");
+   nav.id="mobileNav";
+   nav.className="hp-mobile-bottom-nav";
+   document.body.appendChild(nav);
  }
- const mobileMenuStyleId="planner-mobile-menu-disabled";
+ const bottomNav=$("#mobileNav");
+ if(bottomNav){
+   bottomNav.innerHTML=`
+    <button type="button" data-mobile-section="dashboard" class="${page==="Dashboard"?"active":""}">
+      ${hpIcon("dashboard")}<span>Beranda</span>
+    </button>
+    <button type="button" data-mobile-section="participants" class="${page==="Participants"?"active":""}">
+      ${hpIcon("users-event")}<span>Peserta</span>
+    </button>
+    <button type="button" data-mobile-section="finance" class="${["Income Planning","Expense Planning","Cash Flow"].includes(page)?"active":""}">
+      ${hpIcon("finance")}<span>Keuangan</span>
+    </button>
+    <button type="button" data-mobile-section="destinations" class="${page==="Destinations"?"active":""}">
+      ${hpIcon("maps-location-02")}<span>Destinasi</span>
+    </button>
+    <button type="button" data-mobile-section="more" class="${["General","Villas & Stay","Itinerary","Settings"].includes(page)?"active":""}">
+      ${hpIcon("more")}<span>Lainnya</span>
+    </button>`;
+   bottomNav.removeAttribute("hidden");
+ }
+ let sheet=$("#mobileMoreSheet");
+ if(!sheet){
+   sheet=document.createElement("div");
+   sheet.id="mobileMoreSheet";
+   sheet.className="hp-mobile-sheet";
+   document.body.appendChild(sheet);
+ }
+ const financeItems=[
+   ["Income Planning","finance-manager"],
+   ["Expense Planning","expense-report"],
+   ["Cash Flow","finance"]
+ ];
+ const moreItems=[
+   ["General","grid"],
+   ["Villas & Stay","holiday-village"],
+   ["Itinerary","itinerary"]
+ ];
+ if(mode==="master"||mode==="admin")moreItems.push(["Settings","settings"]);
+ sheet.innerHTML=`
+   <div class="hp-mobile-sheet-backdrop" data-mobile-close></div>
+   <div class="hp-mobile-sheet-panel">
+     <div class="hp-mobile-sheet-handle"></div>
+     <div class="hp-mobile-sheet-title" id="mobileSheetTitle">Menu</div>
+     <div class="hp-mobile-sheet-items" id="mobileSheetItems"></div>
+   </div>`;
+ const mobileMenuStyleId="planner-mobile-menu";
  if(!document.getElementById(mobileMenuStyleId)){
    const style=document.createElement("style");
    style.id=mobileMenuStyleId;
-   style.textContent=`@media(max-width:700px){#mobileNav,.mobile-nav,.mobile-trip-menu,.mobile-more-sheet{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;pointer-events:none!important}}`;
+   style.textContent=`
+@media(min-width:701px){
+ #mobileNav,#mobileMoreSheet{display:none!important}
+}
+@media(max-width:700px){
+ body{padding-bottom:78px!important}
+ #app>main{padding-bottom:82px!important}
+ .sidebar{display:none!important}
+ .hp-mobile-bottom-nav{
+   position:fixed!important;left:0!important;right:0!important;bottom:0!important;
+   z-index:9999!important;display:grid!important;grid-template-columns:repeat(5,1fr);
+   height:72px;padding:7px 8px calc(7px + env(safe-area-inset-bottom));
+   box-sizing:border-box;background:rgba(10,22,39,.96);
+   border-top:1px solid var(--border);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+   box-shadow:0 -10px 30px rgba(0,0,0,.18);
+ }
+ .hp-mobile-bottom-nav button{
+   appearance:none;border:0;background:transparent;color:var(--muted);
+   display:flex;flex-direction:column;align-items:center;justify-content:center;
+   gap:5px;min-width:0;padding:5px 3px;border-radius:14px;cursor:pointer;
+   font:inherit;touch-action:manipulation;
+ }
+ .hp-mobile-bottom-nav button .hp-icon{width:20px;height:20px}
+ .hp-mobile-bottom-nav button span{font-size:10px;font-weight:700;line-height:1;white-space:nowrap}
+ .hp-mobile-bottom-nav button.active{color:var(--accent);background:rgba(247,207,87,.09)}
+ .hp-mobile-sheet{position:fixed;inset:0;z-index:10000;display:none}
+ .hp-mobile-sheet.is-open{display:block}
+ .hp-mobile-sheet-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.46)}
+ .hp-mobile-sheet-panel{
+   position:absolute;left:0;right:0;bottom:0;max-height:78vh;overflow:auto;
+   background:var(--panel);border:1px solid var(--border);border-bottom:0;
+   border-radius:22px 22px 0 0;padding:10px 16px calc(20px + env(safe-area-inset-bottom));
+   box-shadow:0 -18px 50px rgba(0,0,0,.3)
+ }
+ .hp-mobile-sheet-handle{width:42px;height:4px;border-radius:999px;background:var(--muted);opacity:.45;margin:2px auto 16px}
+ .hp-mobile-sheet-title{font-family:inherit;font-size:19px;font-weight:800;color:var(--text);margin:0 2px 12px}
+ .hp-mobile-sheet-items{display:grid;gap:8px}
+ .hp-mobile-sheet-items button{
+   width:100%;border:1px solid var(--border);background:rgba(255,255,255,.025);color:var(--text);
+   border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:11px;
+   font:inherit;font-size:12px;font-weight:700;text-align:left;cursor:pointer
+ }
+ .hp-mobile-sheet-items button .hp-icon{width:20px;height:20px;color:var(--accent)}
+}
+`;
    document.head.appendChild(style);
+ }
+ function populateMobileSheet(title,items){
+   const titleEl=$("#mobileSheetTitle"),itemsEl=$("#mobileSheetItems");
+   if(titleEl)titleEl.textContent=title;
+   if(itemsEl)itemsEl.innerHTML=items.map(([name,icon])=>`<button type="button" data-page="${name}">${hpIcon(icon)}<span>${sidebarLabel(name)}</span></button>`).join("");
  }
  if(pendingTripWelcome&&tripId){document.body.classList.add("trip-welcome-mode");renderTripWelcome();return;}
  document.body.classList.remove("trip-welcome-mode");
@@ -1051,10 +1146,28 @@ $("#tripForm").onsubmit=async e=>{
  finally{if(submit){submit.disabled=false;submit.textContent="Create Trip";}}
 };
 $("#cancelTrip").onclick=()=>$("#tripModal").close();
-document.addEventListener("click",async e=>{let b=e.target.closest("button");if(!b)return;
+document.addEventListener("click",async e=>{
+if(e.target.closest("[data-mobile-close]")){$("#mobileMoreSheet")?.classList.remove("is-open");return;}
+let b=e.target.closest("button");if(!b)return;
+if(b.dataset.mobileSection){
+ const section=b.dataset.mobileSection;
+ if(section==="dashboard"){page="Dashboard";$("#mobileMoreSheet")?.classList.remove("is-open");render();return;}
+ if(section==="participants"){page="Participants";$("#mobileMoreSheet")?.classList.remove("is-open");render();return;}
+ if(section==="destinations"){page="Destinations";$("#mobileMoreSheet")?.classList.remove("is-open");render();return;}
+ const sheet=$("#mobileMoreSheet"),title=$("#mobileSheetTitle"),items=$("#mobileSheetItems");
+ if(sheet&&items){
+   const list=section==="finance"
+     ? [["Income Planning","finance-manager"],["Expense Planning","expense-report"],["Cash Flow","finance"]]
+     : [["General","grid"],["Villas & Stay","holiday-village"],["Itinerary","itinerary"],...(mode==="master"||mode==="admin"?[[ "Settings","settings" ]]:[])];
+   if(title)title.textContent=section==="finance"?"Keuangan":"Lainnya";
+   items.innerHTML=list.map(([name,icon])=>`<button type="button" data-page="${name}">${hpIcon(icon)}<span>${sidebarLabel(name)}</span></button>`).join("");
+   sheet.classList.add("is-open");
+ }
+ return;
+}
 if(b.hasAttribute("data-villa-prev")){setVillaGallery(villaGalleryIndex-1);return;}
 if(b.hasAttribute("data-villa-next")){setVillaGallery(villaGalleryIndex+1);return;}
-if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
+if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){$("#mobileMoreSheet")?.classList.remove("is-open");page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
 if(b.id==="createAdmin"){
  if(mode!=="master")return toast("Master Access required.");
  const name=$("#newAdminName").value.trim(),pin=$("#newAdminPin").value.trim(),trips=[...document.querySelectorAll('input[name="adminTrip"]:checked')].map(o=>o.value);
