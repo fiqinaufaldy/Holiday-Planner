@@ -156,9 +156,9 @@ languagePairs.push(...[["YOUR TRAVEL SPACE", "RUANG PERJALANANMU"], ["Trip works
 const plannerOriginalTextNodes = new WeakMap();
 languagePairs.push(...[
  ["NEXT","BERIKUTNYA"],["SPENDING","PENGELUARAN"],["GROUP DECISION","KEPUTUSAN BERSAMA"],
- ["Villa Vote","Voting Villa"],["Vote for the stay you prefer.","Pilih penginapan yang kamu inginkan."],["Vote Now","Vote Sekarang"],
+ ["Accommodation Vote","Voting Penginapan"],["Vote for the stay you prefer.","Pilih penginapan yang kamu inginkan."],["Vote Now","Vote Sekarang"],
  ["View All","Lihat Semua"],["No upcoming itinerary yet.","Belum ada jadwal berikutnya."],["No expenses planned yet.","Belum ada pengeluaran yang direncanakan."],
- ["No villa available for voting yet.","Belum ada villa yang tersedia untuk voting."],["People","Orang"],["Days","Hari"],["Spent","Terpakai"],
+ ["No accommodation available for voting yet.","Belum ada villa yang tersedia untuk voting."],["People","Orang"],["Days","Hari"],["Spent","Terpakai"],
  ["Remaining Budget","Sisa Anggaran"],["Total Spent","Total Pengeluaran"],["Remaining Until Trip","Sisa Waktu Trip"]
 ]);
 const plannerOriginalAttributes = new WeakMap();
@@ -822,37 +822,65 @@ $("#cancelIncome").onclick=()=>$("#incomeModal").close();
 
 
 
+let accommodationTab="list";
+function accommodationType(v){return String(v?.type||"Villa").trim()||"Villa"}
+function accommodationVoteKey(p,i){return String(p?.id||p?.contact||p?.name||`participant-${i}`).trim().toLowerCase()}
+function accommodationVoteData(t){
+  if(!Array.isArray(t.accommodationVotes))t.accommodationVotes=[];
+  const participants=Array.isArray(t.participants)?t.participants:[];
+  const validKeys=new Set(participants.map((p,i)=>accommodationVoteKey(p,i)));
+  t.accommodationVotes=t.accommodationVotes.filter(v=>validKeys.has(String(v.participantKey||""))&&t.stays?.some((s,i)=>String(v.stayId||"")===String(s.id||i)));
+  return {participants,votes:t.accommodationVotes};
+}
 function villasPage(t){
   if(!Array.isArray(t.stays))t.stays=[];
-  if(!Array.isArray(t.votes))t.votes=[];
-  const stays=t.stays, people=Array.isArray(t.participants)?t.participants:[];
-  let activeTab=window.__hpAccommodationTab||"list";
-  window.__hpAccommodationTab=null;
-  const typeOf=v=>String(v.type||v.category||"Villa").trim()||"Villa";
-  const photoOf=v=>v.photos?.[0]||v.photo||"https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=85";
-  const statusOf=v=>v.status||"Available";
-  const stayKey=(v,i)=>String(v.id||("stay-"+i));
-  const participantKey=p=>String(p.id||p.name);
-  const voteForParticipant=pid=>t.votes.find(v=>String(v.participantId)===String(pid));
-  const header=`<div class="stay-page-head"><div><span class="eyebrow">YOUR TRAVEL SPACE</span><h2>${plannerLanguage==="id"?"Penginapan":"Accommodation"}</h2><p>Accommodation</p></div></div>`;
-  const tabs=()=>`<div class="accommodation-tabs"><button type="button" class="${activeTab==="list"?"active":""}" data-accommodation-tab="list"><span class="accommodation-tab-icon">${hpIcon("bed")}</span><span><strong>${plannerLanguage==="id"?"Daftar Penginapan":"Accommodation List"}</strong><small>Accommodation List</small></span></button><button type="button" class="${activeTab==="vote"?"active":""}" data-accommodation-tab="vote"><span class="accommodation-tab-icon">${hpIcon("checklist")}</span><span><strong>${plannerLanguage==="id"?"Voting Penginapan":"Accommodation Voting"}</strong><small>Accommodation Voting</small></span><b class="new-badge">Baru</b></button></div>`;
-  const stats=()=>{const available=stays.filter(v=>statusOf(v)==="Available").length;return `<div class="accommodation-stats"><div><span>${hpIcon("bed")}</span><small>Total Penginapan</small><b>${stays.length}</b></div><div><span>${hpIcon("checklist")}</span><small>Tersedia</small><b>${available}</b></div><div><span>${hpIcon("calendar")}</span><small>Rencana Stay</small><b>${date(t.start)} – ${date(t.end)}</b></div><div><span>${hpIcon("users")}</span><small>Kebutuhan</small><b>± ${people.length} Orang</b></div></div>`};
-  const stayCard=(v,i)=>`<article class="accommodation-card"><button class="accommodation-photo" data-villadetail="${i}" style="background-image:url('${esc(photoOf(v))}')"></button><div class="accommodation-main"><div class="accommodation-title"><div><h3>${esc(v.name||"Unnamed Accommodation")}</h3><span class="type-badge">${esc(typeOf(v))}</span><p>⌖ ${esc(v.area||v.location||"Location not set")}</p></div><span class="availability-badge">✓ ${esc(statusOf(v)==="Available"?"Tersedia":statusOf(v))}</span></div><div class="stay-meta"><span>♙ ${esc(v.guests||"—")} Tamu</span><span>▤ ${esc(v.bedrooms||"—")} Kamar</span><span>♨ ${esc(v.bathrooms||"—")} Kamar Mandi</span></div></div><div class="accommodation-price"><strong>${money(v.price||0)}</strong><small>/ malam</small></div><div class="accommodation-actions"><button data-villadetail="${i}">Lihat Detail <span>→</span></button>${mode==="member"?"":`<button data-editvilla="${i}">Ubah</button>`}</div></article>`;
-  const listView=()=>`<div class="accommodation-hero"><div><span class="eyebrow">ACCOMMODATION COLLECTION</span><h2>Rencanakan Tempat Menginap</h2><p>Pilih, diskusikan, dan tentukan penginapan terbaik untuk perjalananmu di ${esc(t.name)}.</p></div><div class="hero-count"><b>${stays.length}</b><span>Properties</span></div></div>${stats()}<div class="stay-toolbar"><label class="stay-search">⌕ <input id="villaSearch" placeholder="Cari nama penginapan, lokasi, atau fasilitas..."></label><select id="villaFilter"><option value="All">Semua Tipe</option>${[...new Set(stays.map(typeOf))].map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select>${mode==="member"?"":`<button class="primary" id="addVilla">＋ Tambah Penginapan</button>`}</div><div class="stay-list" id="stayList">${stays.map(stayCard).join("")||`<div class="stay-empty"><h3>Belum ada penginapan</h3><p>Tambahkan pilihan penginapan untuk dibandingkan bersama.</p></div>`}</div>`;
-  const voteView=()=>{const voted=new Set(t.votes.map(v=>String(v.participantId))).size,pct=people.length?Math.round(voted/people.length*100):0;const cards=stays.map((v,i)=>{const sid=stayKey(v,i),count=t.votes.filter(x=>String(x.stayId)===sid).length;return `<button type="button" class="vote-accommodation-card" data-vote-stay="${esc(sid)}"><span class="vote-photo" style="background-image:url('${esc(photoOf(v))}')"></span><span class="vote-info"><strong>${esc(v.name||"Accommodation")}</strong><small>${esc(typeOf(v))} · ${esc(v.area||v.location||"Location not set")}</small><span>± ${money(v.price||0)} / malam</span></span><span class="vote-count">${count} vote</span><span class="vote-radio"></span></button>`}).join("");return `<section class="accommodation-vote-page"><div class="vote-heading"><div><span class="eyebrow">GROUP DECISION</span><h2>Pilih Penginapan Terbaik</h2><p>Bantu tentukan tempat menginap untuk trip ${esc(t.name)}.</p></div></div><div class="vote-progress"><div><span>${hpIcon("users")}</span><small>Progress Voting</small><b>${voted} / ${people.length} Peserta (${pct}%)</b></div><div><span>${hpIcon("calendar")}</span><small>Batas Voting</small><b>${t.voteDeadline?date(t.voteDeadline):"Belum ditentukan"}</b></div></div><div class="vote-layout"><div class="vote-options"><h3>Pilihan Penginapan</h3>${cards||`<div class="empty">Belum ada pilihan penginapan.</div>`}</div><div class="vote-side"><section class="participant-vote-card"><span class="eyebrow">DATA PESERTA</span><h3>Pilih Nama Peserta</h3><p>Vote dicatat berdasarkan peserta, bukan akun Member.</p><select id="voteParticipant" ${people.length?"":"disabled"}>${people.map(p=>`<option value="${esc(participantKey(p))}">${esc(p.name)}</option>`).join("")}</select></section><button type="button" class="primary vote-submit" id="submitAccommodationVote" ${people.length&&stays.length?"":"disabled"}>✓ Kirim Voting</button><div class="vote-result-card"><strong>${voted}/${people.length}</strong><span>Peserta sudah memberikan suara</span></div></div></div></section>`};
-  function render(){
-    $("#content").innerHTML=header+tabs()+(activeTab==="list"?listView():voteView());
-    if(activeTab==="list"){const search=$("#villaSearch"),filter=$("#villaFilter"),list=$("#stayList");function apply(){const q=(search?.value||"").toLowerCase(),f=filter?.value||"All";list.innerHTML=stays.map((v,i)=>({v,i})).filter(({v})=>(!q||`${v.name} ${v.area||v.location||""} ${v.facilities||""}`.toLowerCase().includes(q))&&(f==="All"||typeOf(v)===f)).map(({v,i})=>stayCard(v,i)).join("")||`<div class="stay-empty"><h3>Tidak ada penginapan yang cocok</h3><p>Coba kata kunci atau filter lain.</p></div>`}search?.addEventListener("input",apply);filter?.addEventListener("change",apply);}
-    else{const ps=$("#voteParticipant");if(ps){const first=people[0];if(first){const existing=voteForParticipant(participantKey(first));document.querySelectorAll("[data-vote-stay]").forEach(b=>b.classList.toggle("selected",String(b.dataset.voteStay)===String(existing?.stayId||"")));}ps.onchange=()=>{const v=voteForParticipant(ps.value);document.querySelectorAll("[data-vote-stay]").forEach(b=>b.classList.toggle("selected",String(b.dataset.voteStay)===String(v?.stayId||"")));};}}
+  const stays=t.stays;
+  const {participants,votes}=accommodationVoteData(t);
+  const total=stays.length, available=stays.filter(x=>x.status==="Available"||!x.status).length;
+  const voteCount=votes.length, participantTotal=participants.length, votePct=participantTotal?Math.round(voteCount/participantTotal*100):0;
+  const voteMap=new Map(stays.map((v,i)=>[String(v.id||i),0]));
+  votes.forEach(v=>{const k=String(v.stayId||"");if(voteMap.has(k))voteMap.set(k,(voteMap.get(k)||0)+1)});
+  const ranked=stays.map((v,i)=>({v,i,votes:voteMap.get(String(v.id||i))||0})).sort((a,b)=>b.votes-a.votes);
+  const typeOptions=[...new Set(stays.map(accommodationType))];
+  const typeBadge=v=>`<span class="accom-type-badge">${esc(accommodationType(v))}</span>`;
+  const photo=v=>esc(v.photos?.[0]||v.photo||'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=85');
+  const card=(v,i)=>`<article class="accom-card"><button class="accom-photo" data-villadetail="${i}" style="background-image:url('${photo(v)}')" aria-label="${esc(v.name)}"></button><div class="accom-card-info"><div class="accom-card-main"><div class="accom-title-row"><h3>${esc(v.name||"Penginapan")}</h3>${typeBadge(v)}</div><p class="accom-location">⌖ ${esc(v.area||v.location||'Lokasi belum diatur')}</p><div class="accom-meta"><span>♙ ${esc(v.guests||'—')} Tamu</span><span>▤ ${esc(v.bedrooms||'—')} Kamar</span><span>♨ ${esc(v.bathrooms||'—')} Kamar Mandi</span></div></div><div class="accom-price">${money(v.price||0)} <small>/ malam</small></div><div class="accom-actions"><span class="accom-status ${String(v.status||'Available').toLowerCase()==='available'?'ok':''}">✓ ${esc(v.status||'Tersedia')}</span><button class="accom-detail-btn" data-villadetail="${i}">Lihat Detail <span>→</span></button>${mode==="member"?"":`<button class="accom-edit-btn" data-editvilla="${i}">Ubah</button>`}</div></div></article>`;
+  const hero=`<section class="accom-hero"><div><span class="eyebrow">ACCOMMODATION COLLECTION</span><h2>Rencanakan Tempat Menginap</h2><p>Pilih, diskusikan, dan tentukan penginapan terbaik untuk perjalananmu di ${esc(t.name)}.</p></div></section>`;
+  const tabs=`<div class="accom-tabs"><button type="button" data-accommodation-tab="list" class="${accommodationTab==='list'?'active':''}"><span class="accom-tab-icon">▤</span><span><b>Daftar Penginapan</b><small>Accommodation List</small></span></button><button type="button" data-accommodation-tab="vote" class="${accommodationTab==='vote'?'active':''}"><span class="accom-tab-icon">☑</span><span><b>Voting Penginapan</b><small>Accommodation Voting</small></span>${voteCount<participantTotal?'<em>Baru</em>':''}</button></div>`;
+  const stats=`<div class="accom-stats"><div><span>▤</span><small>Total Penginapan</small><b>${total}</b></div><div><span>☑</span><small>Tersedia</small><b>${available}</b></div><div><span>▣</span><small>Rencana Stay</small><b>${date(t.start)} – ${date(t.end)}</b></div><div><span>♙</span><small>Kebutuhan</small><b>± ${participantTotal} Orang</b></div></div>`;
+  const listToolbar=`<div class="accom-toolbar"><label>⌕ <input id="villaSearch" placeholder="Cari nama penginapan, lokasi, atau fasilitas..."></label><select id="villaFilter"><option value="All">Semua Tipe</option>${typeOptions.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select>${mode==="member"?"":`<button class="primary" id="addVilla">＋ Tambah Penginapan</button>`}</div>`;
+  const listView=`${stats}${listToolbar}<div class="accom-list" id="stayList">${stays.map(card).join('')||`<div class="stay-empty"><h3>Belum ada penginapan</h3><p>Tambahkan hotel, villa, resort, atau homestay untuk perjalanan ini.</p>${mode==="member"?"":`<button class="primary" id="addVillaEmpty">＋ Tambah Penginapan Pertama</button>`}</div>`}</div>`;
+  const resultRows=ranked.map((item,pos)=>{const pct=voteCount?item.votes/voteCount*100:0;return `<div class="vote-result-row"><div class="vote-rank">${pos+1}</div><div class="vote-result-photo" style="background-image:url('${photo(item.v)}')"></div><div class="vote-result-info"><b>${esc(item.v.name||'Penginapan')}</b><span>${money(item.v.price||0)} / malam · ${item.votes} vote${item.votes===1?'':'s'}</span><div class="vote-track"><i style="width:${pct}%"></i></div></div><strong>${pct.toFixed(0)}%</strong></div>`}).join('')||'<div class="stay-empty"><h3>Belum ada pilihan penginapan</h3><p>Tambahkan penginapan terlebih dahulu.</p></div>';
+  const currentParticipant=participants.findIndex((p,i)=>!votes.some(v=>v.participantKey===accommodationVoteKey(p,i)));
+  const defaultParticipant=Math.max(0,currentParticipant>=0?currentParticipant:0);
+  const participantSelect=participants.length?`<select id="accommodationParticipant">${participants.map((p,i)=>{const key=accommodationVoteKey(p,i);const existing=votes.find(v=>v.participantKey===key);return `<option value="${esc(key)}" data-participant-index="${i}" ${i===defaultParticipant?'selected':''}>${esc(p.name||`Peserta ${i+1}`)}${existing?' — sudah voting':''}</option>`}).join('')}</select>`:'<div class="vote-no-participants">Belum ada peserta.</div>';
+  const selectedStay=votes.find(v=>v.participantKey===accommodationVoteKey(participants[defaultParticipant],defaultParticipant))?.stayId||'';
+  const voteCandidates=stays.map((v,i)=>{const id=String(v.id||i);const selected=String(selectedStay)===id;return `<button type="button" class="vote-choice ${selected?'selected':''}" data-vote-stay="${esc(id)}"><span class="vote-choice-photo" style="background-image:url('${photo(v)}')"></span><span class="vote-choice-info"><b>${esc(v.name||'Penginapan')}</b><small>${typeBadge(v)} ${money(v.price||0)} / malam</small></span><span class="vote-radio">${selected?'✓':''}</span></button>`}).join('')||'<div class="stay-empty">Belum ada penginapan untuk dipilih.</div>';
+  const voteView=`<div class="accom-vote-head"><div><span class="eyebrow">GROUP DECISION</span><h2>Pilih Penginapan Terbaik</h2><p>Bantu tentukan tempat menginap untuk trip ${esc(t.name)}.</p></div><div class="vote-summary"><b>${voteCount} / ${participantTotal} Peserta</b><span>${votePct}% sudah voting</span></div></div><div class="accom-vote-layout"><section class="vote-panel"><div class="vote-progress"><div><span>Progress Voting</span><b>${voteCount} / ${participantTotal} Peserta (${votePct}%)</b></div><div><span>Batas Voting</span><b>${date(t.end)}, 23:59</b></div></div><div class="vote-candidates">${voteCandidates}</div><div class="vote-participant"><h3>Data Peserta</h3><label>Nama Peserta *</label>${participantSelect}</div><button type="button" class="primary vote-submit" id="submitAccommodationVote" ${participants.length&&stays.length?'':'disabled'}>✓　Kirim Voting</button></section><section class="vote-results"><div class="dashboard-card-head"><div><span class="eyebrow">RESULT</span><h2>Hasil Voting Penginapan</h2><p>Perolehan suara peserta trip.</p></div></div>${resultRows}</section></div>`;
+  $('#content').innerHTML=`${hero}${tabs}<div id="accommodationTabContent">${accommodationTab==='vote'?voteView:listView}</div>`;
+  document.querySelectorAll('[data-accommodation-tab]').forEach(btn=>btn.onclick=()=>{accommodationTab=btn.dataset.accommodationTab;villasPage(t)});
+  if(accommodationTab==='list'){
+    const search=$('#villaSearch'),filter=$('#villaFilter');
+    const apply=()=>{const q=(search.value||'').toLowerCase(),f=filter.value;$('#stayList').innerHTML=stays.map((v,i)=>({v,i})).filter(({v})=>(!q||`${v.name} ${v.area||v.location||''} ${v.facilities||''}`.toLowerCase().includes(q))&&(f==='All'||accommodationType(v)===f)).map(({v,i})=>card(v,i)).join('')||'<div class="stay-empty"><h3>Tidak ada penginapan</h3><p>Coba kata kunci atau tipe lain.</p></div>'};
+    search?.addEventListener('input',apply);filter?.addEventListener('change',apply);
+  }else{
+    document.querySelectorAll('[data-vote-stay]').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('[data-vote-stay]').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');btn.querySelector('.vote-radio').textContent='✓';document.querySelectorAll('[data-vote-stay]:not(.selected) .vote-radio').forEach(x=>x.textContent='');});
+    const participantEl=$('#accommodationParticipant');
+    participantEl?.addEventListener('change',()=>villasPage(t));
+    $('#submitAccommodationVote')?.addEventListener('click',async()=>{
+      const participantKey=participantEl?.value||'';const selected=document.querySelector('[data-vote-stay].selected');const stayId=selected?.dataset.voteStay||'';
+      if(!participantKey)return toast('Pilih peserta terlebih dahulu.');if(!stayId)return toast('Pilih penginapan terlebih dahulu.');
+      const existing=votes.find(v=>v.participantKey===participantKey);if(existing){existing.stayId=stayId;existing.votedAt=new Date().toISOString()}else votes.push({participantKey,stayId,votedAt:new Date().toISOString()});
+      t.accommodationVotes=votes;save();try{await persistTripCloudNow(t);toast('Voting berhasil disimpan.')}catch(err){console.error('Accommodation vote sync failed',err);toast('Voting tersimpan lokal, tetapi gagal disinkronkan.')}villasPage(t);
+    });
   }
-  render();
 }
 let villaPendingPhotos=[];
 function renderVillaPhotoPreview(){const box=$("#villaPhotoPreview");if(!box)return;box.innerHTML=villaPendingPhotos.map((src,i)=>`<div class="villa-preview-item"><img src="${src}" alt="Villa photo ${i+1}"><button type="button" data-remove-villaphoto="${i}" aria-label="Remove photo">×</button></div>`).join("")||'<span class="villa-preview-empty">No photos selected yet.</span>'}
 function compressVillaImage(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=reject;reader.onload=()=>{const img=new Image();img.onerror=reject;img.onload=()=>{const max=1500,scale=Math.min(1,max/Math.max(img.width,img.height));const canvas=document.createElement("canvas");canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/webp",.76))};img.src=reader.result};reader.readAsDataURL(file)})}
-function openVilla(index=null){if(!canManageTrip())return toast("Member harus mengirim request melalui My Requests.");const f=$("#villaForm");f.reset();$("#villaIndex").value=index===null?"":String(index);$("#villaModalTitle").textContent=index===null?"Add Villa":"Edit Villa";villaPendingPhotos=[];if(index!==null){const v=trip().stays[index]||{};for(const k of ["name","area","price","guests","bedrooms","bathrooms","status","referenceLink","description","facilities","notes"])if(f.elements[k])f.elements[k].value=v[k]??"";villaPendingPhotos=(v.photos&&v.photos.length?v.photos:(v.photo?[v.photo]:[])).slice(0,6)}renderVillaPhotoPreview();$("#villaModal").showModal()}
+function openVilla(index=null){if(!canManageTrip())return toast("Member harus mengirim request melalui My Requests.");const f=$("#villaForm");f.reset();if(!f.elements.type){const grid=f.querySelector(".formgrid")||f;const wrap=document.createElement("label");wrap.innerHTML=`Accommodation type<select name="type"><option>Villa</option><option>Hotel</option><option>Resort</option><option>Homestay</option><option>Guest House</option><option>Apartment</option><option>Other</option></select>`;grid.appendChild(wrap)}$("#villaIndex").value=index===null?"":String(index);$("#villaModalTitle").textContent=index===null?"Add Accommodation":"Edit Accommodation";villaPendingPhotos=[];if(index!==null){const v=trip().stays[index]||{};for(const k of ["name","area","type","price","guests","bedrooms","bathrooms","status","referenceLink","description","facilities","notes"])if(f.elements[k])f.elements[k].value=v[k]??(k==="type"?"Villa":"");villaPendingPhotos=(v.photos&&v.photos.length?v.photos:(v.photo?[v.photo]:[])).slice(0,6)}renderVillaPhotoPreview();$("#villaModal").showModal()}
 $("#villaPhotosInput").addEventListener("change",async e=>{const files=[...e.target.files];if(villaPendingPhotos.length+files.length>6){toast("Maximum 6 photos per villa.");e.target.value="";return}for(const file of files){if(!["image/jpeg","image/png","image/webp"].includes(file.type)){toast("Use JPG, PNG, or WEBP images.");continue}try{const data=await compressVillaImage(file);villaPendingPhotos.push(data);renderVillaPhotoPreview()}catch{toast("Could not process one of the images.")}}e.target.value=""});
-$("#villaForm").onsubmit=async e=>{e.preventDefault();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");const f=e.target,index=$("#villaIndex").value;const v={name:f.elements.name.value.trim(),area:f.elements.area.value.trim(),price:Number(f.elements.price.value||0),guests:f.elements.guests.value,bedrooms:f.elements.bedrooms.value,bathrooms:f.elements.bathrooms.value,status:f.elements.status.value,photos:villaPendingPhotos.slice(0,6),photo:villaPendingPhotos[0]||"",referenceLink:f.elements.referenceLink.value.trim(),description:f.elements.description.value,facilities:f.elements.facilities.value,notes:f.elements.notes.value};if(!v.name)return toast("Villa name is required.");if(!v.photos.length)return toast("Upload at least one villa photo.");const list=trip().stays||(trip().stays=[]);if(index==="")list.push(v);else list[Number(index)]=v;const currentTrip=trip();try{save();await persistTripCloudNow(currentTrip)}catch(err){console.error("Villa cloud save failed",err);return toast("Villa tersimpan lokal, tetapi gagal tersimpan ke Supabase: "+(err.message||"periksa koneksi"))}$("#villaModal").close();villasPage(trip());toast(index===""?"Villa added & synced":"Villa updated & synced")};
+$("#villaForm").onsubmit=async e=>{e.preventDefault();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");const f=e.target,index=$("#villaIndex").value;const v={name:f.elements.name.value.trim(),area:f.elements.area.value.trim(),type:f.elements.type?.value||"Villa",price:Number(f.elements.price.value||0),guests:f.elements.guests.value,bedrooms:f.elements.bedrooms.value,bathrooms:f.elements.bathrooms.value,status:f.elements.status.value,photos:villaPendingPhotos.slice(0,6),photo:villaPendingPhotos[0]||"",referenceLink:f.elements.referenceLink.value.trim(),description:f.elements.description.value,facilities:f.elements.facilities.value,notes:f.elements.notes.value};if(!v.name)return toast("Accommodation name is required.");if(!v.photos.length)return toast("Upload at least one villa photo.");const list=trip().stays||(trip().stays=[]);if(index==="")list.push(v);else list[Number(index)]=v;const currentTrip=trip();try{save();await persistTripCloudNow(currentTrip)}catch(err){console.error("Villa cloud save failed",err);return toast("Villa tersimpan lokal, tetapi gagal tersimpan ke Supabase: "+(err.message||"periksa koneksi"))}$("#villaModal").close();villasPage(trip());toast(index===""?"Villa added & synced":"Villa updated & synced")};
 $("#villaPhotoPreview").addEventListener("click",e=>{const b=e.target.closest("[data-remove-villaphoto]");if(!b)return;villaPendingPhotos.splice(Number(b.dataset.removeVillaphoto),1);renderVillaPhotoPreview()});
 $('#cancelVilla').onclick=()=>$('#villaModal').close();
 
@@ -989,7 +1017,7 @@ function dashboard(t){
      </div>
      <strong class="villa-vote-percent">${vp.toFixed(0)}%</strong>
    </div>`;
- }).join("")||`<div class="villa-empty">No villa available for voting yet.</div>`;
+ }).join("")||`<div class="villa-empty">No accommodation available for voting yet.</div>`;
  const now=Date.now();
  const upcoming=(active.itinerary||[]).map((item,index)=>{
   const rawDate=String(item.date||"").trim();
@@ -1057,7 +1085,7 @@ function dashboard(t){
 
   <section class="section villa-vote-card">
    <div class="dashboard-card-head" style="align-items:flex-start;gap:20px">
-    <div style="min-width:0"><span class="dashboard-card-eyebrow">GROUP DECISION</span><h2>Villa Vote</h2><p>Vote for the stay you prefer.</p></div>
+    <div style="min-width:0"><span class="dashboard-card-eyebrow">GROUP DECISION</span><h2>Accommodation Vote</h2><p>Vote for the accommodation you prefer.</p></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:9px;flex:0 0 auto;padding-top:2px">
      <span class="dashboard-vote-total" style="font-size:12px;font-weight:700;white-space:nowrap">${voteTotal} Votes</span>
      ${ranked.length?`<button class="villa-vote-button" type="button" data-page="Villas & Stay" style="margin:0;border:1px solid var(--border);border-radius:999px;padding:7px 12px;background:var(--accent);color:#fff;font-size:11px;font-weight:800;letter-spacing:.1px;line-height:1;box-shadow:0 6px 16px rgba(0,0,0,.12);cursor:pointer;white-space:nowrap">Vote Now <span aria-hidden="true">→</span></button>`:""}
@@ -1105,35 +1133,7 @@ $("#cancelTrip").onclick=()=>$("#tripModal").close();
 document.addEventListener("click",async e=>{let b=e.target.closest("button");if(!b)return;
 if(b.hasAttribute("data-villa-prev")){setVillaGallery(villaGalleryIndex-1);return;}
 if(b.hasAttribute("data-villa-next")){setVillaGallery(villaGalleryIndex+1);return;}
-if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.dataset.action==="mobile-more"){document.getElementById("mobileMoreSheet")?.classList.add("open");return;}if(b.dataset.action==="mobile-more-close"){document.getElementById("mobileMoreSheet")?.classList.remove("open");return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.accommodationTab){
-  const target=String(b.dataset.accommodationTab);
-  if(page==="Villas & Stay"){
-    window.__hpAccommodationTab=target;
-    villasPage(trip());
-  }
-  return;
-}
-if(b.dataset.voteStay){
-  const t=trip(); if(!Array.isArray(t.votes))t.votes=[];
-  const ps=$("#voteParticipant"); if(!ps)return;
-  const pid=String(ps.value||""); if(!pid)return toast("Pilih nama peserta terlebih dahulu.");
-  document.querySelectorAll("[data-vote-stay]").forEach(x=>x.classList.remove("selected")); b.classList.add("selected");
-  b.dataset.selectedForParticipant=pid;
-  return;
-}
-if(b.id==="submitAccommodationVote"){
-  const t=trip(); if(!Array.isArray(t.votes))t.votes=[];
-  const ps=$("#voteParticipant"); const selected=document.querySelector("[data-vote-stay].selected");
-  if(!ps?.value)return toast("Pilih nama peserta terlebih dahulu.");
-  if(!selected)return toast("Pilih penginapan terlebih dahulu.");
-  const pid=String(ps.value),sid=String(selected.dataset.voteStay);
-  const old=t.votes.findIndex(v=>String(v.participantId)===pid);
-  const vote={participantId:pid,stayId:sid,votedAt:new Date().toISOString()};
-  if(old>=0)t.votes[old]=vote;else t.votes.push(vote);
-  try{save();persistTripCloudNow(t).catch(err=>console.error("Accommodation vote cloud save failed",err));toast("Voting berhasil disimpan.");}catch(err){console.error(err);toast("Voting gagal disimpan.");}
-  return;
-}
-if(b.dataset.page){page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
+if(b.hasAttribute("data-villa-dot")){setVillaGallery(Number(b.dataset.villaDot));return;}if(b.dataset.action==="mobile-more"){document.getElementById("mobileMoreSheet")?.classList.add("open");return;}if(b.dataset.action==="mobile-more-close"){document.getElementById("mobileMoreSheet")?.classList.remove("open");return;}if(b.id==="themeToggle"){togglePlannerTheme();return;}if(b.id==="languageToggle"){togglePlannerLanguage();return;}if(b.dataset.action==="enter-trip"){pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");page="Dashboard";render();return}if(b.dataset.action==="exit-trip"){mode="";tripId=null;activeAdmin=null;memberName="";page="All Trips";auth();return}if(b.dataset.page){page=b.dataset.page;document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));if(page==="All Trips"){mode="master";tripId=null;pendingTripWelcome=false;document.body.classList.remove("trip-welcome-mode");showApp()}else if(page==="Assigned Trips"){tripId=null;showApp()}else render();return}
 if(b.id==="createAdmin"){
  if(mode!=="master")return toast("Master Access required.");
  const name=$("#newAdminName").value.trim(),pin=$("#newAdminPin").value.trim(),trips=[...document.querySelectorAll('input[name="adminTrip"]:checked')].map(o=>o.value);
