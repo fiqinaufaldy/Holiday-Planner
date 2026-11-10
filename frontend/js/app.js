@@ -570,7 +570,7 @@ function settings(){
  const inTrip=!!tripId&&(mode==="master"||mode==="admin");
  const currentTrip=inTrip?trip():null;
  const profile=isAdmin?"":`<section class="section"><h2>Profile Settings</h2><div class="profile-setting">${db.admin.photo?`<img id="profilePreview" src="${db.admin.photo}" alt="Profile photo">`:`<div class="profile-placeholder" id="profilePreview">${esc((db.admin.name||"AD").split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase())}</div>`}<div><strong>${esc(db.admin.name||"Fiqi Naufaldy")}</strong><p style="font-size:11px;color:#788177;margin:5px 0 9px">Account profile</p><label class="profile-upload" for="profilePhoto">↑ Upload profile photo</label><input id="profilePhoto" type="file" accept="image/png,image/jpeg,image/webp" hidden></div></div><div class="formgrid"><label>Display name<input id="adminName" value="${esc(db.admin.name)}"></label><label>New Master PIN (optional)<input id="adminPin" inputmode="numeric" maxlength="6" placeholder="Leave blank to keep current"></label></div><p><button class="primary" id="saveAdmin">Save Settings</button></p><p style="font-size:11px;color:#788177">Foto dan nama ini ditampilkan di footer sidebar sebagai identitas pemilik akun.</p></section>`;
- const tripSettings=inTrip?`<section class="section"><div class="toolbar"><div><span class="eyebrow">TRIP ACCESS</span><h2>Member PIN</h2><p>PIN ini khusus digunakan Member untuk masuk ke trip <strong>${esc(currentTrip?.name||"trip ini")}</strong>. PIN Member terpisah dari PIN Master/Admin.</p></div></div><div class="formgrid"><label>Member PIN<input id="memberTripPin" inputmode="numeric" maxlength="6" value="${esc(currentTrip?.pin||"")}" placeholder="Enter 6-digit PIN"></label></div><p><button class="primary" id="saveMemberTripPin">Save Member PIN</button></p><p style="font-size:11px;color:#788177">Gunakan 6 digit. Mengubah Member PIN tidak mengubah PIN Master atau PIN Admin.</p></section>`:"";
+ const tripSettings=inTrip?`<section class="section"><div class="toolbar"><div><span class="eyebrow">TRIP ACCESS</span><h2>Member PIN</h2><p>PIN ini khusus digunakan Member untuk masuk ke trip <strong>${esc(currentTrip?.name||"trip ini")}</strong>. PIN Member terpisah dari PIN Master/Admin.</p></div></div><div class="formgrid"><label>Member PIN<input id="memberTripPin" inputmode="numeric" maxlength="6" value="${esc(currentTrip?.pin||"")}" placeholder="Enter 6-digit PIN" autocomplete="off"></label></div><p><button class="primary" id="saveMemberTripPin">Save Member PIN</button></p><p style="font-size:11px;color:#788177">Gunakan 6 digit. Mengubah Member PIN tidak mengubah PIN Master atau PIN Admin.</p></section>`:"";
  const scopeText=isAdmin?`Backup hanya mencakup ${scopeTrips.length} trip yang ditugaskan ke akun Admin ini. Data trip lain dan pengaturan akses Master tidak akan berubah saat restore.`:"Backup mencakup seluruh trip, akun Admin, dan profil Master.";
  $("#content").innerHTML=`${profile}${tripSettings}<section class="section"><h2>Backup & Restore</h2><p>${scopeText}</p><div class="actions backup-actions"><button class="primary" id="export">${hpIcon("download")}<span>${isAdmin?"Export Assigned Trips":"Export All Data"}</span></button><button id="import">${hpIcon("upload")}<span>Import Backup</span></button></div><p style="font-size:11px;color:#788177">Simpan file backup di tempat aman. Saat import, data pada cakupan backup akan menggantikan data yang sekarang.</p></section>`;
 
@@ -1049,7 +1049,42 @@ if(b.dataset.removeadmin){if(mode!=="master")return;db.admins=db.admins.filter(a
 
 
 if(isMemberViewOnly() && (b.id==="newTrip" || b.id==="addParticipant" || b.id==="addBudget" || b.id==="addIncome" || b.id==="cashflowAdd" || b.id==="addCashflow" || b.id==="planningAdd" || b.id==="addVilla" || b.id==="addVillaEmpty" || b.id==="addDestination" || b.id==="addItinerary" || b.id==="addItem"))return toast("Member Access hanya untuk melihat data.");
-if(b.id==="newTrip")openTrip();if(b.dataset.open){tripId=b.dataset.open;if(mode==="master"||assignedTrips().some(t=>t.id===tripId)){page="Dashboard";pendingTripWelcome=true;showApp()}else toast("Trip access denied.")}if(b.dataset.edittrip){let t=db.trips.find(x=>x.id===b.dataset.edittrip);if(t){editingTripId=t.id;let f=$("#tripForm");f.elements.name.value=t.name;f.elements.destination.value=t.destination;f.elements.start.value=t.start;f.elements.end.value=t.end;f.elements.pin.value=t.pin||"";f.elements.cover.value=t.cover||"";$("#tripModal").showModal();}}if(b.dataset.deltrip){if(confirm("Delete this trip and all its data?")){const id=b.dataset.deltrip;try{await window.HolidayPlannerCloud.deleteTrip(id);db.trips=db.trips.filter(t=>t.id!==id);if(db.cloudTripMap)for(const k of Object.keys(db.cloudTripMap))if(db.cloudTripMap[k]===id)delete db.cloudTripMap[k];save();render();toast("Trip deleted from Supabase")}catch(error){toast(error.message||"Gagal menghapus trip.")}}}if(b.id==="saveAdmin"){let p=$("#adminPin").value;if(p&&!/^\d{6}$/.test(p))return toast("Master PIN harus 6 digit.");db.admin.name=$("#adminName").value||"Fiqi Naufaldy";if(p)db.admin.pin=p;save();updateSidebarProfile();settings();toast("Settings saved")}if(b.id==="export"){let payload,filename;if(mode==="admin"){const a=db.admins.find(x=>x.id===activeAdmin);if(!a)return toast("Admin account not found.");payload={app:"Holiday Planner",format:"holiday-planner-backup",version:2,scope:"admin-assigned",adminId:activeAdmin,createdAt:new Date().toISOString(),trips:assignedTrips()};filename="holiday-planner-admin-backup.json";}else{payload={app:"Holiday Planner",format:"holiday-planner-backup",version:2,scope:"master-full",createdAt:new Date().toISOString(),...db};filename="holiday-planner-master-backup.json";}const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}if(b.id==="import")$("#backupFile").click();if(b.id==="saveGeneral"){
+if(b.id==="newTrip")openTrip();if(b.dataset.open){tripId=b.dataset.open;if(mode==="master"||assignedTrips().some(t=>t.id===tripId)){page="Dashboard";pendingTripWelcome=true;showApp()}else toast("Trip access denied.")}if(b.dataset.edittrip){let t=db.trips.find(x=>x.id===b.dataset.edittrip);if(t){editingTripId=t.id;let f=$("#tripForm");f.elements.name.value=t.name;f.elements.destination.value=t.destination;f.elements.start.value=t.start;f.elements.end.value=t.end;f.elements.pin.value=t.pin||"";f.elements.cover.value=t.cover||"";$("#tripModal").showModal();}}if(b.dataset.deltrip){if(confirm("Delete this trip and all its data?")){const id=b.dataset.deltrip;try{await window.HolidayPlannerCloud.deleteTrip(id);db.trips=db.trips.filter(t=>t.id!==id);if(db.cloudTripMap)for(const k of Object.keys(db.cloudTripMap))if(db.cloudTripMap[k]===id)delete db.cloudTripMap[k];save();render();toast("Trip deleted from Supabase")}catch(error){toast(error.message||"Gagal menghapus trip.")}}}if(b.id==="saveMemberTripPin"){
+ if(mode!=="master"&&mode!=="admin")return toast("Akses tidak diizinkan.");
+ const pin=$("#memberTripPin")?.value.trim()||"";
+ if(!/^\d{6}$/.test(pin))return toast(plannerLanguage==="id"?"PIN Member harus 6 digit.":"Member PIN must be 6 digits.");
+ const currentTrip=trip();
+ if(!currentTrip)return toast(plannerLanguage==="id"?"Trip tidak ditemukan.":"Trip not found.");
+ b.disabled=true;
+ try{
+  const updated=await window.HolidayPlannerCloud.updateTrip(currentTrip.id,{
+   name:currentTrip.name,
+   destination:currentTrip.destination||"",
+   start:currentTrip.start||"",
+   end:currentTrip.end||"",
+   cover:currentTrip.cover||"",
+   pin
+  });
+  currentTrip.pin=pin;
+  if(updated){
+   currentTrip.name=updated.name||currentTrip.name;
+   currentTrip.destination=updated.destination||currentTrip.destination||"";
+   currentTrip.start=updated.start_date||currentTrip.start||"";
+   currentTrip.end=updated.end_date||currentTrip.end||"";
+   currentTrip.cover=updated.cover_image_url||currentTrip.cover||"";
+  }
+  save();
+  settings();
+  toast(plannerLanguage==="id"?"PIN Member berhasil disimpan.":"Member PIN saved successfully.");
+ }catch(error){
+  console.error("Member PIN save failed",error);
+  toast(error?.message||(plannerLanguage==="id"?"Gagal menyimpan PIN Member.":"Failed to save Member PIN."));
+ }finally{
+  b.disabled=false;
+ }
+ return;
+}
+if(b.id==="saveAdmin"){let p=$("#adminPin").value;if(p&&!/^\d{6}$/.test(p))return toast("Master PIN harus 6 digit.");db.admin.name=$("#adminName").value||"Fiqi Naufaldy";if(p)db.admin.pin=p;save();updateSidebarProfile();settings();toast("Settings saved")}if(b.id==="export"){let payload,filename;if(mode==="admin"){const a=db.admins.find(x=>x.id===activeAdmin);if(!a)return toast("Admin account not found.");payload={app:"Holiday Planner",format:"holiday-planner-backup",version:2,scope:"admin-assigned",adminId:activeAdmin,createdAt:new Date().toISOString(),trips:assignedTrips()};filename="holiday-planner-admin-backup.json";}else{payload={app:"Holiday Planner",format:"holiday-planner-backup",version:2,scope:"master-full",createdAt:new Date().toISOString(),...db};filename="holiday-planner-master-backup.json";}const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}if(b.id==="import")$("#backupFile").click();if(b.id==="saveGeneral"){
  const t=trip();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");
  t.name=$("#gName").value.trim()||t.name;
  t.destination=$("#gDestination").value.trim();t.start=$("#gStart").value;t.end=$("#gEnd").value;
