@@ -911,11 +911,9 @@ async function villasPage(t){
       ? selectedParticipantIndex
       : Math.max(0,currentParticipant>=0?currentParticipant:0));
   const participantOptions=participants.map((p,i)=>{const key=accommodationVoteKey(p,i);const existing=votes.find(v=>v.participantKey===key);return `<option value="${esc(key)}" data-participant-index="${i}" ${i===defaultParticipant?'selected':''}>${esc(p.name||`Peserta ${i+1}`)}${existing?' — sudah voting':''}</option>`}).join('');
-  const participantSelect=mode==="member"
-    ? (memberParticipantIndex>=0
-      ? `<select id="accommodationParticipant" hidden>${participantOptions}</select>`
-      : `<select id="accommodationParticipant" hidden></select>`)
-    : (participants.length?`<select id="accommodationParticipant">${participantOptions}</select>`:'<div class="vote-no-participants">Belum ada peserta.</div>');
+  const participantSelect=participants.length
+    ? `<select id="accommodationParticipant">${participantOptions}</select>`
+    : '<div class="vote-no-participants">Belum ada peserta.</div>';
   const selectedVote=votes.find(v=>v.participantKey===accommodationVoteKey(participants[defaultParticipant],defaultParticipant));
   const selectedStay=selectedVote?.stayId||'';
   const voteButtonLabel=selectedVote?'↻　Perbarui Voting':'✓　Kirim Voting';
