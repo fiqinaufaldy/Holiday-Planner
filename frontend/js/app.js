@@ -938,7 +938,7 @@ async function villasPage(t){
     });
     $('#submitAccommodationVote')?.addEventListener('click',async()=>{
       const participantKey=participantEl?.value||'';const selected=document.querySelector('[data-vote-stay].selected');const stayId=selected?.dataset.voteStay||'';
-      if(!participantKey)return toast(mode==="member"?'Akun Member belum terhubung ke peserta trip.':'Pilih peserta terlebih dahulu.');if(!stayId)return toast('Pilih penginapan terlebih dahulu.');
+      if(!participantKey)return toast('Pilih peserta terlebih dahulu.');if(!stayId)return toast('Pilih penginapan terlebih dahulu.');
       const existing=votes.find(v=>v.participantKey===participantKey);
       accommodationSelectedParticipantKey=participantKey;
       const now=new Date().toISOString();
