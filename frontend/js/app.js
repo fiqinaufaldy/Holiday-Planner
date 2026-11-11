@@ -477,7 +477,7 @@ function showApp(){
   #mobileMoreSheet .mobile-more-head{display:flex!important;align-items:center!important;justify-content:space-between!important;margin-bottom:10px!important;color:var(--text,#fff)!important;}
   #mobileMoreSheet .mobile-more-head button{border:0!important;background:transparent!important;color:var(--text,#fff)!important;font-size:24px!important;cursor:pointer!important;}
   #mobileMoreSheet .mobile-more-list{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;}
-  #mobileMoreSheet .mobile-more-list button{display:flex!important;align-items:center!important;gap:10px!important;padding:12px!important;border:1px solid var(--border,#334967)!important;border-radius:10px!important;background:rgba(255,255,255,.03)!important;color:var(--text,#fff)!important;}
+  #mobileMoreSheet .mobile-more-list button{display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;padding:12px!important;border:1px solid var(--border,#334967)!important;border-radius:10px!important;background:rgba(255,255,255,.03)!important;color:var(--text,#fff)!important;text-align:center!important;}
   #mobileMoreSheet .mobile-more-list svg{width:18px!important;height:18px!important;}
 }
 @media(min-width:769px){#mobileNav,#mobileMoreSheet{display:none!important;}}
