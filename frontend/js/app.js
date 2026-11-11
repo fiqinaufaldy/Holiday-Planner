@@ -578,9 +578,21 @@ function renderCore(){
  if(mode==="member")return tripPage();
 }
 
+function syncActiveNavigation(){
+ const currentPage=page==="Villas & Stay"?"Accommodation":page;
+ // Keep desktop sidebar active state in sync with the page currently rendered.
+ document.querySelectorAll("#nav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===currentPage));
+ // Mobile navigation is created once and must be refreshed whenever page changes.
+ document.querySelectorAll("#mobileNav [data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===currentPage));
+ const mobileExtraPages=navItems().filter(([n])=>!["Dashboard","Participants","Cash Flow","Accommodation","Settings"].includes(n)).map(([n])=>n);
+ const moreButton=document.querySelector('#mobileNav [data-action="mobile-more"]');
+ if(moreButton)moreButton.classList.toggle("active",mobileExtraPages.includes(currentPage));
+}
 function render(){
+ if(page==="Villas & Stay")page="Accommodation";
  renderCore();
  applyPlannerLanguage();
+ syncActiveNavigation();
 }
 
 function assignedTripsPage(){
