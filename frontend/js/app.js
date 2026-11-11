@@ -447,7 +447,7 @@ function showApp(){
    ["Accommodation","holiday-village",plannerLanguage==="id"?"Penginapan":"Accommodation"],
  ];
  const mobileExtra=navItems().filter(([n])=>!["Dashboard","Participants","Cash Flow","Accommodation","Settings"].includes(n));
- mobileNav.innerHTML=mobileItems.map(([n,i,l])=>`<button type="button" data-page="${n}" class="mobile-nav-item ${page===n?"active":""}">${hpIcon(i)}<span>${l}</span></button>`).join("")+`<button type="button" data-action="mobile-more" class="mobile-nav-item"><span class="mobile-more-icon">···</span><span>Lainnya</span></button>`;
+ mobileNav.innerHTML=mobileItems.map(([n,i,l])=>`<button type="button" data-page="${n}" class="mobile-nav-item ${page===n?"active":""}">${hpIcon(i)}<span>${l}</span></button>`).join("")+`<button type="button" data-action="mobile-more" class="mobile-nav-item"><span class="mobile-more-icon">···</span><span>${plannerLanguage==="id"?"Lainnya":"Others"}</span></button>`;
  let moreSheet=document.getElementById("mobileMoreSheet");
  if(!moreSheet){
    moreSheet=document.createElement("div");
@@ -455,7 +455,7 @@ function showApp(){
    moreSheet.className="mobile-more-sheet";
    document.body.appendChild(moreSheet);
  }
- moreSheet.innerHTML=`<div class="mobile-more-panel"><div class="mobile-more-head"><strong>Lainnya</strong><button type="button" data-action="mobile-more-close">×</button></div><div class="mobile-more-list">${mobileExtra.map(([n,i])=>`<button type="button" data-page="${n}">${hpIcon(i)}<span>${sidebarLabel(n)}</span></button>`).join("")}</div></div>`;
+ moreSheet.innerHTML=`<div class="mobile-more-panel"><div class="mobile-more-head"><strong>${plannerLanguage==="id"?"Lainnya":"Others"}</strong><button type="button" data-action="mobile-more-close">×</button></div><div class="mobile-more-list">${mobileExtra.map(([n,i])=>`<button type="button" data-page="${n}">${hpIcon(i)}<span>${sidebarLabel(n)}</span></button>`).join("")}</div></div>`;
  moreSheet.classList.remove("open");
  const mobileMenuStyleId="planner-mobile-menu";
  if(!document.getElementById(mobileMenuStyleId)){
@@ -1072,6 +1072,9 @@ async function villasPage(t){
       try{await resetAccommodationVoteCloud(t.id);t.accommodationVotes=[];save();toast('All votes reset successfully.')}catch(err){console.error('Accommodation vote reset all sync failed',err);toast('Failed to reset all votes: '+(err.message||'periksa koneksi'))}villasPage(t);
     });
   }
+  // Tab switching calls villasPage() directly instead of the global render(),
+  // so apply the currently selected language after Accommodation is rendered.
+  applyPlannerLanguage();
 }
 let villaPendingPhotos=[];
 function renderVillaPhotoPreview(){const box=$("#villaPhotoPreview");if(!box)return;box.innerHTML=villaPendingPhotos.map((src,i)=>`<div class="villa-preview-item"><img src="${src}" alt="Villa photo ${i+1}"><button type="button" data-remove-villaphoto="${i}" aria-label="Remove photo">×</button></div>`).join("")||'<span class="villa-preview-empty">No photos selected yet.</span>'}
