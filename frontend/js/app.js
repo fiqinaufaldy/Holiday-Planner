@@ -898,18 +898,13 @@ async function villasPage(t){
   const listView=`${stats}${listToolbar}<div class="accom-list" id="stayList">${stays.map(card).join('')||`<div class="stay-empty"><h3>Belum ada penginapan</h3><p>Tambahkan hotel, villa, resort, atau homestay untuk perjalanan ini.</p>${mode==="member"?"":`<button class="primary" id="addVillaEmpty">＋ Tambah Penginapan Pertama</button>`}</div>`}</div>`;
   const canResetVotes=mode==="master"||mode==="admin";
   const resultRows=ranked.map((item,pos)=>{const pct=voteCount?item.votes/voteCount*100:0;return `<div class="vote-result-row"><div class="vote-rank">${pos+1}</div><div class="vote-result-photo" style="background-image:url('${photo(item.v)}')"></div><div class="vote-result-info"><b>${esc(item.v.name||'Penginapan')}</b><span>${money(item.v.price||0)} / malam · ${item.votes} vote${item.votes===1?'':'s'}</span><div class="vote-track"><i style="width:${pct}%"></i></div></div><strong>${pct.toFixed(0)}%</strong></div>`}).join('')||'<div class="stay-empty"><h3>Belum ada pilihan penginapan</h3><p>Tambahkan penginapan terlebih dahulu.</p></div>';
-  const memberParticipantIndex=mode==="member"
-    ? participants.findIndex(p=>String(p?.name||"").trim().toLowerCase()===String(memberName||"").trim().toLowerCase())
-    : -1;
   const selectedParticipantIndex=accommodationSelectedParticipantKey
     ? participants.findIndex((p,i)=>accommodationVoteKey(p,i)===accommodationSelectedParticipantKey)
     : -1;
   const currentParticipant=participants.findIndex((p,i)=>!votes.some(v=>v.participantKey===accommodationVoteKey(p,i)));
-  const defaultParticipant=mode==="member"
-    ? memberParticipantIndex
-    : (selectedParticipantIndex>=0
-      ? selectedParticipantIndex
-      : Math.max(0,currentParticipant>=0?currentParticipant:0));
+  const defaultParticipant=selectedParticipantIndex>=0
+    ? selectedParticipantIndex
+    : Math.max(0,currentParticipant>=0?currentParticipant:0);
   const participantOptions=participants.map((p,i)=>{const key=accommodationVoteKey(p,i);const existing=votes.find(v=>v.participantKey===key);return `<option value="${esc(key)}" data-participant-index="${i}" ${i===defaultParticipant?'selected':''}>${esc(p.name||`Peserta ${i+1}`)}${existing?' — sudah voting':''}</option>`}).join('');
   const participantSelect=participants.length
     ? `<select id="accommodationParticipant">${participantOptions}</select>`
