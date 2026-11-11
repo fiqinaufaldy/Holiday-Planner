@@ -843,14 +843,9 @@ $("#cancelIncome").onclick=()=>$("#incomeModal").close();
 
 
 let accommodationTab="list";
+let accommodationSelectedParticipantKey="";
 function accommodationType(v){return String(v?.type||"Villa").trim()||"Villa"}
 function accommodationVoteKey(p,i){return String(p?.id||p?.contact||p?.name||`participant-${i}`).trim().toLowerCase()}
-function accommodationDeviceId(){
-  const key="hp_accommodation_device_id";
-  let id=localStorage.getItem(key);
-  if(!id){id=`device_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,12)}`;localStorage.setItem(key,id)}
-  return id;
-}
 function accommodationVoteData(t){
   if(!Array.isArray(t.accommodationVotes))t.accommodationVotes=[];
   const participants=Array.isArray(t.participants)?t.participants:[];
@@ -873,6 +868,10 @@ function ensureAccommodationCSS(){
 }
 async function villasPage(t){
   ensureAccommodationCSS();
+  if(window.__hpAccommodationTripId!==t?.id){
+    window.__hpAccommodationTripId=t?.id||null;
+    accommodationSelectedParticipantKey="";
+  }
   if(cloudSyncReady&&t?.id&&!t.__accommodationVotesHydrated){
     t.__accommodationVotesHydrated=true;
     try{
@@ -899,8 +898,13 @@ async function villasPage(t){
   const listView=`${stats}${listToolbar}<div class="accom-list" id="stayList">${stays.map(card).join('')||`<div class="stay-empty"><h3>Belum ada penginapan</h3><p>Tambahkan hotel, villa, resort, atau homestay untuk perjalanan ini.</p>${mode==="member"?"":`<button class="primary" id="addVillaEmpty">＋ Tambah Penginapan Pertama</button>`}</div>`}</div>`;
   const canResetVotes=mode==="master"||mode==="admin";
   const resultRows=ranked.map((item,pos)=>{const pct=voteCount?item.votes/voteCount*100:0;return `<div class="vote-result-row"><div class="vote-rank">${pos+1}</div><div class="vote-result-photo" style="background-image:url('${photo(item.v)}')"></div><div class="vote-result-info"><b>${esc(item.v.name||'Penginapan')}</b><span>${money(item.v.price||0)} / malam · ${item.votes} vote${item.votes===1?'':'s'}</span><div class="vote-track"><i style="width:${pct}%"></i></div></div><strong>${pct.toFixed(0)}%</strong></div>`}).join('')||'<div class="stay-empty"><h3>Belum ada pilihan penginapan</h3><p>Tambahkan penginapan terlebih dahulu.</p></div>';
+  const selectedParticipantIndex=accommodationSelectedParticipantKey
+    ? participants.findIndex((p,i)=>accommodationVoteKey(p,i)===accommodationSelectedParticipantKey)
+    : -1;
   const currentParticipant=participants.findIndex((p,i)=>!votes.some(v=>v.participantKey===accommodationVoteKey(p,i)));
-  const defaultParticipant=Math.max(0,currentParticipant>=0?currentParticipant:0);
+  const defaultParticipant=selectedParticipantIndex>=0
+    ? selectedParticipantIndex
+    : Math.max(0,currentParticipant>=0?currentParticipant:0);
   const participantSelect=participants.length?`<select id="accommodationParticipant">${participants.map((p,i)=>{const key=accommodationVoteKey(p,i);const existing=votes.find(v=>v.participantKey===key);return `<option value="${esc(key)}" data-participant-index="${i}" ${i===defaultParticipant?'selected':''}>${esc(p.name||`Peserta ${i+1}`)}${existing?' — sudah voting':''}</option>`}).join('')}</select>`:'<div class="vote-no-participants">Belum ada peserta.</div>';
   const selectedVote=votes.find(v=>v.participantKey===accommodationVoteKey(participants[defaultParticipant],defaultParticipant));
   const selectedStay=selectedVote?.stayId||'';
@@ -924,11 +928,15 @@ async function villasPage(t){
       btn.classList.add('selected');const radio=btn.querySelector('.vote-radio');if(radio)radio.textContent='✓';
     });
     const participantEl=$('#accommodationParticipant');
-    participantEl?.addEventListener('change',()=>villasPage(t));
+    participantEl?.addEventListener('change',()=>{
+      accommodationSelectedParticipantKey=String(participantEl.value||"");
+      villasPage(t);
+    });
     $('#submitAccommodationVote')?.addEventListener('click',async()=>{
       const participantKey=participantEl?.value||'';const selected=document.querySelector('[data-vote-stay].selected');const stayId=selected?.dataset.voteStay||'';
       if(!participantKey)return toast('Pilih peserta terlebih dahulu.');if(!stayId)return toast('Pilih penginapan terlebih dahulu.');
       const existing=votes.find(v=>v.participantKey===participantKey);
+      accommodationSelectedParticipantKey=participantKey;
       const now=new Date().toISOString();
       if(existing){existing.stayId=stayId;existing.votedAt=now;existing.deviceId=null;existing.votedBy=existing.votedBy||mode}
       else votes.push({participantKey,stayId,votedAt:now,deviceId:null,votedBy:mode});
