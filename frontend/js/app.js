@@ -455,7 +455,7 @@ function showApp(){
    moreSheet.className="mobile-more-sheet";
    document.body.appendChild(moreSheet);
  }
- moreSheet.innerHTML=`<div class="mobile-more-panel"><div class="mobile-more-head"><strong>Lainnya</strong><button type="button" data-action="mobile-more-close">×</button></div><div class="mobile-more-list">${mobileExtra.map(([n,i])=>`<button type="button" data-page="${n}">${hpIcon(i)}<span>${sidebarLabel(n)}</span></button>`).join("")}</div></div>`;
+ moreSheet.innerHTML=`<div class="mobile-more-panel"><div class="mobile-more-head"><strong>${plannerLanguage==="id"?"Lainnya":"Others"}</strong><button type="button" data-action="mobile-more-close">×</button></div><div class="mobile-more-list">${mobileExtra.map(([n,i])=>`<button type="button" data-page="${n}">${hpIcon(i)}<span>${sidebarLabel(n)}</span></button>`).join("")}</div></div>`;
  moreSheet.classList.remove("open");
  const mobileMenuStyleId="planner-mobile-menu";
  if(!document.getElementById(mobileMenuStyleId)){
@@ -476,9 +476,10 @@ function showApp(){
   #mobileMoreSheet .mobile-more-panel{width:100%!important;box-sizing:border-box!important;padding:16px 16px calc(88px + env(safe-area-inset-bottom))!important;border-radius:18px 18px 0 0!important;background:var(--panel,#101d32)!important;border:1px solid var(--border,#334967)!important;}
   #mobileMoreSheet .mobile-more-head{display:flex!important;align-items:center!important;justify-content:space-between!important;margin-bottom:10px!important;color:var(--text,#fff)!important;}
   #mobileMoreSheet .mobile-more-head button{border:0!important;background:transparent!important;color:var(--text,#fff)!important;font-size:24px!important;cursor:pointer!important;}
-  #mobileMoreSheet .mobile-more-list{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;}
-  #mobileMoreSheet .mobile-more-list button{display:flex!important;align-items:center!important;gap:10px!important;padding:12px!important;border:1px solid var(--border,#334967)!important;border-radius:10px!important;background:rgba(255,255,255,.03)!important;color:var(--text,#fff)!important;}
-  #mobileMoreSheet .mobile-more-list svg{width:18px!important;height:18px!important;}
+  #mobileMoreSheet .mobile-more-list{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;align-items:stretch!important;}
+  #mobileMoreSheet .mobile-more-list button{display:flex!important;align-items:center!important;gap:10px!important;padding:12px!important;min-height:48px!important;border:1px solid var(--border,#334967)!important;border-radius:10px!important;background:rgba(255,255,255,.03)!important;color:var(--text,#fff)!important;}
+  #mobileMoreSheet .mobile-more-list svg{width:18px!important;height:18px!important;flex:0 0 18px!important;}
+  #mobileMoreSheet .mobile-more-list button:last-child{grid-column:1 / -1!important;width:calc(50% - 4px)!important;justify-self:center!important;}
 }
 @media(min-width:769px){#mobileNav,#mobileMoreSheet{display:none!important;}}
 `;
@@ -881,88 +882,6 @@ function ensureAccommodationCSS(){
 .accom-list{display:flex;flex-direction:column;gap:12px}.accom-card{min-height:168px;border:1px solid #294966;border-radius:16px;overflow:hidden;background:#12253d;display:grid;grid-template-columns:285px minmax(0,1fr)}.accom-photo{border:0;min-height:168px;background-position:center;background-size:cover;background-repeat:no-repeat;cursor:pointer}.accom-card-info{display:grid;grid-template-columns:minmax(0,1fr) 190px 165px;align-items:center;gap:18px;padding:20px 22px}.accom-title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.accom-title-row h3{margin:0;font-family:Georgia,serif;font-size:22px;color:#fff4df}.accom-type-badge{display:inline-flex;border-radius:999px;background:#203b5b;color:#dce8f6;padding:6px 10px;font-size:11px;font-weight:700}.accom-location{margin:7px 0 14px;color:#b8c7d9;font-size:12px}.accom-meta{display:flex;gap:18px;flex-wrap:wrap;color:#dce5ef;font-size:12px}.accom-price{border-left:1px solid #29445f;padding-left:22px;font-size:17px;font-weight:800;color:#fff}.accom-price small{font-size:11px;font-weight:500;color:#b9c8da}.accom-actions{height:100%;display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:10px}.accom-status{display:inline-flex;border-radius:999px;padding:6px 10px;background:#52353a;color:#ffc3c7;font-size:11px;font-weight:800}.accom-status.ok{background:#174c3c;color:#9ff0c6}.accom-detail-btn,.accom-edit-btn{border:1px solid #bca064;border-radius:999px;background:transparent;color:#f2dfb0;padding:8px 18px;font-weight:700;cursor:pointer}.accom-detail-btn span{margin-left:8px}.accom-edit-btn{border-color:#48627e;color:#d7e2ee;padding:6px 12px;font-size:11px}
 .accom-vote-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin:4px 0 18px}.accom-vote-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(340px,.85fr);gap:16px}.vote-panel,.vote-results{border:1px solid #294966;border-radius:16px;background:#11233a;padding:18px}.vote-progress{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}.vote-progress>div{border:1px solid #365474;border-radius:12px;padding:12px 14px;background:#152b46}.vote-progress span{display:block;color:#b9c8da;font-size:11px}.vote-progress b{display:block;color:#fff;margin-top:4px;font-size:14px}.vote-candidates{display:flex;flex-direction:column;gap:10px}.vote-choice{display:grid;grid-template-columns:74px minmax(0,1fr) 34px;align-items:center;gap:14px;border:1px solid #284866;border-radius:14px;background:#162b46;padding:8px;text-align:left;color:#fff;cursor:pointer}.vote-choice.selected{border-color:#aebeff;box-shadow:0 0 0 1px rgba(150,170,255,.4)}.vote-choice-photo{width:74px;height:58px;border-radius:9px;background-position:center;background-size:cover}.vote-choice-info b{display:block;font-family:Georgia,serif;font-size:17px}.vote-choice-info small{display:block;margin-top:4px;color:#b9c8da;font-size:11px}.vote-radio{width:20px;height:20px;border:2px solid #879bb3;border-radius:50%;display:flex;align-items:center;justify-content:center}.vote-choice.selected .vote-radio{background:#b8c9ff;border-color:#b8c9ff;color:#101d2e}.vote-participant{margin-top:16px;border:1px solid #294966;border-radius:14px;padding:14px;background:#142940}.vote-participant h3{margin:0 0 10px;font-family:Georgia,serif;color:#fff4df}.vote-participant label{display:block;color:#b9c8da;font-size:11px;margin-bottom:6px}.vote-participant select{width:100%;height:42px;border:1px solid #42617f;border-radius:10px;background:#102139;color:#fff;padding:0 12px}.vote-edit-hint{display:block;margin-top:7px;color:#aebfd2;font-size:10px;line-height:1.45}.vote-submit{width:100%;margin-top:14px;border:0!important;background:#ffd968!important;color:#111!important;border-radius:999px!important;min-height:48px;font-weight:900}.vote-result-row{display:grid;grid-template-columns:28px 62px minmax(0,1fr) 48px;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #27445f}.vote-result-photo{height:48px;border-radius:8px;background:center/cover no-repeat}.vote-result-info b{display:block;color:#fff;font-size:14px}.vote-result-info span{display:block;color:#b8c7d9;font-size:10px;margin:3px 0 7px}.vote-result-row>strong{color:#fff;text-align:right}.vote-track{height:5px;border-radius:99px;background:#273e56;overflow:hidden}.vote-track i{display:block;height:100%;background:#d7a84b;border-radius:99px}\n.vote-reset-btn{margin-left:8px;border:1px solid #7d4b4b;background:transparent;color:#ffb0b0;border-radius:8px;padding:6px 8px;font-size:9px;cursor:pointer}.vote-reset-all{margin-top:8px;font-size:10px;padding:7px 12px} .vote-admin-manager{margin-top:12px;padding-top:12px;border-top:1px solid #294966}.vote-admin-manager-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:7px}.vote-admin-manager-head strong{font-size:11px;color:#fff}.vote-admin-manager-head small{font-size:9px;color:#9fb0c4}.vote-admin-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(53,82,110,.5)}.vote-admin-row:last-child{border-bottom:0}.vote-admin-row span{min-width:0}.vote-admin-row b{display:block;color:#fff;font-size:10px}.vote-admin-row small{display:block;color:#9fb0c4;font-size:9px;margin-top:2px}.stay-empty{border:1px dashed #3b5975;border-radius:14px;padding:30px;text-align:center;color:#b8c7d9}
 @media(max-width:768px){.accom-hero{min-height:150px;border-radius:14px}.accom-hero>div{padding:24px 22px}.accom-hero h2{font-size:25px}.accom-hero p{font-size:12px}.accom-tabs{gap:8px}.accom-tabs>button{min-height:60px;padding:8px 12px;gap:8px}.accom-tab-icon{font-size:22px}.accom-tabs b{font-size:13px}.accom-tabs small{font-size:9px}.accom-stats{grid-template-columns:1fr 1fr}.accom-stats>div{min-height:54px;padding:10px}.accom-toolbar{flex-wrap:wrap}.accom-toolbar label{max-width:none;flex:1 1 100%}.accom-toolbar select{flex:1;min-width:0}.accom-toolbar .primary{display:none}.accom-card{grid-template-columns:105px minmax(0,1fr);min-height:145px}.accom-photo{min-height:145px}.accom-card-info{display:block;padding:12px}.accom-title-row h3{font-size:17px}.accom-location{margin:5px 0 9px;font-size:10px}.accom-meta{gap:8px;font-size:9px}.accom-meta span:nth-child(3){display:none}.accom-price{border:0;padding:0;margin-top:10px;font-size:14px}.accom-actions{height:auto;display:flex;flex-direction:row;align-items:center;margin-top:9px}.accom-status{font-size:9px;padding:4px 7px}.accom-detail-btn{padding:6px 11px;font-size:9px}.accom-edit-btn{display:none}.accom-vote-head{display:block}.accom-vote-head h2{font-size:25px}.vote-summary{margin-top:12px;min-width:0}.accom-vote-layout{grid-template-columns:1fr}.vote-progress{grid-template-columns:1fr 1fr}.vote-choice{grid-template-columns:66px minmax(0,1fr) 30px}.vote-choice-photo{width:66px;height:54px}}
-@media(max-width:768px){
-  /* Accommodation mobile polish */
-  #content{width:100%;box-sizing:border-box;}
-  #content>.accom-hero,#content>.accom-tabs,#content>.accom-vote-head,#content>.accom-vote-layout,#content>.accom-stats,#content>.accom-toolbar,#content>.accom-list{width:100%;box-sizing:border-box;}
-  .accom-hero{min-height:178px;margin-bottom:12px;border-radius:16px;background-position:center;}
-  .accom-hero>div{width:100%;box-sizing:border-box;padding:24px 20px;}
-  .accom-hero .eyebrow{font-size:8px;letter-spacing:1.8px;margin-bottom:8px;}
-  .accom-hero h2{font-size:25px;line-height:1.12;max-width:100%;}
-  .accom-hero p{font-size:11px;line-height:1.45;max-width:100%;}
-
-  .accom-tabs{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
-  .accom-tabs>button{min-height:68px;padding:10px 10px;gap:7px;border-radius:14px;justify-content:flex-start;}
-  .accom-tab-icon{font-size:21px;flex:0 0 25px;text-align:center;}
-  .accom-tabs b{font-size:12px;line-height:1.2;}
-  .accom-tabs small{font-size:8px;line-height:1.2;margin-top:4px;}
-  .accom-tabs em{font-size:9px;padding:4px 8px;margin-left:auto;}
-
-  .accom-stats{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
-  .accom-stats>div{min-height:68px;padding:10px 9px;grid-template-columns:24px minmax(0,1fr);column-gap:6px;border-radius:12px;}
-  .accom-stats span{font-size:18px;}
-  .accom-stats small{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .accom-stats b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-  .accom-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 118px;gap:8px;padding:8px 0 12px;margin-bottom:12px;}
-  .accom-toolbar label{height:38px;max-width:none;min-width:0;grid-column:1/-1;box-sizing:border-box;}
-  .accom-toolbar input{font-size:11px;}
-  .accom-toolbar select{width:100%;min-width:0;height:38px;font-size:10px;}
-
-  .accom-list{gap:9px;}
-  .accom-card{grid-template-columns:92px minmax(0,1fr);min-height:132px;border-radius:14px;}
-  .accom-photo{min-height:132px;}
-  .accom-card-info{min-width:0;padding:10px;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;gap:0;}
-  .accom-title-row{gap:6px;align-items:center;}
-  .accom-title-row h3{font-size:15px;line-height:1.15;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .accom-type-badge{padding:4px 7px;font-size:8px;flex:0 0 auto;}
-  .accom-location{margin:5px 0 7px;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .accom-meta{gap:6px;font-size:8px;line-height:1.3;}
-  .accom-meta span:nth-child(3){display:none;}
-  .accom-price{border:0;padding:0;margin-top:7px;font-size:12px;line-height:1.2;}
-  .accom-price small{font-size:9px;}
-  .accom-actions{height:auto;display:flex;flex-direction:row;align-items:center;justify-content:space-between;margin-top:7px;gap:6px;}
-  .accom-status{font-size:8px;padding:4px 6px;white-space:nowrap;}
-  .accom-detail-btn{padding:5px 9px;font-size:8px;white-space:nowrap;}
-
-  .accom-vote-head{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:3px 0 12px;}
-  .accom-vote-head .eyebrow{font-size:8px;letter-spacing:1.8px;margin-bottom:6px;}
-  .accom-vote-head h2{font-size:25px;line-height:1.15;margin-bottom:6px;}
-  .accom-vote-head p{font-size:11px;line-height:1.45;margin:0;}
-  .vote-summary{margin-top:0;text-align:left;display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;min-width:0;font-size:11px;}
-  .vote-summary b,.vote-summary span{font-size:11px;}
-
-  .accom-vote-layout{grid-template-columns:1fr;gap:10px;}
-  .vote-panel,.vote-results{padding:12px;border-radius:15px;min-width:0;}
-  .vote-progress{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
-  .vote-progress>div{min-width:0;padding:10px;border-radius:12px;}
-  .vote-progress span{font-size:8px;}
-  .vote-progress b{font-size:11px;line-height:1.35;}
-  .vote-candidates{gap:8px;}
-  .vote-choice{grid-template-columns:58px minmax(0,1fr) 26px;gap:9px;padding:7px;border-radius:13px;min-width:0;}
-  .vote-choice-photo{width:58px;height:52px;border-radius:8px;}
-  .vote-choice-info{min-width:0;}
-  .vote-choice-info b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .vote-choice-info small{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .vote-radio{width:18px;height:18px;}
-
-  .vote-participant{margin-top:10px;padding:11px;border-radius:13px;}
-  .vote-participant h3{font-size:14px;margin-bottom:8px;}
-  .vote-participant label{font-size:9px;}
-  .vote-participant select{height:40px;font-size:11px;}
-  .vote-submit{min-height:44px;margin-top:10px;font-size:12px;}
-
-  .vote-results .dashboard-card-head h2{font-size:22px;line-height:1.15;}
-  .vote-results .dashboard-card-head p{font-size:10px;line-height:1.4;}
-  .vote-result-row{grid-template-columns:20px 54px minmax(0,1fr) 40px;gap:7px;padding:10px 0;}
-  .vote-result-photo{height:44px;border-radius:8px;}
-  .vote-result-info{min-width:0;}
-  .vote-result-info b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .vote-result-info span{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .vote-result-row>strong{font-size:11px;}
-  .vote-track{height:4px;}
-}
-
 `;
  document.head.appendChild(style);
 }
@@ -990,21 +909,11 @@ async function villasPage(t){
   const typeOptions=[...new Set(stays.map(accommodationType))];
   const typeBadge=v=>`<span class="accom-type-badge">${esc(accommodationType(v))}</span>`;
   const photo=v=>esc(v.photos?.[0]||v.photo||'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=85');
-  const iconAccommodationList=`<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8.713 16.713Q9 16.425 9 16t-.288-.712T8 15t-.712.288T7 16t.288.713T8 17t.713-.288m0-4Q9 12.425 9 12t-.288-.712T8 11t-.712.288T7 12t.288.713T8 13t.713-.288m0-4Q9 8.426 9 8t-.288-.712T8 7t-.712.288T7 8t.288.713T8 9t.713-.288M12 17h4q.425 0 .713-.288T17 16t-.288-.712T16 15h-4q-.425 0-.712.288T11 16t.288.713T12 17m0-4h4q.425 0 .713-.288T17 12t-.288-.712T16 11h-4q-.425 0-.712.288T11 12t.288.713T12 13m0-4h4q.425 0 .713-.288T17 8t-.288-.712T16 7h-4q-.425 0-.712.288T11 8t.288.713T12 9M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h14q.825 0 1.413.588T21 5v14q0 .825-.587 1.413T19 21zM5 5v14h14V5z"/></svg>`;
-  const iconAccommodationVoting=`<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><rect width="7.5" height="8" x="8.25" y="2.75" rx="1.25"/><path d="M10.25 6.75L11.5 8l2.25-2.5"/><rect width="16.5" height="8" x="3.75" y="13.25" rx="2"/><path d="M8.25 16.75h7.5"/></g></svg>`;
-  const iconTotalAccommodation=`<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21 6a1 1 0 0 1-1 1H10a1 1 0 1 1 0-2h10a1 1 0 0 1 1 1m0 6a1 1 0 0 1-1 1H10a1 1 0 1 1 0-2h10a1 1 0 0 1 1 1m0 6a1 1 0 0 1-1 1H10a1 1 0 1 1 0-2h10a1 1 0 0 1 1 1M7 5.995v.02c0 1.099-.895 1.99-2 1.99s-2-.891-2-1.99v-.02c0-1.099.895-1.99 2-1.99s2 .891 2 1.99m0 6v.02c0 1.099-.895 1.99-2 1.99s-2-.891-2-1.99v-.02c0-1.099.895-1.99 2-1.99s2 .891 2 1.99m0 6v.02c0 1.099-.895 1.99-2 1.99s-2-.891-2-1.99v-.02c0-1.099.895-1.99 2-1.99s2 .891 2 1.99"/></svg>`;
-  const iconAvailable=`<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 12 12" aria-hidden="true"><path fill="currentColor" d="M6 0a6 6 0 1 0 0 12A6 6 0 0 0 6 0M1.5 6a4.5 4.5 0 1 1 9 0a4.5 4.5 0 0 1-9 0m7.03-1.78a.75.75 0 0 1 0 1.06L5.78 8.03a.75.75 0 0 1-1.06 0l-1-1a.75.75 0 0 1 1.06-1.06l.47.47l2.22-2.22a.75.75 0 0 1 1.06 0"/></svg>`;
-  const iconStayDates=`<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M22 2.25h-3.25V.75a.75.75 0 0 0-1.5-.001V2.25h-4.5V.75a.75.75 0 0 0-1.5-.001V2.25h-4.5V.75a.75.75 0 0 0-1.5-.001V2.25H2a2 2 0 0 0-2 1.999v17.75a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V4.249a2 2 0 0 0-2-1.999M22.5 22a.5.5 0 0 1-.499.5H2a.5.5 0 0 1-.5-.5V4.25a.5.5 0 0 1 .5-.499h3.25v1.5a.75.75 0 0 0 1.5.001V3.751h4.5v1.5a.75.75 0 0 0 1.5.001V3.751h4.5v1.5a.75.75 0 0 0 1.5.001V3.751H22a.5.5 0 0 1 .499.499z"/><path fill="currentColor" d="M5.25 9h3v2.25h-3zm0 3.75h3V15h-3zm0 3.75h3v2.25h-3zm5.25 0h3v2.25h-3zm0-3.75h3V15h-3zm0-3.75h3v2.25h-3zm5.25 7.5h3v2.25h-3zm0-3.75h3V15h-3zm0-3.75h3v2.25h-3z"/></svg>`;
-  const iconGuests=`<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" aria-hidden="true"><path fill="currentColor" d="M17 10a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2zm-5.826 1A3 3 0 0 0 11 12H4.009C3.448 12 3 12.447 3 13c0 1.309.623 2.283 1.673 2.953C5.743 16.636 7.265 17 9 17c.708 0 1.38-.063 2-.18V17c0 .283.041.556.114.815A12 12 0 0 1 9 18c-1.855 0-3.583-.386-4.865-1.203C2.833 15.967 2 14.69 2 13c0-1.113.903-2 2.009-2zm3.326 1a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zM9 2a4 4 0 1 1 0 8a4 4 0 0 1 0-8m0 1a3 3 0 1 0 0 6a3 3 0 0 0-6 0a3 3 0 0 0 6 0"/></svg>`;
-  const iconLocation=`<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 15c2.21 0 4-1.79 4-4s-1.79-4-4-4s-4 1.79-4 4s1.79 4 4 4m0-6c1.1 0 2 .9 2 2s-.9 2-2 2s-2-.9-2-2s.9-2 2-2"/><path fill="currentColor" d="M11.65 21.94a1.03 1.03 0 0 0 .7 0C12.7 21.81 21 18.61 21 11c0-4.96-4.04-9-9-9s-9 4.04-9 9c0 7.6 8.3 10.8 8.65 10.94M12 4c3.86 0 7 3.14 7 7c0 5.42-5.53 8.26-7 8.91c-1.47-.66-7-3.5-7-8.91c0-3.86 3.14-7 7-7"/></svg>`;
-  const iconBedrooms=`<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 12c0-1.1-.9-2-2-2V7c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v3c-1.1 0-2 1-2 2v5h1.33L6 19h1l.67-2h8.67l.66 2h1l.67-2H20zm-4-2h-3V7h3zM8 7h3v3H8zm-2 5h12v3H6z"/></svg>`;
-  const iconBathrooms=`<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m7 10l5 5l5-5z"/></svg>`;
-  const iconDropdown=iconBathrooms;
-  const card=(v,i)=>`<article class="accom-card"><button class="accom-photo" data-villadetail="${i}" style="background-image:url('${photo(v)}')" aria-label="${esc(v.name)}"></button><div class="accom-card-info"><div class="accom-card-main"><div class="accom-title-row"><h3>${esc(v.name||"Penginapan")}</h3>${typeBadge(v)}</div><p class="accom-location">${iconLocation} ${esc(v.area||v.location||'Location not set')}</p><div class="accom-meta"><span>${iconGuests} ${esc(v.guests||'—')} Guests</span><span>${iconBedrooms} ${esc(v.bedrooms||'—')} Bedrooms</span><span>${iconBathrooms} ${esc(v.bathrooms||'—')} Bathrooms</span></div></div><div class="accom-price">${money(v.price||0)} <small>/ night</small></div><div class="accom-actions"><span class="accom-status ${String(v.status||'Available').toLowerCase()==='available'?'ok':''}">✓ ${esc(v.status||'Available')}</span><button class="accom-detail-btn" data-villadetail="${i}">View Details <span>→</span></button>${mode==="member"?"":`<button class="accom-edit-btn" data-editvilla="${i}">Edit</button>`}</div></div></article>`;
+  const card=(v,i)=>`<article class="accom-card"><button class="accom-photo" data-villadetail="${i}" style="background-image:url('${photo(v)}')" aria-label="${esc(v.name)}"></button><div class="accom-card-info"><div class="accom-card-main"><div class="accom-title-row"><h3>${esc(v.name||"Penginapan")}</h3>${typeBadge(v)}</div><p class="accom-location">⌖ ${esc(v.area||v.location||'Location not set')}</p><div class="accom-meta"><span>♙ ${esc(v.guests||'—')} Guests</span><span>▤ ${esc(v.bedrooms||'—')} Bedrooms</span><span>♨ ${esc(v.bathrooms||'—')} Bathrooms</span></div></div><div class="accom-price">${money(v.price||0)} <small>/ night</small></div><div class="accom-actions"><span class="accom-status ${String(v.status||'Available').toLowerCase()==='available'?'ok':''}">✓ ${esc(v.status||'Available')}</span><button class="accom-detail-btn" data-villadetail="${i}">View Details <span>→</span></button>${mode==="member"?"":`<button class="accom-edit-btn" data-editvilla="${i}">Edit</button>`}</div></div></article>`;
   const hero=`<section class="accom-hero"><div><span class="eyebrow">ACCOMMODATION COLLECTION</span><h2>Plan Your Stay</h2><p>Explore, discuss, and choose the best accommodation for your trip in ${esc(t.name)}.</p></div></section>`;
-  const tabs=`<div class="accom-tabs"><button type="button" data-accommodation-tab="list" class="${accommodationTab==='list'?'active':''}"><span class="accom-tab-icon">${iconAccommodationList}</span><span><b>Accommodation List</b><small>Accommodation List</small></span></button><button type="button" data-accommodation-tab="vote" class="${accommodationTab==='vote'?'active':''}"><span class="accom-tab-icon">${iconAccommodationVoting}</span><span><b>Accommodation Voting</b><small>Accommodation Voting</small></span>${voteCount<participantTotal?'<em>New</em>':''}</button></div>`;
-  const stats=`<div class="accom-stats"><div><span>${iconTotalAccommodation}</span><small>Total Accommodations</small><b>${total}</b></div><div><span>${iconAvailable}</span><small>Available</small><b>${available}</b></div><div><span>${iconStayDates}</span><small>Stay Dates</small><b>${date(t.start)} – ${date(t.end)}</b></div><div><span>${iconGuests}</span><small>Guests</small><b>± ${participantTotal} Guests</b></div></div>`;
-  const listToolbar=`<div class="accom-toolbar"><label>${iconDropdown}<input id="villaSearch" placeholder="Search accommodation, location, or facilities..."></label><select id="villaFilter"><option value="All">All Types</option>${typeOptions.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select>${mode==="member"?"":`<button class="primary" id="addVilla">＋ Add Accommodation</button>`}</div>`;
+  const tabs=`<div class="accom-tabs"><button type="button" data-accommodation-tab="list" class="${accommodationTab==='list'?'active':''}"><span class="accom-tab-icon">▤</span><span><b>Accommodation List</b><small>Accommodation List</small></span></button><button type="button" data-accommodation-tab="vote" class="${accommodationTab==='vote'?'active':''}"><span class="accom-tab-icon">☑</span><span><b>Accommodation Voting</b><small>Accommodation Voting</small></span>${voteCount<participantTotal?'<em>New</em>':''}</button></div>`;
+  const stats=`<div class="accom-stats"><div><span>▤</span><small>Total Accommodations</small><b>${total}</b></div><div><span>☑</span><small>Available</small><b>${available}</b></div><div><span>▣</span><small>Stay Dates</small><b>${date(t.start)} – ${date(t.end)}</b></div><div><span>♙</span><small>Guests</small><b>± ${participantTotal} Guests</b></div></div>`;
+  const listToolbar=`<div class="accom-toolbar"><label>⌕ <input id="villaSearch" placeholder="Search accommodation, location, or facilities..."></label><select id="villaFilter"><option value="All">All Types</option>${typeOptions.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select>${mode==="member"?"":`<button class="primary" id="addVilla">＋ Add Accommodation</button>`}</div>`;
   const listView=`${stats}${listToolbar}<div class="accom-list" id="stayList">${stays.map(card).join('')||`<div class="stay-empty"><h3>No accommodations yet</h3><p>Add a hotel, villa, resort, or homestay for this trip.</p>${mode==="member"?"":`<button class="primary" id="addVillaEmpty">＋ Add Your First Accommodation</button>`}</div>`}</div>`;
   const canResetVotes=mode==="master"||mode==="admin";
   const resultRows=ranked.map((item,pos)=>{const pct=voteCount?item.votes/voteCount*100:0;return `<div class="vote-result-row"><div class="vote-rank">${pos+1}</div><div class="vote-result-photo" style="background-image:url('${photo(item.v)}')"></div><div class="vote-result-info"><b>${esc(item.v.name||'Penginapan')}</b><span>${money(item.v.price||0)} / night · ${item.votes} vote${item.votes===1?'':'s'}</span><div class="vote-track"><i style="width:${pct}%"></i></div></div><strong>${pct.toFixed(0)}%</strong></div>`}).join('')||'<div class="stay-empty"><h3>No accommodation votes yet</h3><p>Add an accommodation first.</p></div>';
