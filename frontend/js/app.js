@@ -181,6 +181,8 @@ languagePairs.push(...[
  ["No accommodation available for voting yet.","Belum ada villa yang tersedia untuk voting."],["People","Orang"],["Days","Hari"],["Spent","Terpakai"],
  ["Remaining Budget","Sisa Anggaran"],["Total Spent","Total Pengeluaran"],["Remaining Until Trip","Sisa Waktu Trip"]
 ]);
+languagePairs.push(...[
+ ["Accommodation","Penginapan"],["Accommodation List","Daftar Penginapan"],["Accommodation Voting","Voting Penginapan"],["Plan Your Stay","Rencanakan Tempat Menginap"],["Choose Your Preferred Stay","Pilih Penginapan Terbaik"],["Explore, discuss, and choose the best accommodation for your trip in","Pilih, diskusikan, dan tentukan penginapan terbaik untuk perjalananmu di"],["Voting Progress","Progress Voting"],["Voting Deadline","Batas Voting"],["Accommodation Voting Results","Hasil Voting Penginapan"],["Participant Votes","Voting Peserta"],["Accommodation selected by each participant.","Penginapan yang dipilih oleh setiap peserta."],["Total Accommodations","Total Penginapan"],["Stay Dates","Rentang Menginap"],["Guests","Kebutuhan"],["All Types","Semua Tipe"],["View Details","Lihat Detail"],["New","Baru"],["Available","Tersedia"],["Search accommodation, location, or facilities...","Cari nama penginapan, lokasi, atau fasilitas..."],["Choose Your Preferred Stay","Pilih Penginapan Terbaik"],["Help choose the best place to stay for the Batu Escape trip.","Bantu tentukan tempat menginap untuk trip Batu Escape."],["Vote distribution among trip participants.","Perolehan suara peserta trip."],["Voted","Sudah Voting"],["Submit Vote","Kirim Voting"],["Update Vote","Perbarui Voting"],["No accommodation selected yet.","Belum ada penginapan yang dipilih."],["No participants have voted yet.","Belum ada peserta yang melakukan voting."]]);
 const plannerOriginalAttributes = new WeakMap();
 function applyPlannerLanguage(){
  const pairs=[...languagePairs].sort((a,b)=>Math.max(b[0].length,b[1].length)-Math.max(a[0].length,a[1].length));
@@ -429,7 +431,7 @@ function showApp(){
    ["Villas & Stay","holiday-village",plannerLanguage==="id"?"Penginapan":"Accommodation"],
  ];
  const mobileExtra=navItems().filter(([n])=>!["Dashboard","Participants","Cash Flow","Villas & Stay","Settings"].includes(n));
- mobileNav.innerHTML=mobileItems.map(([n,i,l])=>`<button type="button" data-page="${n}" class="mobile-nav-item ${page===n?"active":""}">${hpIcon(i)}<span>${l}</span></button>`).join("")+`<button type="button" data-action="mobile-more" class="mobile-nav-item"><span class="mobile-more-icon">···</span><span>${plannerLanguage==="id"?"Lainnya":"Others"}</span></button>`;
+ mobileNav.innerHTML=mobileItems.map(([n,i,l])=>`<button type="button" data-page="${n}" class="mobile-nav-item ${page===n?"active":""}">${hpIcon(i)}<span>${l}</span></button>`).join("")+`<button type="button" data-action="mobile-more" class="mobile-nav-item"><span class="mobile-more-icon">···</span><span>Lainnya</span></button>`;
  let moreSheet=document.getElementById("mobileMoreSheet");
  if(!moreSheet){
    moreSheet=document.createElement("div");
@@ -459,7 +461,6 @@ function showApp(){
   #mobileMoreSheet .mobile-more-head{display:flex!important;align-items:center!important;justify-content:space-between!important;margin-bottom:10px!important;color:var(--text,#fff)!important;}
   #mobileMoreSheet .mobile-more-head button{border:0!important;background:transparent!important;color:var(--text,#fff)!important;font-size:24px!important;cursor:pointer!important;}
   #mobileMoreSheet .mobile-more-list{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;}
-  #mobileMoreSheet .mobile-more-list button:last-child:nth-child(odd){grid-column:1 / -1!important;width:calc(50% - 4px)!important;justify-self:center!important;}
   #mobileMoreSheet .mobile-more-list button{display:flex!important;align-items:center!important;gap:10px!important;padding:12px!important;border:1px solid var(--border,#334967)!important;border-radius:10px!important;background:rgba(255,255,255,.03)!important;color:var(--text,#fff)!important;}
   #mobileMoreSheet .mobile-more-list svg{width:18px!important;height:18px!important;}
 }
@@ -561,16 +562,8 @@ function renderCore(){
  if(mode==="member")return tripPage();
 }
 
-function syncMobileNavState(){
- const mobileNav=document.getElementById("mobileNav");
- if(!mobileNav)return;
- mobileNav.querySelectorAll("[data-page]").forEach(btn=>btn.classList.toggle("active",btn.dataset.page===page));
- const moreSheet=document.getElementById("mobileMoreSheet");
- if(moreSheet)moreSheet.classList.remove("open");
-}
 function render(){
  renderCore();
- syncMobileNavState();
  applyPlannerLanguage();
 }
 
@@ -933,6 +926,7 @@ async function villasPage(t){
     : `<div class="vote-participant"><h3>Data Peserta</h3><label>Nama Peserta *</label>${participantSelect}${voteEditHint}${adminVoteManager}<button type="button" class="primary vote-submit" id="submitAccommodationVote" ${participants.length&&stays.length&&defaultParticipant>=0?'':'disabled'}>${voteButtonLabel}</button></div>`;
   const voteView=`<div class="accom-vote-head"><div><span class="eyebrow">GROUP DECISION</span><h2>Pilih Penginapan Terbaik</h2><p>Bantu tentukan tempat menginap untuk trip ${esc(t.name)}.</p></div><div class="vote-summary"><b>${voteCount} / ${participantTotal} Peserta</b><span>${votePct}% sudah voting</span>${resetAllButton}</div></div><div class="accom-vote-layout"><section class="vote-panel"><div class="vote-progress"><div><span>Progress Voting</span><b>${voteCount} / ${participantTotal} Peserta (${votePct}%)</b></div><div><span>Batas Voting</span><b>${date(t.end)}, 23:59</b></div></div><div class="vote-candidates">${voteCandidates}</div>${participantBlock}</section><section class="vote-results"><div class="dashboard-card-head"><div><span class="eyebrow">RESULT</span><h2>Hasil Voting Penginapan</h2><p>Perolehan suara peserta trip.</p></div></div>${resultRows}</section></div>`;
   $('#content').innerHTML=`${hero}${tabs}<div id="accommodationTabContent">${accommodationTab==='vote'?voteView:listView}</div>`;
+  applyPlannerLanguage();
   document.querySelectorAll('[data-accommodation-tab]').forEach(btn=>btn.onclick=()=>{accommodationTab=btn.dataset.accommodationTab;villasPage(t)});
   if(accommodationTab==='list'){
     const search=$('#villaSearch'),filter=$('#villaFilter');
