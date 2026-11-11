@@ -181,6 +181,24 @@ languagePairs.push(...[
  ["No accommodation available for voting yet.","Belum ada villa yang tersedia untuk voting."],["People","Orang"],["Days","Hari"],["Spent","Terpakai"],
  ["Remaining Budget","Sisa Anggaran"],["Total Spent","Total Pengeluaran"],["Remaining Until Trip","Sisa Waktu Trip"]
 ]);
+languagePairs.push(...[
+ ["Accommodation List","Daftar Penginapan"],["Accommodation Voting","Voting Penginapan"],["New","Baru"],
+ ["Plan Your Stay","Rencanakan Tempat Menginap"],["Explore, discuss, and choose the best accommodation for your trip in Batu Escape.","Pilih, diskusikan, dan tentukan penginapan terbaik untuk perjalananmu di Batu Escape."],
+ ["Total Accommodations","Total Penginapan"],["Stay Dates","Rentang Menginap"],["Guests","Tamu"],["Search accommodation, location, or facilities...","Cari nama penginapan, lokasi, atau fasilitas..."],["All Types","Semua Tipe"],["View Details","Lihat Detail"],
+ ["Choose Your Preferred Stay","Pilih Penginapan Terbaik"],["Help choose the best place to stay for the Batu Escape trip.","Bantu tentukan tempat menginap untuk trip Batu Escape."],
+ ["Voting Progress","Progress Voting"],["Voting Deadline","Batas Voting"],["Accommodation Voting Results","Hasil Voting Penginapan"],["Vote distribution among trip participants.","Perolehan suara peserta trip."],
+ ["Participant Votes","Voting Peserta"],["Accommodation selected by each participant.","Penginapan yang dipilih oleh setiap peserta."],
+ ["No accommodation votes yet","Belum ada voting penginapan"],["Add an accommodation first.","Tambahkan penginapan terlebih dahulu."],
+ ["No participants have voted yet.","Belum ada peserta yang melakukan voting."],["No accommodations available for voting.","Belum ada penginapan yang tersedia untuk voting."],
+ ["Participant Data","Data Peserta"],["Participant Name *","Nama Peserta *"],["This participant has already voted. Choose another accommodation to update the vote.","Peserta ini sudah melakukan voting. Pilih penginapan lain untuk memperbarui voting."],
+ ["Select a participant and accommodation, then submit the vote.","Pilih peserta dan penginapan, lalu kirim voting."],["Submit Vote","Kirim Voting"],["Update Vote","Perbarui Voting"],
+ ["Manage Participant Votes","Kelola Voting Peserta"],["Admin/Master can reset participant votes.","Admin/Master dapat menghapus vote peserta."],["Reset Vote","Reset Vote"],["Reset All Votes","Reset Semua Voting"],
+ ["have voted","sudah voting"],["vote","vote"],["votes","vote"],["night","malam"],
+ ["No accommodations yet","Belum ada penginapan"],["Add a hotel, villa, resort, or homestay for this trip.","Tambahkan hotel, villa, resort, atau homestay untuk trip ini."],
+ ["No accommodations found","Penginapan tidak ditemukan"],["Try another keyword or type.","Coba kata kunci atau tipe lain."],
+ ["Add Accommodation","Tambah Penginapan"],["Add Your First Accommodation","Tambah Penginapan Pertama"],
+ ["View details","Lihat Detail"],["Accommodation Vote","Voting Penginapan"],["Vote for the accommodation you prefer.","Pilih penginapan yang kamu inginkan."]
+]);
 const plannerOriginalAttributes = new WeakMap();
 function applyPlannerLanguage(){
  const pairs=[...languagePairs].sort((a,b)=>Math.max(b[0].length,b[1].length)-Math.max(a[0].length,a[1].length));
