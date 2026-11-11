@@ -131,9 +131,9 @@ async function persistTripCloudNow(t){
  const snapshot=JSON.parse(JSON.stringify(t));
  await window.HolidayPlannerCloud.saveTripWorkspace(t.id,snapshot);
 }
-async function saveAccommodationVoteCloud(tripId,participantKey,stayId,deviceId,votedBy){
+async function saveAccommodationVoteCloud(tripId,participantKey,stayId,votedBy){
  if(!cloudSyncReady||!window.HolidayPlannerCloud?.client)throw new Error("Supabase belum siap.");
- const {data,error}=await window.HolidayPlannerCloud.client.rpc("save_accommodation_vote",{p_trip_id:tripId,p_participant_key:participantKey,p_stay_id:String(stayId),p_device_id:deviceId||null,p_voted_by:votedBy||mode});
+ const {data,error}=await window.HolidayPlannerCloud.client.rpc("save_accommodation_vote",{p_trip_id:tripId,p_participant_key:participantKey,p_stay_id:String(stayId),p_device_id:null,p_voted_by:votedBy||mode});
  if(error)throw new Error(error.message||"Gagal menyimpan voting.");
  return data;
 }
@@ -845,12 +845,6 @@ $("#cancelIncome").onclick=()=>$("#incomeModal").close();
 let accommodationTab="list";
 function accommodationType(v){return String(v?.type||"Villa").trim()||"Villa"}
 function accommodationVoteKey(p,i){return String(p?.id||p?.contact||p?.name||`participant-${i}`).trim().toLowerCase()}
-function accommodationDeviceId(){
-  const key="hp_accommodation_device_id";
-  let id=localStorage.getItem(key);
-  if(!id){id=`device_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,12)}`;localStorage.setItem(key,id)}
-  return id;
-}
 function accommodationVoteData(t){
   if(!Array.isArray(t.accommodationVotes))t.accommodationVotes=[];
   const participants=Array.isArray(t.participants)?t.participants:[];
@@ -877,7 +871,7 @@ async function villasPage(t){
     t.__accommodationVotesHydrated=true;
     try{
       const cloudVotes=await loadAccommodationVotesCloud(t.id);
-      t.accommodationVotes=cloudVotes.map(v=>({participantKey:String(v.participant_key||v.participantKey||""),stayId:String(v.stay_id||v.stayId||""),votedAt:v.voted_at||v.votedAt||new Date().toISOString(),deviceId:v.device_id||v.deviceId||null,votedBy:v.voted_by||v.votedBy||"member"}));
+      t.accommodationVotes=cloudVotes.map(v=>({participantKey:String(v.participant_key||v.participantKey||""),stayId:String(v.stay_id||v.stayId||""),votedAt:v.voted_at||v.votedAt||new Date().toISOString(),votedBy:v.voted_by||v.votedBy||"member"}));
     }catch(err){console.warn("Accommodation vote load skipped:",err);}
   }
   if(!Array.isArray(t.stays))t.stays=[];
@@ -899,13 +893,9 @@ async function villasPage(t){
   const listView=`${stats}${listToolbar}<div class="accom-list" id="stayList">${stays.map(card).join('')||`<div class="stay-empty"><h3>Belum ada penginapan</h3><p>Tambahkan hotel, villa, resort, atau homestay untuk perjalanan ini.</p>${mode==="member"?"":`<button class="primary" id="addVillaEmpty">＋ Tambah Penginapan Pertama</button>`}</div>`}</div>`;
   const canResetVotes=mode==="master"||mode==="admin";
   const resultRows=ranked.map((item,pos)=>{const pct=voteCount?item.votes/voteCount*100:0;return `<div class="vote-result-row"><div class="vote-rank">${pos+1}</div><div class="vote-result-photo" style="background-image:url('${photo(item.v)}')"></div><div class="vote-result-info"><b>${esc(item.v.name||'Penginapan')}</b><span>${money(item.v.price||0)} / malam · ${item.votes} vote${item.votes===1?'':'s'}</span><div class="vote-track"><i style="width:${pct}%"></i></div></div><strong>${pct.toFixed(0)}%</strong></div>`}).join('')||'<div class="stay-empty"><h3>Belum ada pilihan penginapan</h3><p>Tambahkan penginapan terlebih dahulu.</p></div>';
-  const deviceId=accommodationDeviceId();
-  const deviceVote=votes.find(v=>v.deviceId===deviceId);
-  const currentParticipant=mode==="member"&&deviceVote
-    ?participants.findIndex((p,i)=>accommodationVoteKey(p,i)===deviceVote.participantKey)
-    :participants.findIndex((p,i)=>!votes.some(v=>v.participantKey===accommodationVoteKey(p,i)));
-  const defaultParticipant=Math.max(0,currentParticipant>=0?currentParticipant:0);
-  const participantSelect=participants.length?`<select id="accommodationParticipant" ${mode==="member"&&deviceVote?'disabled':''}>${participants.map((p,i)=>{const key=accommodationVoteKey(p,i);const existing=votes.find(v=>v.participantKey===key);const foreign=mode==="member"&&existing&&existing.deviceId&&existing.deviceId!==deviceId;return `<option value="${esc(key)}" data-participant-index="${i}" ${i===defaultParticipant?'selected':''} ${foreign?'disabled':''}>${esc(p.name||`Peserta ${i+1}`)}${existing?' — sudah voting':''}</option>`}).join('')}</select>`:'<div class="vote-no-participants">Belum ada peserta.</div>';
+  const firstUnvoted=participants.findIndex((p,i)=>!votes.some(v=>v.participantKey===accommodationVoteKey(p,i)));
+  const defaultParticipant=Math.max(0,firstUnvoted>=0?firstUnvoted:0);
+  const participantSelect=participants.length?`<select id="accommodationParticipant">${participants.map((p,i)=>{const key=accommodationVoteKey(p,i);const existing=votes.find(v=>v.participantKey===key);return `<option value="${esc(key)}" data-participant-index="${i}" ${i===defaultParticipant?'selected':''}>${esc(p.name||`Peserta ${i+1}`)}${existing?' — sudah voting':''}</option>`}).join('')}</select>`:'<div class="vote-no-participants">Belum ada peserta.</div>';
   const selectedVote=votes.find(v=>v.participantKey===accommodationVoteKey(participants[defaultParticipant],defaultParticipant));
   const selectedStay=selectedVote?.stayId||'';
   const voteButtonLabel=selectedVote?'↻　Perbarui Voting':'✓　Kirim Voting';
@@ -935,12 +925,10 @@ async function villasPage(t){
       const participantKey=participantEl?.value||'';const selected=document.querySelector('[data-vote-stay].selected');const stayId=selected?.dataset.voteStay||'';
       if(!participantKey)return toast('Pilih peserta terlebih dahulu.');if(!stayId)return toast('Pilih penginapan terlebih dahulu.');
       const existing=votes.find(v=>v.participantKey===participantKey);
-      if(mode==="member"&&existing&&existing.deviceId&&existing.deviceId!==deviceId)return toast('Voting peserta ini hanya dapat diubah dari device yang digunakan saat voting.');
-      if(mode==="member"&&deviceVote&&participantKey!==deviceVote.participantKey)return toast('Device ini sudah terdaftar untuk peserta lain.');
       const now=new Date().toISOString();
-      if(existing){existing.stayId=stayId;existing.votedAt=now;existing.deviceId=mode==="member"?deviceId:existing.deviceId||null;existing.votedBy=mode==="member"?'member':existing.votedBy||mode}
-      else votes.push({participantKey,stayId,votedAt:now,deviceId:mode==="member"?deviceId:null,votedBy:mode==="member"?'member':mode});
-      try{await saveAccommodationVoteCloud(t.id,participantKey,stayId,mode==='member'?deviceId:null,mode==='member'?'member':mode);t.accommodationVotes=votes;save();toast(existing?'Voting berhasil diperbarui.':'Voting berhasil disimpan.')}catch(err){console.error('Accommodation vote sync failed',err);toast('Voting gagal disimpan ke Supabase: '+(err.message||'periksa koneksi'))}villasPage(t);
+      if(existing){existing.stayId=stayId;existing.votedAt=now;existing.votedBy=mode==='member'?'member':existing.votedBy||mode}
+      else votes.push({participantKey,stayId,votedAt:now,votedBy:mode==='member'?'member':mode});
+      try{await saveAccommodationVoteCloud(t.id,participantKey,stayId,mode==='member'?'member':mode);t.accommodationVotes=votes;save();toast(existing?'Voting berhasil diperbarui.':'Voting berhasil disimpan.')}catch(err){console.error('Accommodation vote sync failed',err);toast('Voting gagal disimpan ke Supabase: '+(err.message||'periksa koneksi'))}villasPage(t);
     });
     document.querySelectorAll('[data-reset-accommodation-participant]').forEach(btn=>btn.addEventListener('click',async()=>{
       if(!canResetVotes)return;
