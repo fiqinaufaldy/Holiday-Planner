@@ -906,8 +906,8 @@ async function villasPage(t){
   const selectedStay=selectedVote?.stayId||'';
   const voteButtonLabel=selectedVote?'↻　Perbarui Voting':'✓　Kirim Voting';
   const voteEditHint=selectedVote
-    ?'<small class="vote-edit-hint">Peserta ini sudah voting. Kamu dapat memperbarui pilihannya.</small>'
-    :'<small class="vote-edit-hint">Pilih peserta dan penginapan, lalu simpan voting.</small>';
+    ?'<small class="vote-edit-hint">Peserta ini sudah voting. Pilihan penginapan dapat diperbarui kapan saja.</small>'
+    :'<small class="vote-edit-hint">Pilih nama peserta, lalu pilih penginapan yang diinginkan.</small>';
   const adminVoteManager=canResetVotes&&votes.length?`<div class="vote-admin-manager"><div class="vote-admin-manager-head"><strong>Kelola Voting Peserta</strong><small>Admin/Master dapat menghapus vote peserta.</small></div>${votes.map(v=>{const pIndex=participants.findIndex((p,i)=>accommodationVoteKey(p,i)===v.participantKey);const pName=pIndex>=0?(participants[pIndex].name||`Peserta ${pIndex+1}`):v.participantKey;const stay=stays.find((x,i)=>String(x.id||i)===String(v.stayId||''));return `<div class="vote-admin-row"><span><b>${esc(pName)}</b><small>${esc(stay?.name||'Penginapan tidak ditemukan')}</small></span><button type="button" class="vote-reset-btn" data-reset-accommodation-participant="${esc(v.participantKey)}">Reset Vote</button></div>`}).join('')}</div>`:'';
   const voteCandidates=stays.map((v,i)=>{const id=String(v.id||i);const selected=String(selectedStay)===id;return `<button type="button" class="vote-choice ${selected?'selected':''}" data-vote-stay="${esc(id)}"><span class="vote-choice-photo" style="background-image:url('${photo(v)}')"></span><span class="vote-choice-info"><b>${esc(v.name||'Penginapan')}</b><small>${typeBadge(v)} ${money(v.price||0)} / malam</small></span><span class="vote-radio">${selected?'✓':''}</span></button>`}).join('')||'<div class="stay-empty">Belum ada penginapan untuk dipilih.</div>';
   const resetAllButton=canResetVotes&&voteCount?`<button type="button" class="secondary vote-reset-all" id="resetAllAccommodationVotes">Reset Semua Voting</button>`:"";
@@ -931,8 +931,8 @@ async function villasPage(t){
       const existing=votes.find(v=>v.participantKey===participantKey);
       const now=new Date().toISOString();
       if(existing){existing.stayId=stayId;existing.votedAt=now;existing.deviceId=null;existing.votedBy=existing.votedBy||mode}
-      else votes.push({participantKey,stayId,votedAt:now,deviceId:null,votedBy:mode==='member'?'member':mode});
-      try{await saveAccommodationVoteCloud(t.id,participantKey,stayId,null,mode==='member'?'member':mode);t.accommodationVotes=votes;save();toast(existing?'Voting berhasil diperbarui.':'Voting berhasil disimpan.')}catch(err){console.error('Accommodation vote sync failed',err);toast('Voting gagal disimpan ke Supabase: '+(err.message||'periksa koneksi'))}villasPage(t);
+      else votes.push({participantKey,stayId,votedAt:now,deviceId:null,votedBy:mode});
+      try{await saveAccommodationVoteCloud(t.id,participantKey,stayId,null,mode);t.accommodationVotes=votes;save();toast(existing?'Voting berhasil diperbarui.':'Voting berhasil disimpan.')}catch(err){console.error('Accommodation vote sync failed',err);toast('Voting gagal disimpan ke Supabase: '+(err.message||'periksa koneksi'))}villasPage(t);
     });
     document.querySelectorAll('[data-reset-accommodation-participant]').forEach(btn=>btn.addEventListener('click',async()=>{
       if(!canResetVotes)return;
