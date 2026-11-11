@@ -893,15 +893,17 @@ async function villasPage(t){
   const listView=`${stats}${listToolbar}<div class="accom-list" id="stayList">${stays.map(card).join('')||`<div class="stay-empty"><h3>Belum ada penginapan</h3><p>Tambahkan hotel, villa, resort, atau homestay untuk perjalanan ini.</p>${mode==="member"?"":`<button class="primary" id="addVillaEmpty">＋ Tambah Penginapan Pertama</button>`}</div>`}</div>`;
   const canResetVotes=mode==="master"||mode==="admin";
   const resultRows=ranked.map((item,pos)=>{const pct=voteCount?item.votes/voteCount*100:0;return `<div class="vote-result-row"><div class="vote-rank">${pos+1}</div><div class="vote-result-photo" style="background-image:url('${photo(item.v)}')"></div><div class="vote-result-info"><b>${esc(item.v.name||'Penginapan')}</b><span>${money(item.v.price||0)} / malam · ${item.votes} vote${item.votes===1?'':'s'}</span><div class="vote-track"><i style="width:${pct}%"></i></div></div><strong>${pct.toFixed(0)}%</strong></div>`}).join('')||'<div class="stay-empty"><h3>Belum ada pilihan penginapan</h3><p>Tambahkan penginapan terlebih dahulu.</p></div>';
-  const currentParticipant=participants.findIndex((p,i)=>!votes.some(v=>v.participantKey===accommodationVoteKey(p,i)));
-  const defaultParticipant=Math.max(0,currentParticipant>=0?currentParticipant:0);
+  const firstUnvoted=participants.findIndex((p,i)=>!votes.some(v=>v.participantKey===accommodationVoteKey(p,i)));
+  const defaultParticipant=Math.max(0,firstUnvoted>=0?firstUnvoted:0);
   const participantSelect=participants.length?`<select id="accommodationParticipant">${participants.map((p,i)=>{const key=accommodationVoteKey(p,i);const existing=votes.find(v=>v.participantKey===key);return `<option value="${esc(key)}" data-participant-index="${i}" ${i===defaultParticipant?'selected':''}>${esc(p.name||`Peserta ${i+1}`)}${existing?' — sudah voting':''}</option>`}).join('')}</select>`:'<div class="vote-no-participants">Belum ada peserta.</div>';
   const selectedVote=votes.find(v=>v.participantKey===accommodationVoteKey(participants[defaultParticipant],defaultParticipant));
   const selectedStay=selectedVote?.stayId||'';
   const voteButtonLabel=selectedVote?'↻　Perbarui Voting':'✓　Kirim Voting';
   const voteEditHint=selectedVote
-    ?'<small class="vote-edit-hint">Peserta ini sudah voting. Pilih penginapan lain untuk mengganti pilihannya.</small>'
-    :'<small class="vote-edit-hint">Voting tersimpan di Supabase dan dapat diubah kembali kapan saja.</small>';
+    ?(mode==="member"&&selectedVote.deviceId&&selectedVote.deviceId!==deviceId
+      ?'<small class="vote-edit-hint">Peserta ini sudah voting dari device lain. Kamu tidak dapat mengubah voting tersebut.</small>'
+      :'<small class="vote-edit-hint">Peserta ini sudah voting dari device ini. Pilih penginapan lain untuk mengganti pilihannya.</small>')
+    :'<small class="vote-edit-hint">Setelah voting, pilihan tersimpan di Supabase dan dapat diubah kembali dari device yang sama.</small>';
   const adminVoteManager=canResetVotes&&votes.length?`<div class="vote-admin-manager"><div class="vote-admin-manager-head"><strong>Kelola Voting Peserta</strong><small>Admin/Master dapat menghapus vote peserta.</small></div>${votes.map(v=>{const pIndex=participants.findIndex((p,i)=>accommodationVoteKey(p,i)===v.participantKey);const pName=pIndex>=0?(participants[pIndex].name||`Peserta ${pIndex+1}`):v.participantKey;const stay=stays.find((x,i)=>String(x.id||i)===String(v.stayId||''));return `<div class="vote-admin-row"><span><b>${esc(pName)}</b><small>${esc(stay?.name||'Penginapan tidak ditemukan')}</small></span><button type="button" class="vote-reset-btn" data-reset-accommodation-participant="${esc(v.participantKey)}">Reset Vote</button></div>`}).join('')}</div>`:'';
   const voteCandidates=stays.map((v,i)=>{const id=String(v.id||i);const selected=String(selectedStay)===id;return `<button type="button" class="vote-choice ${selected?'selected':''}" data-vote-stay="${esc(id)}"><span class="vote-choice-photo" style="background-image:url('${photo(v)}')"></span><span class="vote-choice-info"><b>${esc(v.name||'Penginapan')}</b><small>${typeBadge(v)} ${money(v.price||0)} / malam</small></span><span class="vote-radio">${selected?'✓':''}</span></button>`}).join('')||'<div class="stay-empty">Belum ada penginapan untuk dipilih.</div>';
   const resetAllButton=canResetVotes&&voteCount?`<button type="button" class="secondary vote-reset-all" id="resetAllAccommodationVotes">Reset Semua Voting</button>`:"";
@@ -1155,7 +1157,7 @@ function dashboard(t){
     <div style="min-width:0"><span class="dashboard-card-eyebrow">GROUP DECISION</span><h2>Accommodation Vote</h2><p>Vote for the accommodation you prefer.</p></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:9px;flex:0 0 auto;padding-top:2px">
      <span class="dashboard-vote-total" style="font-size:12px;font-weight:700;white-space:nowrap">${voteTotal} Votes</span>
-     ${ranked.length?`<button class="villa-vote-button" type="button" data-page="Villas & Stay" style="margin:0;border:1px solid var(--border);border-radius:999px;padding:7px 12px;background:var(--accent);color:#fff;font-size:11px;font-weight:800;letter-spacing:.1px;line-height:1;box-shadow:0 6px 16px rgba(0,0,0,.12);cursor:pointer;white-space:nowrap">Vote Now <span aria-hidden="true">→</span></button>`:""}
+     ${`<button class="villa-vote-button" type="button" data-page="Villas & Stay" style="margin:0;border:1px solid var(--border);border-radius:999px;padding:7px 12px;background:var(--accent);color:#fff;font-size:11px;font-weight:800;letter-spacing:.1px;line-height:1;box-shadow:0 6px 16px rgba(0,0,0,.12);cursor:pointer;white-space:nowrap">Vote Now <span aria-hidden="true">→</span></button>`}
     </div>
    </div>
    <div class="villa-vote-list" style="margin-top:18px">${villaRows}</div>
