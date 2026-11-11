@@ -479,7 +479,7 @@ function showApp(){
   #mobileMoreSheet .mobile-more-list{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;}
   #mobileMoreSheet .mobile-more-list button{position:relative!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:0!important;padding:12px 14px!important;border:1px solid var(--border,#334967)!important;border-radius:10px!important;background:rgba(255,255,255,.03)!important;color:var(--text,#fff)!important;text-align:center!important;}
   #mobileMoreSheet .mobile-more-list button svg{position:absolute!important;left:14px!important;top:50%!important;transform:translateY(-50%)!important;}
-  #mobileMoreSheet .mobile-more-list button span{display:block!important;width:auto!important;margin-left:24px!important;text-align:left!important;line-height:1.15!important;}
+  #mobileMoreSheet .mobile-more-list button span{display:block!important;width:auto!important;margin-left:32px!important;text-align:left!important;line-height:1.15!important;}
   #mobileMoreSheet .mobile-more-list svg{width:18px!important;height:18px!important;}
 }
 @media(min-width:769px){#mobileNav,#mobileMoreSheet{display:none!important;}}
