@@ -125,7 +125,7 @@ function queueCloudWorkspaceSave(t){
   finally{cloudSaveTimers.delete(t.id);}
  },450));
 }
-function save(){localStorage.setItem(store,JSON.stringify(db));if(cloudSyncReady&&mode!=="member"&&Array.isArray(db.trips))db.trips.forEach(queueCloudWorkspaceSave)}
+function save(){try{localStorage.setItem(store,JSON.stringify(db));}catch(error){if(error?.name!=="QuotaExceededError")throw error;console.warn("Holiday Planner localStorage quota exceeded; cloud remains source of truth.");}if(cloudSyncReady&&mode!=="member"&&Array.isArray(db.trips))db.trips.forEach(queueCloudWorkspaceSave)}
 async function persistTripCloudNow(t){
  if(!cloudSyncReady||!t?.id||!window.HolidayPlannerCloud?.saveTripWorkspace)return;
  const snapshot=JSON.parse(JSON.stringify(t));
@@ -295,6 +295,7 @@ async function hydrateTripsFromCloud(){
   catch(error){console.warn("Workspace load skipped for",item.name,error);}
  }
  cloudSyncReady=true;
+ try{await migrateInlineVillaPhotosToCloud();}catch(error){console.warn("Villa photo migration skipped",error);}
  save();
 }
 async function enter(pin){
@@ -1098,12 +1099,28 @@ async function villasPage(t){
   applyPlannerLanguage();
 }
 let villaPendingPhotos=[];
+const VILLA_PHOTO_BUCKET="holiday-planner";
+function isVillaDataUrl(src){return /^data:image\/(?:jpeg|png|webp);base64,/i.test(String(src||""))}
+function makeVillaId(){return (globalThis.crypto?.randomUUID?.()||("villa-"+Date.now()+"-"+Math.random().toString(16).slice(2))).toString()}
+async function uploadVillaPhotoToStorage(dataUrl,tripId,villaId){
+ if(!cloudSyncReady||!window.HolidayPlannerCloud?.client)throw new Error("Supabase belum siap untuk upload foto Villa.");
+ const blob=await (await fetch(dataUrl)).blob();
+ const path=`${tripId}/${villaId}/${Date.now()}-${Math.random().toString(16).slice(2)}.webp`;
+ const {error}=await window.HolidayPlannerCloud.client.storage.from(VILLA_PHOTO_BUCKET).upload(path,blob,{contentType:"image/webp",upsert:false,cacheControl:"31536000"});
+ if(error)throw new Error(error.message||"Gagal upload foto Villa ke Supabase Storage.");
+ const {data}=window.HolidayPlannerCloud.client.storage.from(VILLA_PHOTO_BUCKET).getPublicUrl(path);
+ if(!data?.publicUrl)throw new Error("URL foto Villa tidak berhasil dibuat.");
+ return data.publicUrl;
+}
+async function normalizeVillaPhotosForCloud(photos,tripId,villaId){const out=[];for(const src of (Array.isArray(photos)?photos:[]).slice(0,6)){if(!src)continue;out.push(isVillaDataUrl(src)?await uploadVillaPhotoToStorage(src,tripId,villaId):String(src))}return out}
+async function migrateInlineVillaPhotosToCloud(){if(!cloudSyncReady||!window.HolidayPlannerCloud?.client||!Array.isArray(db.trips))return;let changed=false;for(const t of db.trips){for(const v of (Array.isArray(t.stays)?t.stays:[])){const photos=v.photos?.length?v.photos:(v.photo?[v.photo]:[]);if(!photos.some(isVillaDataUrl))continue;const villaId=v.id||makeVillaId();const urls=await normalizeVillaPhotosForCloud(photos,t.id,villaId);v.id=villaId;v.photos=urls.slice(0,6);v.photo=v.photos[0]||"";changed=true}}if(changed){save();for(const t of db.trips)await persistTripCloudNow(t)}}
 function renderVillaPhotoPreview(){const box=$("#villaPhotoPreview");if(!box)return;box.innerHTML=villaPendingPhotos.map((src,i)=>`<div class="villa-preview-item"><img src="${src}" alt="Villa photo ${i+1}"><button type="button" data-remove-villaphoto="${i}" aria-label="Remove photo">×</button></div>`).join("")||'<span class="villa-preview-empty">No photos selected yet.</span>'}
 function compressVillaImage(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=reject;reader.onload=()=>{const img=new Image();img.onerror=reject;img.onload=()=>{const max=1500,scale=Math.min(1,max/Math.max(img.width,img.height));const canvas=document.createElement("canvas");canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/webp",.76))};img.src=reader.result};reader.readAsDataURL(file)})}
 function openVilla(index=null){if(!canManageTrip())return toast("Member harus mengirim request melalui My Requests.");const f=$("#villaForm");f.reset();if(f.elements.status&&!Array.from(f.elements.status.options).some(o=>String(o.value)==="Not Available")){const opt=document.createElement("option");opt.value="Not Available";opt.textContent="Not Available";f.elements.status.appendChild(opt);}if(!f.elements.type){const grid=f.querySelector(".formgrid")||f;const wrap=document.createElement("label");wrap.innerHTML=`Accommodation type<select name="type"><option>Villa</option><option>Hotel</option><option>Resort</option><option>Homestay</option><option>Guest House</option><option>Apartment</option><option>Other</option></select>`;grid.appendChild(wrap)}$("#villaIndex").value=index===null?"":String(index);$("#villaModalTitle").textContent=index===null?"Add Accommodation":"Edit Accommodation";villaPendingPhotos=[];if(index!==null){const v=trip().stays[index]||{};for(const k of ["name","area","type","price","guests","bedrooms","bathrooms","status","referenceLink","description","facilities","notes"])if(f.elements[k])f.elements[k].value=v[k]??(k==="type"?"Villa":"");villaPendingPhotos=(v.photos&&v.photos.length?v.photos:(v.photo?[v.photo]:[])).slice(0,6)}renderVillaPhotoPreview();$("#villaModal").showModal()}
 $("#villaPhotosInput").addEventListener("change",async e=>{const files=[...e.target.files];if(villaPendingPhotos.length+files.length>6){toast("Maximum 6 photos per villa.");e.target.value="";return}for(const file of files){if(!["image/jpeg","image/png","image/webp"].includes(file.type)){toast("Use JPG, PNG, or WEBP images.");continue}try{const data=await compressVillaImage(file);villaPendingPhotos.push(data);renderVillaPhotoPreview()}catch{toast("Could not process one of the images.")}}e.target.value=""});
-$("#villaForm").onsubmit=async e=>{e.preventDefault();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");const f=e.target,index=$("#villaIndex").value;const v={name:f.elements.name.value.trim(),area:f.elements.area.value.trim(),type:f.elements.type?.value||"Villa",price:Number(f.elements.price.value||0),guests:f.elements.guests.value,bedrooms:f.elements.bedrooms.value,bathrooms:f.elements.bathrooms.value,status:f.elements.status.value,photos:villaPendingPhotos.slice(0,6),photo:villaPendingPhotos[0]||"",referenceLink:f.elements.referenceLink.value.trim(),description:f.elements.description.value,facilities:f.elements.facilities.value,notes:f.elements.notes.value};if(!v.name)return toast("Accommodation name is required.");if(!v.photos.length)return toast("Upload at least one villa photo.");const list=trip().stays||(trip().stays=[]);if(index==="")list.push(v);else list[Number(index)]=v;const currentTrip=trip();try{save();await persistTripCloudNow(currentTrip)}catch(err){console.error("Villa cloud save failed",err);return toast("Villa tersimpan lokal, tetapi gagal tersimpan ke Supabase: "+(err.message||"periksa koneksi"))}$("#villaModal").close();villasPage(trip());toast(index===""?"Villa added & synced":"Villa updated & synced")};
+$("#villaForm").onsubmit=async e=>{e.preventDefault();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");const f=e.target,index=$("#villaIndex").value,currentTrip=trip(),existing=index!==""?currentTrip.stays?.[Number(index)]:null,villaId=existing?.id||makeVillaId(),rawPhotos=villaPendingPhotos.slice(0,6);if(!f.elements.name.value.trim())return toast("Accommodation name is required.");if(!rawPhotos.length)return toast("Upload at least one villa photo.");if(!cloudSyncReady)return toast("Supabase belum siap. Coba lagi setelah koneksi tersedia.");const submit=e.submitter;if(submit)submit.disabled=true;try{const photos=await normalizeVillaPhotosForCloud(rawPhotos,currentTrip.id,villaId),v={id:villaId,name:f.elements.name.value.trim(),area:f.elements.area.value.trim(),type:f.elements.type?.value||"Villa",price:Number(f.elements.price.value||0),guests:f.elements.guests.value,bedrooms:f.elements.bedrooms.value,bathrooms:f.elements.bathrooms.value,status:f.elements.status.value,photos,photo:photos[0]||"",referenceLink:f.elements.referenceLink.value.trim(),description:f.elements.description.value,facilities:f.elements.facilities.value,notes:f.elements.notes.value},list=currentTrip.stays||(currentTrip.stays=[]);if(index==="")list.push(v);else list[Number(index)]=v;save();await persistTripCloudNow(currentTrip);$("#villaModal").close();villasPage(currentTrip);toast(index===""?"Villa added & synced":"Villa updated & synced")}catch(err){console.error("Villa cloud save failed",err);toast("Villa gagal disimpan ke Supabase: "+(err.message||"periksa koneksi Storage/bucket villa-photos"))}finally{if(submit)submit.disabled=false}};
 $("#villaPhotoPreview").addEventListener("click",e=>{const b=e.target.closest("[data-remove-villaphoto]");if(!b)return;villaPendingPhotos.splice(Number(b.dataset.removeVillaphoto),1);renderVillaPhotoPreview()});
+
 $('#cancelVilla').onclick=()=>$('#villaModal').close();
 
 let villaGalleryIndex=0,villaGalleryPhotos=[];
