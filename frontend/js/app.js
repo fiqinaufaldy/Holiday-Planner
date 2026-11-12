@@ -48,7 +48,9 @@ function activatePlan(t,id){
  const p=t.plans.find(x=>x.id===id&&x.enabled);if(!p)return false;
  t.activePlanId=id;activePlanId=id;
  ["budget","income","cashflow","stays","destinations","itinerary","budgetLimit"].forEach(k=>t[k]=p[k]??(k==="budgetLimit"?0:[]));
- t.destination=p.tripInfo?.destination??t.destination??"";
+ t.destination=p.tripInfo?.destination??p.destination??"";
+ t.start=p.tripInfo?.start??p.start??t.start??"";
+ t.end=p.tripInfo?.end??p.end??t.end??"";
  t.start=p.tripInfo?.start??t.start??"";
  t.end=p.tripInfo?.end??t.end??"";
  save();return true;
@@ -1562,7 +1564,14 @@ if(b.id==="saveAdmin"){let p=$("#adminPin").value;if(p&&!/^\d{6}$/.test(p))retur
  const t=trip();if(!canManageTrip())return toast("Member Access hanya untuk melihat data.");
  t.name=$("#gName").value.trim()||t.name;
  t.destination=$("#gDestination").value.trim();t.start=$("#gStart").value;t.end=$("#gEnd").value;
- ensurePlans(t);t.plans.forEach(p=>p.tripInfo={destination:t.destination,start:t.start,end:t.end});
+ ensurePlans(t);
+ const currentPlan=t.plans.find(p=>p.id===t.activePlanId)||t.plans[0];
+ if(currentPlan){
+   currentPlan.tripInfo={destination:t.destination,start:t.start,end:t.end};
+   currentPlan.destination=t.destination;
+   currentPlan.start=t.start;
+   currentPlan.end=t.end;
+ }
  save();general(t);toast("Trip information saved");
 }if(b.id==="savePlans"){const t=trip();ensurePlans(t);const checks=[...document.querySelectorAll("[data-plan-enabled]")];if(!checks.some(x=>x.checked))return toast("Minimal satu plan harus aktif.");t.plans.forEach(p=>{p.enabled=!!document.querySelector(`[data-plan-enabled="${p.id}"]`)?.checked;const n=document.querySelector(`[data-plan-name="${p.id}"]`);if(n&&n.value.trim())p.name=n.value.trim()});const def=$("#defaultPlan").value;if(t.plans.some(p=>p.id===def&&p.enabled))t.activePlanId=def;activatePlan(t,t.activePlanId);save();general(t);toast("Plan settings saved")}if(b.id==="editTripSettings")toast("Trip settings editor is next development step");if(b.id==="planningAdd")openPlanningForm(b.dataset.kind);if(b.dataset.planEdit){const [k,i]=b.dataset.planEdit.split(":");openPlanningForm(k,Number(i));}if(b.dataset.planDelete){const [k,i]=b.dataset.planDelete.split(":");if(confirm("Delete this item?")){const t=trip();if(!Array.isArray(t[k]))t[k]=[];t[k].splice(Number(i),1);save();planningCollectionPage(t,k);}}if(b.id==="cashflowAdd")openCashFlowForm();if(b.dataset.cfEdit!==undefined){const [pid,ix]=b.dataset.cfEdit.split(":");if(pid!=="legacy"){const t=trip();t.activePlanId=pid;openCashFlowForm(Number(ix));}}if(b.dataset.cfDelete!==undefined){const [pid,ix]=b.dataset.cfDelete.split(":");const t=trip();if(confirm("Hapus transaksi ini?")){if(pid==="legacy")t.cashflow.splice(Number(ix),1);else{const p=t.plans.find(p=>p.id===pid);p?.cashflow?.splice(Number(ix),1);}save();cashFlowPage(t);}}if(b.id==="addItem"){
  const key=b.dataset.key;
