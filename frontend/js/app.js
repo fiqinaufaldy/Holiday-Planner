@@ -1329,8 +1329,8 @@ function hpIcon(name){
 }
 async function dashboard(t){
  ensurePlans(t);
- if(cloudSyncReady&&t?.id&&!t.__accommodationVotesHydrated){
-   t.__accommodationVotesHydrated=true;
+ if(cloudSyncReady&&t?.id&&!t.__dashboardVotesHydrated){
+   t.__dashboardVotesHydrated=true;
    try{
      const cloudVotes=await loadAccommodationVotesCloud(t.id);
      t.accommodationVotes=(Array.isArray(cloudVotes)?cloudVotes:[]).map(v=>({
@@ -1344,7 +1344,6 @@ async function dashboard(t){
      console.warn("Dashboard accommodation vote load skipped:",err);
    }
  }
-
  const active=t.plans.find(p=>p.id===t.activePlanId)||t.plans[0]||{};
  const incomeTotal=(active.income||[]).reduce((a,x)=>a+Number(x.amount||0),0);
  const expenseItems=Array.isArray(active.budget)?active.budget:[];
@@ -1422,7 +1421,7 @@ async function dashboard(t){
  $("#content").innerHTML=`
  <section class="hero" style="background-image:url('${esc(t.cover||"")}')"><span class="pill">TRIP SPACE</span><h2>${esc(t.name)}</h2><p>${date(t.start)} – ${date(t.end)}　·　${esc(t.destination)}</p></section>
  <div class="stats dashboard-stats">
-  <div class="stat"><span class="stat-icon">${hpIcon("users")}</span><small>Participants</small><b>${(t.participants||[]).length} People</b></div>
+  <div class="stat"><span class="stat-icon">${hpIcon("users")}</span><small>Participants</small><b>${(t.participants||[]).filter(p=>String(p.status||"Confirmed").trim().toLowerCase()==="confirmed").length} People</b></div>
   <div class="stat"><span class="stat-icon">${hpIcon("wallet")}</span><small>Planned Budget</small><b>${money(plannedBudget)}</b></div>
   <div class="stat"><span class="stat-icon">${hpIcon("chart")}</span><small>Total Spent</small><b>${money(totalSpent)}</b></div>
   <div class="stat"><span class="stat-icon">${hpIcon("calendar")}</span><small>Remaining Until Trip</small><b>${remainingDays} Days</b></div>
