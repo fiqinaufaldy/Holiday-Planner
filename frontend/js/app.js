@@ -1132,19 +1132,34 @@ $("#villaForm").onsubmit=async e=>{
  const existing=index!==""?currentTrip.stays?.[Number(index)]:null;
  const v={id:existing?.id||makeVillaId(),name:f.elements.name.value.trim(),area:f.elements.area.value.trim(),type:f.elements.type?.value||"Villa",price:Number(f.elements.price.value||0),guests:f.elements.guests.value,bedrooms:f.elements.bedrooms.value,bathrooms:f.elements.bathrooms.value,status:f.elements.status.value,photos:villaPendingPhotos.slice(0,6),photo:villaPendingPhotos[0]||"",referenceLink:f.elements.referenceLink.value.trim(),description:f.elements.description.value,facilities:f.elements.facilities.value,notes:f.elements.notes.value,storagePaths:existing?.storagePaths||[]};
  if(!v.name)return toast("Accommodation name is required.");if(!v.photos.length)return toast("Upload at least one villa photo.");
- const list=currentTrip.stays||(currentTrip.stays=[]);if(index==="")list.push(v);else list[Number(index)]=v;
  const submit=e.submitter;if(submit)submit.disabled=true;
  try{
-  // Save the Villa immediately so Storage permission problems cannot prevent the form from saving.
+  // Upload photo data first. Never persist base64 photo data into localStorage or trip_workspaces.
+  // The workspace remains the source of truth for Villa metadata + Storage URLs.
+  if(!cloudSyncReady||!window.HolidayPlannerCloud?.client){
+   throw new Error("Supabase belum siap untuk menyimpan foto Villa.");
+  }
+  await syncVillaPhotosToStorage(v,currentTrip.id);
+
+  const list=currentTrip.stays||(currentTrip.stays=[]);
+  if(index==="")list.push(v);else list[Number(index)]=v;
+
+  // Persist only after photos have become Storage URLs.
   save();
-  try{await persistTripCloudNow(currentTrip);}catch(cloudErr){console.error("Initial Villa cloud save failed",cloudErr);}
-  let photoSyncError=null;
-  if(cloudSyncReady&&window.HolidayPlannerCloud?.client){try{await syncVillaPhotosToStorage(v,currentTrip.id);save();await persistTripCloudNow(currentTrip);}catch(err){photoSyncError=err;console.error("Villa photo upload failed",err);}}
-  $("#villaModal").close();villasPage(currentTrip);
-  if(photoSyncError)toast("Villa tersimpan, tetapi foto belum ter-upload: "+(photoSyncError.message||"cek Storage policy"));
-  else toast(index===""?"Villa added & synced":"Villa updated & synced");
- }catch(err){console.error("Villa save failed",err);toast("Villa gagal disimpan: "+(err.message||"periksa koneksi"));}
- finally{if(submit)submit.disabled=false}
+  await persistTripCloudNow(currentTrip);
+
+  $("#villaModal").close();
+  villasPage(currentTrip);
+  toast(index===""?"Villa added & synced":"Villa updated & synced");
+ }catch(err){
+  console.error("Villa save failed",err);
+  const msg=String(err?.message||"periksa koneksi");
+  if(/row-level security policy|storage|permission|not authorized/i.test(msg)){
+   toast("Foto Villa ditolak Supabase Storage. Buat policy INSERT untuk bucket holiday-planner.");
+  }else{
+   toast("Villa gagal disimpan: "+msg);
+  }
+ }finally{if(submit)submit.disabled=false}
 };
 $("#villaPhotoPreview").addEventListener("click",e=>{const b=e.target.closest("[data-remove-villaphoto]");if(!b)return;villaPendingPhotos.splice(Number(b.dataset.removeVillaphoto),1);renderVillaPhotoPreview()});
 $('#cancelVilla').onclick=()=>$('#villaModal').close();
