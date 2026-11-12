@@ -1126,8 +1126,17 @@ async function refreshVillaPhotoUrls(tripObj){
   for(const path of paths.slice(0,6)){
    if(!path)continue;
    const {data,error}=await client.storage.from(VILLA_PHOTO_BUCKET).createSignedUrl(path,60*60*24*7);
-   if(error){console.warn("Villa photo signed URL failed",path,error.message);continue;}
+   if(error){
+    console.warn("Villa photo signed URL failed",path,error.message);
+    const pub=client.storage.from(VILLA_PHOTO_BUCKET).getPublicUrl(path);
+    if(pub?.data?.publicUrl)fresh.push(pub.data.publicUrl);
+    continue;
+   }
    if(data?.signedUrl)fresh.push(data.signedUrl);
+   else {
+    const pub=client.storage.from(VILLA_PHOTO_BUCKET).getPublicUrl(path);
+    if(pub?.data?.publicUrl)fresh.push(pub.data.publicUrl);
+   }
   }
   if(fresh.length){v.photos=fresh;v.photo=fresh[0]||"";}
  }
