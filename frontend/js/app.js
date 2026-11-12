@@ -995,6 +995,7 @@ async function villasPage(t){
     }catch(err){console.warn("Accommodation vote load skipped:",err);}
   }
   if(!Array.isArray(t.stays))t.stays=[];
+  if(window.HolidayPlannerCloud?.client){try{await refreshVillaPhotoUrls(t);}catch(err){console.warn("Villa photo refresh failed",err);}}
   const stays=t.stays;
   const {participants,votes}=accommodationVoteData(t);
   const total=stays.length, available=stays.filter(x=>String(x.status||"Available").toLowerCase()==="available").length;
@@ -1110,20 +1111,38 @@ async function uploadVillaPhotoToStorage(dataUrl,tripId,villaId,index){
  const path=`villas/${tripId}/${villaId}/${Date.now()}-${index}.webp`;
  const {error}=await client.storage.from(VILLA_PHOTO_BUCKET).upload(path,blob,{contentType:"image/webp",upsert:true,cacheControl:"31536000"});
  if(error)throw new Error(error.message||"Gagal upload foto Villa.");
- const {data:signed,error:signedError}=await client.storage.from(VILLA_PHOTO_BUCKET).createSignedUrl(path,31536000);
+ const {data,error:signedError}=await client.storage.from(VILLA_PHOTO_BUCKET).createSignedUrl(path,60*60*24*7);
  if(signedError)throw new Error(signedError.message||"Gagal membuat URL foto Villa.");
- if(!signed?.signedUrl)throw new Error("Signed URL foto Villa tidak tersedia.");
- return {path,url:signed.signedUrl};
+ if(!data?.signedUrl)throw new Error("Signed URL foto Villa tidak tersedia.");
+ return {path,url:data.signedUrl};
+}
+async function refreshVillaPhotoUrls(tripObj){
+ const client=window.HolidayPlannerCloud?.client;
+ if(!client||!tripObj)return;
+ for(const v of (tripObj.stays||[])){
+  const paths=Array.isArray(v.storagePaths)?v.storagePaths:[];
+  if(!paths.length)continue;
+  const fresh=[];
+  for(const path of paths.slice(0,6)){
+   if(!path)continue;
+   const {data,error}=await client.storage.from(VILLA_PHOTO_BUCKET).createSignedUrl(path,60*60*24*7);
+   if(error){console.warn("Villa photo signed URL failed",path,error.message);continue;}
+   if(data?.signedUrl)fresh.push(data.signedUrl);
+  }
+  if(fresh.length){v.photos=fresh;v.photo=fresh[0]||"";}
+ }
 }
 async function syncVillaPhotosToStorage(villa,tripId){
- const source=Array.isArray(villa.photos)?villa.photos:[];const urls=[];const storagePaths=[];
+ const source=Array.isArray(villa.photos)?villa.photos:[];
+ const previousPaths=Array.isArray(villa.storagePaths)?villa.storagePaths:[];
+ const urls=[];const storagePaths=[];
  for(let i=0;i<source.length;i++){
   const src=source[i];
   if(!src)continue;
   if(isVillaDataUrl(src)){const uploaded=await uploadVillaPhotoToStorage(src,tripId,villa.id,i);urls.push(uploaded.url);storagePaths.push(uploaded.path);}
-  else{urls.push(String(src));}
+  else{urls.push(String(src));if(previousPaths[i])storagePaths.push(previousPaths[i]);}
  }
- villa.photos=urls.slice(0,6);villa.photo=villa.photos[0]||"";villa.storagePaths=storagePaths;return villa;
+ villa.photos=urls.slice(0,6);villa.photo=villa.photos[0]||"";villa.storagePaths=storagePaths.slice(0,6);return villa;
 }
 function openVilla(index=null){if(!canManageTrip())return toast("Member harus mengirim request through My Requests.");const f=$("#villaForm");f.reset();if(f.elements.status&&!Array.from(f.elements.status.options).some(o=>String(o.value)==="Not Available")){const opt=document.createElement("option");opt.value="Not Available";opt.textContent="Not Available";f.elements.status.appendChild(opt);}if(!f.elements.type){const grid=f.querySelector(".formgrid")||f;const wrap=document.createElement("label");wrap.innerHTML=`Accommodation type<select name="type"><option>Villa</option><option>Hotel</option><option>Resort</option><option>Homestay</option><option>Guest House</option><option>Apartment</option><option>Other</option></select>`;grid.appendChild(wrap)}$("#villaIndex").value=index===null?"":String(index);$("#villaModalTitle").textContent=index===null?"Add Accommodation":"Edit Accommodation";villaPendingPhotos=[];if(index!==null){const v=trip().stays[index]||{};for(const k of ["name","area","type","price","guests","bedrooms","bathrooms","status","referenceLink","description","facilities","notes"])if(f.elements[k])f.elements[k].value=v[k]??(k==="type"?"Villa":"");villaPendingPhotos=(v.photos&&v.photos.length?v.photos:(v.photo?[v.photo]:[])).slice(0,6)}renderVillaPhotoPreview();$("#villaModal").showModal()}
 $("#villaPhotosInput").addEventListener("change",async e=>{const files=[...e.target.files];if(villaPendingPhotos.length+files.length>6){toast("Maximum 6 photos per villa.");e.target.value="";return}for(const file of files){if(!["image/jpeg","image/png","image/webp"].includes(file.type)){toast("Use JPG, PNG, or WEBP images.");continue}try{const data=await compressVillaImage(file);villaPendingPhotos.push(data);renderVillaPhotoPreview()}catch(err){console.error(err);toast("Could not process one of the images.")}}e.target.value=""});
