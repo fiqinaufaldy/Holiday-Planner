@@ -1363,8 +1363,13 @@ function dashboard(t){
      <span class="expense-pct">${p.toFixed(1)}%</span>
    </div>`;
  }).join("")||`<div class="expense-empty">No expenses planned yet.</div>`;
- const ranked=(active.stays||[]).map((v,i)=>({v,i,votes:Number(v.votes||v.voteCount||0)})).sort((a,b)=>b.votes-a.votes);
- const voteTotal=ranked.reduce((a,x)=>a+x.votes,0);
+ const dashboardConfirmedParticipants=(active.participants||[]).filter(p=>String(p.status||"Confirmed").trim().toLowerCase()==="confirmed");
+ const dashboardConfirmedKeys=new Set(dashboardConfirmedParticipants.map((p,i)=>accommodationVoteKey(p,i)));
+ const dashboardVotes=Array.isArray(active.accommodationVotes)?active.accommodationVotes.filter(v=>dashboardConfirmedKeys.has(String(v.participantKey||""))):[];
+ const dashboardVoteMap=new Map((active.stays||[]).map((v,i)=>[String(v.id||i),0]));
+ dashboardVotes.forEach(v=>{const k=String(v.stayId||"");if(dashboardVoteMap.has(k))dashboardVoteMap.set(k,(dashboardVoteMap.get(k)||0)+1)});
+ const ranked=(active.stays||[]).map((v,i)=>({v,i,votes:dashboardVoteMap.get(String(v.id||i))||0})).sort((a,b)=>b.votes-a.votes);
+ const voteTotal=dashboardVotes.length;
  const villaRows=ranked.slice(0,3).map((item,pos)=>{
    const v=item.v,votes=item.votes,vp=voteTotal?votes/voteTotal*100:0;
    const photo=v.photos?.[0]||v.photo||"";
