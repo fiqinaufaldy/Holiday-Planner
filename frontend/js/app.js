@@ -1327,8 +1327,24 @@ function hpIcon(name){
  };
  return `<svg class="hp-icon" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.more}</svg>`;
 }
-function dashboard(t){
+async function dashboard(t){
  ensurePlans(t);
+ if(cloudSyncReady&&t?.id&&!t.__accommodationVotesHydrated){
+   t.__accommodationVotesHydrated=true;
+   try{
+     const cloudVotes=await loadAccommodationVotesCloud(t.id);
+     t.accommodationVotes=(Array.isArray(cloudVotes)?cloudVotes:[]).map(v=>({
+       participantKey:String(v.participant_key||v.participantKey||""),
+       stayId:String(v.stay_id||v.stayId||""),
+       votedAt:v.voted_at||v.votedAt||new Date().toISOString(),
+       deviceId:v.device_id||v.deviceId||null,
+       votedBy:v.voted_by||v.votedBy||"member"
+     }));
+   }catch(err){
+     console.warn("Dashboard accommodation vote load skipped:",err);
+   }
+ }
+
  const active=t.plans.find(p=>p.id===t.activePlanId)||t.plans[0]||{};
  const incomeTotal=(active.income||[]).reduce((a,x)=>a+Number(x.amount||0),0);
  const expenseItems=Array.isArray(active.budget)?active.budget:[];
@@ -1363,12 +1379,12 @@ function dashboard(t){
      <span class="expense-pct">${p.toFixed(1)}%</span>
    </div>`;
  }).join("")||`<div class="expense-empty">No expenses planned yet.</div>`;
- const dashboardConfirmedParticipants=(active.participants||[]).filter(p=>String(p.status||"Confirmed").trim().toLowerCase()==="confirmed");
+ const dashboardConfirmedParticipants=(t.participants||[]).filter(p=>String(p.status||"Confirmed").trim().toLowerCase()==="confirmed");
  const dashboardConfirmedKeys=new Set(dashboardConfirmedParticipants.map((p,i)=>accommodationVoteKey(p,i)));
- const dashboardVotes=Array.isArray(active.accommodationVotes)?active.accommodationVotes.filter(v=>dashboardConfirmedKeys.has(String(v.participantKey||""))):[];
- const dashboardVoteMap=new Map((active.stays||[]).map((v,i)=>[String(v.id||i),0]));
+ const dashboardVotes=Array.isArray(t.accommodationVotes)?t.accommodationVotes.filter(v=>dashboardConfirmedKeys.has(String(v.participantKey||""))):[];
+ const dashboardVoteMap=new Map((t.stays||[]).map((v,i)=>[String(v.id||i),0]));
  dashboardVotes.forEach(v=>{const k=String(v.stayId||"");if(dashboardVoteMap.has(k))dashboardVoteMap.set(k,(dashboardVoteMap.get(k)||0)+1)});
- const ranked=(active.stays||[]).map((v,i)=>({v,i,votes:dashboardVoteMap.get(String(v.id||i))||0})).sort((a,b)=>b.votes-a.votes);
+ const ranked=(t.stays||[]).map((v,i)=>({v,i,votes:dashboardVoteMap.get(String(v.id||i))||0})).sort((a,b)=>b.votes-a.votes);
  const voteTotal=dashboardVotes.length;
  const villaRows=ranked.slice(0,3).map((item,pos)=>{
    const v=item.v,votes=item.votes,vp=voteTotal?votes/voteTotal*100:0;
