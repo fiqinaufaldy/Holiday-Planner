@@ -1327,11 +1327,12 @@ function hpIcon(name){
  };
  return `<svg class="hp-icon" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.more}</svg>`;
 }
-function dashboard(t){
+async function dashboard(t){
  ensurePlans(t);
- if(cloudSyncReady&&t?.id&&!t.__dashboardAccommodationVotesHydrating){
-   t.__dashboardAccommodationVotesHydrating=true;
-   loadAccommodationVotesCloud(t.id).then(cloudVotes=>{
+ if(cloudSyncReady&&t?.id&&!t.__accommodationVotesHydrated){
+   t.__accommodationVotesHydrated=true;
+   try{
+     const cloudVotes=await loadAccommodationVotesCloud(t.id);
      t.accommodationVotes=(Array.isArray(cloudVotes)?cloudVotes:[]).map(v=>({
        participantKey:String(v.participant_key||v.participantKey||""),
        stayId:String(v.stay_id||v.stayId||""),
@@ -1339,13 +1340,11 @@ function dashboard(t){
        deviceId:v.device_id||v.deviceId||null,
        votedBy:v.voted_by||v.votedBy||"member"
      }));
-     t.__dashboardAccommodationVotesHydrating=false;
-     if(page==="Dashboard"&&tripId===t.id)dashboard(t);
-   }).catch(err=>{
-     t.__dashboardAccommodationVotesHydrating=false;
-     console.warn("Dashboard accommodation vote refresh skipped:",err);
-   });
+   }catch(err){
+     console.warn("Dashboard accommodation vote load skipped:",err);
+   }
  }
+
  const active=t.plans.find(p=>p.id===t.activePlanId)||t.plans[0]||{};
  const incomeTotal=(active.income||[]).reduce((a,x)=>a+Number(x.amount||0),0);
  const expenseItems=Array.isArray(active.budget)?active.budget:[];
@@ -1423,7 +1422,7 @@ function dashboard(t){
  $("#content").innerHTML=`
  <section class="hero" style="background-image:url('${esc(t.cover||"")}')"><span class="pill">TRIP SPACE</span><h2>${esc(t.name)}</h2><p>${date(t.start)} – ${date(t.end)}　·　${esc(t.destination)}</p></section>
  <div class="stats dashboard-stats">
-  <div class="stat"><span class="stat-icon">${hpIcon("users")}</span><small>Participants</small><b>${(t.participants||[]).filter(p=>String(p.status||"Confirmed").trim().toLowerCase()==="confirmed").length} People</b></div>
+  <div class="stat"><span class="stat-icon">${hpIcon("users")}</span><small>Participants</small><b>${(t.participants||[]).length} People</b></div>
   <div class="stat"><span class="stat-icon">${hpIcon("wallet")}</span><small>Planned Budget</small><b>${money(plannedBudget)}</b></div>
   <div class="stat"><span class="stat-icon">${hpIcon("chart")}</span><small>Total Spent</small><b>${money(totalSpent)}</b></div>
   <div class="stat"><span class="stat-icon">${hpIcon("calendar")}</span><small>Remaining Until Trip</small><b>${remainingDays} Days</b></div>
